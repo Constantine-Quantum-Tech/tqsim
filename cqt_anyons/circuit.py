@@ -7,10 +7,10 @@ from .lib.drawer import Drawer
 
 
 class AnyonicCircuit:
-    def __init__(self, nb_qudits: int, nb_anyons_per_qudits: int):
+    def __init__(self, nb_qudits: int, nb_anyons_per_qudit: int):
         self.__nb_qudits = nb_qudits
-        self.__nb_anyons_per_qudits = nb_anyons_per_qudits
-        self.__nb_anyons = nb_qudits * nb_anyons_per_qudits
+        self.__nb_anyons_per_qudit = nb_anyons_per_qudit
+        self.__nb_anyons = nb_qudits * nb_anyons_per_qudit
 
         self.__nb_braids: int = 0
         self.__braids_history: List[Tuple[int, int]] = []
@@ -25,7 +25,7 @@ class AnyonicCircuit:
         self.__sigmas = self.__get_sigmas()
         self.__unitary = np.eye(self.__dim)
 
-        self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudits)
+        self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudit)
 
     @property
     def nb_qudits(self):
@@ -33,7 +33,7 @@ class AnyonicCircuit:
 
     @property
     def nb_anyons_per_qudits(self):
-        return self.__nb_anyons_per_qudits
+        return self.__nb_anyons_per_qudit
 
     @property
     def drawer(self):
@@ -44,7 +44,7 @@ class AnyonicCircuit:
         return self.__dim
 
     def __get_basis(self) -> Tuple[np.ndarray, int]:
-        basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudits)
+        basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
 
         return basis, len(basis)
 
@@ -52,7 +52,7 @@ class AnyonicCircuit:
         sigmas = []
         for index in range(1, self.__nb_anyons):
             sigma = braiding_generator(
-                index, self.__nb_qudits, self.__nb_anyons_per_qudits
+                index, self.__nb_qudits, self.__nb_anyons_per_qudit
             )
             sigmas.append(np.array(sigma))
         return sigmas

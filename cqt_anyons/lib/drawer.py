@@ -8,7 +8,7 @@ class Drawer:
     def __init__(
         self,
         nb_qudits: int,
-        nb_anyons_per_qudits: int,
+        nb_anyons_per_qudit: int,
     ):
         self._i = np.linspace(0, 1)
         self._one = np.ones_like(self._i)
@@ -16,16 +16,16 @@ class Drawer:
         self._id = 2 * (0.5 - self._hi[-1])
 
         self.__nb_qudits = nb_qudits
-        self.__nb_anyons_per_qudits = nb_anyons_per_qudits
-        self.__nb_anyons = nb_qudits * nb_anyons_per_qudits
+        self.__nb_anyons_per_qudit = nb_anyons_per_qudit
+        self.__nb_anyons = nb_qudits * nb_anyons_per_qudit
 
         self.anyons: dict[int, DrawerAnyon] = {}
 
         for i in range(self.__nb_qudits):
-            for j in range(self.__nb_anyons_per_qudits):
-                id = i * self.__nb_anyons_per_qudits + j + 1
+            for j in range(self.__nb_anyons_per_qudit):
+                id = i * self.__nb_anyons_per_qudit + j + 1
                 self.anyons[id] = DrawerAnyon(
-                    id, (i * (self.__nb_anyons_per_qudits + 1) + j)
+                    id, (i * (self.__nb_anyons_per_qudit + 1) + j)
                 )
 
     def _sigmoid(self, x):
@@ -76,14 +76,14 @@ class Drawer:
             curr_anyon.add_identity()
 
         for i in range(self.__nb_qudits):
-            for j in range(self.__nb_anyons_per_qudits - 1):
+            for j in range(self.__nb_anyons_per_qudit - 1):
                 # Idle anyons
-                for k in range(j + 2, self.__nb_anyons_per_qudits):
-                    idx = i * self.__nb_anyons_per_qudits + k + 1
+                for k in range(j + 2, self.__nb_anyons_per_qudit):
+                    idx = i * self.__nb_anyons_per_qudit + k + 1
                     self.anyons[idx].add_identity()
 
                 # Fusing
-                idx_anyon_bot = i * self.__nb_anyons_per_qudits + j + 1
+                idx_anyon_bot = i * self.__nb_anyons_per_qudit + j + 1
                 idx_anyon_top = idx_anyon_bot + 1
 
                 self.anyons[idx_anyon_bot].x = (
@@ -113,8 +113,8 @@ class Drawer:
         fig, ax = plt.subplots(1, 1, figsize=(width, height))
 
         for i in range(self.__nb_qudits):
-            for j in range(self.__nb_anyons_per_qudits):
-                k = i * self.__nb_anyons_per_qudits + j + 1
+            for j in range(self.__nb_anyons_per_qudit):
+                k = i * self.__nb_anyons_per_qudit + j + 1
                 curr_anyon = self.anyons[k]
 
                 for x, y in zip(curr_anyon.x, curr_anyon.y):
