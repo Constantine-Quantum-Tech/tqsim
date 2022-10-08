@@ -129,7 +129,7 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).getH()[jjj[ii + 1], pp[ii]]
+                * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
                 * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
@@ -150,7 +150,7 @@ def L(k, h, i_, i, jj_, jj):
     for ii in range(qudit_len):
         product = (
             product
-            * F(i, jjj[ii], 1, pp[ii + 1]).getH()[jjj[ii + 1], pp[ii]]
+            * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
             * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
         )
 
@@ -182,7 +182,7 @@ def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
         component += (
             F(jmoo, i, jj[-1], jm)[jmo, kk]
             * L(kk, h, i_, i, jj_, jj)
-            * F(jmoo, i_, jj_[-1], jm).getH()[kk, jmo_]
+            * F(jmoo, i_, jj_[-1], jm).T.conjugate()[kk, jmo_]
         )
 
     return component
