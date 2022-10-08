@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Tuple
 from .drawer_anyon import DrawerAnyon
-
+from .utils import matplotlib_close_if_inline
 
 class Drawer:
     def __init__(
@@ -126,4 +126,6 @@ class Drawer:
                     horizontalalignment="right",
                 )
         ax.axis("off")
+        if fig:
+            matplotlib_close_if_inline(fig)
         return fig
