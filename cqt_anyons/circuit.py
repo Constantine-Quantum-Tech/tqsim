@@ -1,0 +1,165 @@
+from typing import List, Tuple
+import numpy as np
+
+from .lib.basis_generator import gen_basis
+from .lib.get_generators import braiding_generator
+from .lib.drawer import Drawer
+
+
+class AnyonicCircuit:
+    def __init__(self, nb_qudits: int, nb_anyons_per_qudits: int):
+        self.__nb_qudits = nb_qudits
+        self.__nb_anyons_per_qudits = nb_anyons_per_qudits
+        self.__nb_anyons = nb_qudits * nb_anyons_per_qudits
+
+        self.__nb_braids: int = 0
+        self.__braids_history: List[Tuple[int, int]] = []
+        self.__measured: bool = False
+
+        _, self.__dim = self.__get_basis()
+
+        input_state = np.zeros((self.__dim, 1), dtype=np.complex128)
+        input_state[0, 0] = 1
+        self.__initial_state = input_state
+
+        self.__sigmas = self.__get_sigmas()
+        self.__unitary = np.eye(self.__dim)
+
+        self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudits)
+
+    @property
+    def nb_qudits(self):
+        return self.__nb_qudits
+
+    @property
+    def nb_anyons_per_qudits(self):
+        return self.__nb_anyons_per_qudits
+
+    @property
+    def drawer(self):
+        return self.__drawer
+
+    @property
+    def dim(self):
+        return self.__dim
+
+    def __get_basis(self) -> Tuple[np.ndarray, int]:
+        basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudits)
+
+        return basis, len(basis)
+
+    def __get_sigmas(self) -> List[np.ndarray]:
+        sigmas = []
+        for index in range(1, self.__nb_anyons):
+            sigma = braiding_generator(
+                index, self.__nb_qudits, self.__nb_anyons_per_qudits
+            )
+            sigmas.append(np.array(sigma))
+        return sigmas
+
+    def initialize(self, input_state: np.ndarray):
+        if self.__nb_braids > 0:
+            raise Exception(
+                "Initialization should happen before any braiding operation is performed!"
+            )
+
+        input_state = np.array(input_state)
+        if not np.size(input_state) == self.__dim:
+            raise ValueError("The state has wrong dimension. Should be {self.__dim}")
+
+        norm = np.sum(np.real(input_state * input_state.conjugate()))
+        if not np.isclose(norm, 1, 5):
+            raise ValueError("The input state is not normalized correctly!")
+
+        self.__initial_state = np.reshape(input_state, (self.__dim, 1))
+
+        return self
+
+    def braid(self, m: int, n: int):
+        if self.__measured:
+            raise Exception("System already measured! Cannot perform further braiding!")
+
+        if abs(n - m) != 1:
+            raise Exception("You can only braid adjacent anyons!")
+
+        if not isinstance(m, int) or not isinstance(n, int):
+            raise ValueError("n, m must be integers")
+        if m < 1 or n < 1:
+            raise ValueError("n, m must be higher than 0!")
+
+        if m > self.__nb_anyons or n > self.__nb_anyons:
+            ## Check if correct
+            raise ValueError(
+                f"The system has only {self.__nb_anyons} anyons! n, m are erroneous!"
+            )
+
+        if m < n:
+            self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
+
+        else:
+            self._unitary = self.__sigmas[n - 1] @ self.__unitary
+
+        self.__braids_history.append((m, n))
+
+        self.__nb_braids += 1
+
+        self.drawer.braid(m, n)
+
+        return self
+
+    def measure(self):
+        self.__measured = True
+        self.drawer.measure()
+        return self
+
+    def history(self, output="raw"):
+        if not output in ["raw", "sigmas", "latex"]:
+            raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
+
+        if output == "raw":
+            return self.__braids_history
+
+        elif output == "sigmas":
+            ret = []
+            for (m, n) in self.__braids_history:
+                if m < n:
+                    ret.append(f"is{m}")
+                else:
+                    ret.append(f"s{n}")
+            return ret
+
+        else:
+            sigmas = self.history(output="sigmas")
+
+            latex = " ".join(sigmas[::-1])
+            latex = "$ " + latex + "$"
+
+            latex = latex.replace(" is", "\sigma^{-1}_")
+            latex = latex.replace(f" s", f" \sigma_")
+            return latex
+
+    def draw(self):
+        return self.drawer.draw()
+
+    def statevector(self) -> np.ndarray:
+        return self.__unitary @ self.__initial_state
+
+    def unitary(self) -> np.ndarray:
+        return self.__unitary
+
+    def run(self, shots=1024):
+        # Needs to be measured?
+        if not self.__measured:
+            raise Exception("The system was not measured!")
+
+        statevector = self.statevector()
+        probs = np.ravel(np.real(statevector * statevector.conjugate()))
+        memory = np.random.choice(np.arange(self.__dim), p=probs, size=shots)
+
+        idx, counts = np.unique(memory, return_counts=True)
+
+        counts_dict = {}
+        for i in range(len(idx)):
+            counts_dict[str(idx[i])] = counts[i]
+
+        return {"counts": counts_dict, "memory": memory}
