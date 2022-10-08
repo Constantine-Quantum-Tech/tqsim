@@ -25,7 +25,7 @@ def check_outcomes(outcomes: List[int]) -> bool:
     return True
 
 
-def check_state(state: dict[str, List[int]]) -> bool:
+def check_state(state) -> bool:
     nb_qudits = len(state["qudits"])
     qudit_len = len(state["qudits"][0])
 

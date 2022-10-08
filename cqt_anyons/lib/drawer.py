@@ -19,7 +19,7 @@ class Drawer:
         self.__nb_anyons_per_qudits = nb_anyons_per_qudits
         self.__nb_anyons = nb_qudits * nb_anyons_per_qudits
 
-        self.anyons: dict[int, DrawerAnyon] = {}
+        self.anyons = {}
 
         for i in range(self.__nb_qudits):
             for j in range(self.__nb_anyons_per_qudits):
