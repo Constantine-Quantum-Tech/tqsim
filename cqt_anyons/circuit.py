@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Sequence
 import numpy as np
 
 from .lib.basis_generator import gen_basis
@@ -97,13 +97,43 @@ class AnyonicCircuit:
             self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
         else:
-            self._unitary = self.__sigmas[n - 1] @ self.__unitary
+            self.__unitary = self.__sigmas[n - 1] @ self.__unitary
 
         self.__braids_history.append((m, n))
 
         self.__nb_braids += 1
 
         self.drawer.braid(m, n)
+
+        return self
+
+    def braid_sequence(self, braid: Sequence[Sequence[int]]):
+        """ Takes a sequence of [sigma operator, power], and applies the
+        successive operators to the 'power'.
+        The first operator in the sequence is the first to be applied.
+        """
+        for ind, power in braid:
+            if not isinstance(ind, int) or not isinstance(power, int):
+                raise ValueError("Indices and powers must be integers!")
+            if ind < 1:
+                raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
+                                 f"The operators indices must be > 1.")
+            if ind >= self.__nb_anyons:
+                raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
+                                 f"The operators indices must be < {self.__nb_anyons}.")
+            # Computing m and n
+            m = n = 0
+            if power > 0:
+                n = ind
+                m = ind + 1
+            elif power < 0:
+                m = ind
+                n = ind + 1
+            else:  # if power=0, do nothing (identity)
+                continue
+
+            for _ in range(abs(power)):
+                self.braid(m, n)
 
         return self
 
