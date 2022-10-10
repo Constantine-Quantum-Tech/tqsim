@@ -161,11 +161,37 @@ class AnyonicCircuit:
         else:
             sigmas = self.history(output="sigmas")
 
-            latex = " ".join(sigmas[::-1])
-            latex = "$ " + latex + "$"
+            # Converting to a sigma notation with powers
+            power_sigmas = []
+            last_sigma = sigmas[-1] if len(sigmas) else None
+            power = 0
+            for sigma in reversed(sigmas):
+                if sigma == last_sigma:
+                    power += 1
+                    continue
+                # Done counting the powers of the last sigma, adding it
+                power_sigmas.append((last_sigma, power))
+                # resetting
+                power = 1
+                last_sigma = sigma
 
-            latex = latex.replace(" is", "\sigma^{-1}_")
-            latex = latex.replace(f" s", f" \sigma_")
+            # Handling the last sigma
+            if power != 0:
+                power_sigmas.append((last_sigma, power))
+
+            # Converting to LaTeX
+            latex = ""
+            for sigma, p in power_sigmas:
+                # Inverses of sigmas (negative powers)
+                if sigma[0] == "i":
+                    latex += "\sigma_{"f"{sigma[2:]}""}^{"f"{-p}""}"
+                # Sigmas (positive powers)
+                else:
+                    latex += "\sigma_{"f"{sigma[1:]}""}"
+                    if p > 1:  # Only add exponents != 1
+                        latex += "^{"f"{p}""}"
+
+            latex = "$ " + latex + "$"
             return latex
 
     def draw(self):
