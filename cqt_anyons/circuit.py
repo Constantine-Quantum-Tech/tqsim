@@ -117,7 +117,7 @@ class AnyonicCircuit:
                 raise ValueError("Indices and powers must be integers!")
             if ind < 1:
                 raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
-                                 f"The operators indices must be > 1.")
+                                 f"The operators indices must be >= 1.")
             if ind >= self.__nb_anyons:
                 raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
                                  f"The operators indices must be < {self.__nb_anyons}.")
