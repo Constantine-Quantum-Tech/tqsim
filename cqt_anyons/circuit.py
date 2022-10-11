@@ -16,7 +16,7 @@ class AnyonicCircuit:
         self.__braids_history: List[Tuple[int, int]] = []
         self.__measured: bool = False
 
-        _, self.__dim = self.__get_basis()
+        self.__basis, self.__dim = self.__get_basis()
 
         input_state = np.zeros((self.__dim, 1), dtype=np.complex128)
         input_state[0, 0] = 1
@@ -42,6 +42,10 @@ class AnyonicCircuit:
     @property
     def dim(self):
         return self.__dim
+
+    @property
+    def basis(self):
+        return self.__basis
 
     def __get_basis(self) -> Tuple[np.ndarray, int]:
         basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
