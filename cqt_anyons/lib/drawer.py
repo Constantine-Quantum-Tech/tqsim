@@ -19,14 +19,21 @@ class Drawer:
         self.__nb_anyons_per_qudit = nb_anyons_per_qudit
         self.__nb_anyons = nb_qudits * nb_anyons_per_qudit
 
-        self.anyons = {}
+        self.__anyons = {}
+        self.__idx_map = {}
+
+        self.__STARTING_INDEX = 1
 
         for i in range(self.__nb_qudits):
             for j in range(self.__nb_anyons_per_qudit):
-                id = i * self.__nb_anyons_per_qudit + j + 1
-                self.anyons[id] = DrawerAnyon(
+                id = i * self.__nb_anyons_per_qudit + j + self.__STARTING_INDEX
+                self.__idx_map[id] = id
+                self.__anyons[id] = DrawerAnyon(
                     id, (i * (self.__nb_anyons_per_qudit + 1) + j)
                 )
+    @property
+    def anyons(self):
+        return self.__anyons
 
     def _sigmoid(self, x):
         expr = 1 / (1 + np.exp(-(x - 0.5) * 12))
@@ -37,11 +44,14 @@ class Drawer:
     def braid(self, m: int, n: int) -> None:
 
         # Preprocess
-        anyon_over = self.anyons[m]
-        anyon_under = self.anyons[n]
+        m_init = self.__idx_map[m]
+        n_init = self.__idx_map[n]
+
+        anyon_over = self.__anyons[m_init]
+        anyon_under = self.__anyons[n_init]
         anyons_idle = map(
-            lambda x: self.anyons[x],
-            filter(lambda x: x != m and x != n, self.anyons.keys()),
+            lambda x: self.__anyons[x],
+            filter(lambda x: x != m_init and x != n_init, self.__anyons.keys()),
         )
 
         distance = abs(anyon_over.get_last_y() - anyon_under.get_last_y())
@@ -69,53 +79,55 @@ class Drawer:
         anyon_under.y = start_y + distance * np.sign(m - n) * sigm[25:]
 
         # Renaming
-        self.anyons[n], self.anyons[m] = self.anyons[m], self.anyons[n]
+        self.__idx_map[n], self.__idx_map[m] = self.__idx_map[m], self.__idx_map[n]
 
     def measure(self):
-        for curr_anyon in self.anyons.values():
+        for curr_anyon in self.__anyons.values():
             curr_anyon.add_identity()
 
         for i in range(self.__nb_qudits):
             for j in range(self.__nb_anyons_per_qudit - 1):
                 # Idle anyons
                 for k in range(j + 2, self.__nb_anyons_per_qudit):
-                    idx = i * self.__nb_anyons_per_qudit + k + 1
-                    self.anyons[idx].add_identity()
+                    final_idx = i * self.__nb_anyons_per_qudit + k + self.__STARTING_INDEX
+                    idx = self.__idx_map[final_idx]
+                    self.__anyons[idx].add_identity()
 
                 # Fusing
-                idx_anyon_bot = i * self.__nb_anyons_per_qudit + j + 1
-                idx_anyon_top = idx_anyon_bot + 1
+                final_bot_idx = i * self.__nb_anyons_per_qudit + j + self.__STARTING_INDEX
+                idx_anyon_bot = self.__idx_map[final_bot_idx]
+                idx_anyon_top = self.__idx_map[final_bot_idx + 1]
 
-                self.anyons[idx_anyon_bot].x = (
-                    self.anyons[idx_anyon_bot].get_last_x() + self._i
+                self.__anyons[idx_anyon_bot].x = (
+                    self.__anyons[idx_anyon_bot].get_last_x() + self._i
                 )
 
-                self.anyons[idx_anyon_top].x = (
-                    self.anyons[idx_anyon_top].get_last_x() + self._i
+                self.__anyons[idx_anyon_top].x = (
+                    self.__anyons[idx_anyon_top].get_last_x() + self._i
                 )
 
                 distance = 0.5 * abs(
-                    self.anyons[idx_anyon_bot].get_last_y()
-                    - self.anyons[idx_anyon_top].get_last_y()
+                    self.__anyons[idx_anyon_bot].get_last_y()
+                    - self.__anyons[idx_anyon_top].get_last_y()
                 )
 
-                self.anyons[idx_anyon_bot].y = self.anyons[
+                self.__anyons[idx_anyon_bot].y = self.__anyons[
                     idx_anyon_bot
                 ].get_last_y() + distance * self._sigmoid(self._i)
 
-                self.anyons[idx_anyon_top].y = self.anyons[
+                self.__anyons[idx_anyon_top].y = self.__anyons[
                     idx_anyon_top
                 ].get_last_y() - distance * self._sigmoid(self._i)
 
     def draw(self):
-        width = self.anyons[1].get_last_x() * 0.5
+        width = self.__anyons[1].get_last_x() * 0.5
         height = self.__nb_anyons * 0.3
         fig, ax = plt.subplots(1, 1, figsize=(width, height))
 
         for i in range(self.__nb_qudits):
             for j in range(self.__nb_anyons_per_qudit):
                 k = i * self.__nb_anyons_per_qudit + j + 1
-                curr_anyon = self.anyons[k]
+                curr_anyon = self.__anyons[k]
 
                 for x, y in zip(curr_anyon.x, curr_anyon.y):
                     ax.plot(x, y, curr_anyon.color)
