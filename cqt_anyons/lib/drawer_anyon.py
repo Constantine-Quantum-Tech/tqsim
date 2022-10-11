@@ -8,8 +8,6 @@ class DrawerAnyon:
         self.__x = [np.copy(self.__i)]
         self.__y = [pos * self.__one]
 
-        self.__initial_id = initial_id
-
         self.__color = "black"
         self.__label = ""
 
@@ -19,9 +17,6 @@ class DrawerAnyon:
     def __str__(self):
         return f"{self.__label} (color: {self.__color}"
 
-    @property
-    def initial_id(self):
-        return self.__initial_id
 
     @property
     def label(self):
