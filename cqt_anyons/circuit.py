@@ -79,7 +79,7 @@ class AnyonicCircuit:
 
         return self
 
-    def braid(self, m: int, n: int):
+    def braid(self, n: int, m: int):
         if self.__measured:
             raise Exception("System already measured! Cannot perform further braiding!")
 
@@ -97,11 +97,11 @@ class AnyonicCircuit:
                 f"The system has only {self.__nb_anyons} anyons! n, m are erroneous!"
             )
 
-        if m < n:
+        if n < m:
+            self.__unitary = self.__sigmas[n - 1] @ self.__unitary
+        else:
             self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
-        else:
-            self.__unitary = self.__sigmas[n - 1] @ self.__unitary
 
         self.__braids_history.append((m, n))
 
@@ -137,7 +137,7 @@ class AnyonicCircuit:
                 continue
 
             for _ in range(abs(power)):
-                self.braid(m, n)
+                self.braid(n, m)
 
         return self
 
