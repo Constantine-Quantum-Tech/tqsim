@@ -276,9 +276,9 @@ def gen_sigma(index, state_i, state_f):
     return braket * amplitude
 
 
-def braiding_generator(index, nb_qudits, nb_anyons_per_qubit):
+def braiding_generator(index, nb_qudits, nb_anyons_per_qudit):
 
-    basis = gen_basis(nb_qudits, nb_anyons_per_qubit)
+    basis = gen_basis(nb_qudits, nb_anyons_per_qudit)
 
     sigmas = []
     for f, base_f in enumerate(basis):
