@@ -7,7 +7,7 @@ from .lib.drawer import Drawer
 
 
 class AnyonicCircuit:
-    def __init__(self, nb_qudits: int, nb_anyons_per_qudit: int):
+    def __init__(self, nb_qudits: int = 1, nb_anyons_per_qudit: int = 3):
         self.__nb_qudits = nb_qudits
         self.__nb_anyons_per_qudit = nb_anyons_per_qudit
         self.__nb_anyons = nb_qudits * nb_anyons_per_qudit
