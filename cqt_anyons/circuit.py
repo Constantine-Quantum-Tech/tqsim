@@ -4,6 +4,12 @@ import numpy as np
 from .lib.basis_generator import gen_basis
 from .lib.get_generators import braiding_generator
 from .lib.drawer import Drawer
+import os
+import pickle
+
+PROGRAM_NAME = "cqt_anyons"
+CONFIG_PATH = os.path.join(os.path.expanduser("~"), f".{PROGRAM_NAME}")
+STORE_PATH = os.path.join(CONFIG_PATH, "store")
 
 
 class AnyonicCircuit:
@@ -48,17 +54,42 @@ class AnyonicCircuit:
         return self.__basis
 
     def __get_basis(self) -> Tuple[np.ndarray, int]:
-        basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
+        folder_path = os.path.join(
+            STORE_PATH, f"{self.__nb_qudits}_{self.__nb_anyons_per_qudit}"
+        )
+        filename = os.path.join(folder_path, "basis.dat")
+        try:
+            with open(filename, "rb") as f:
+                basis = pickle.load(f)
+        except FileNotFoundError:
+            basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            with open(filename, "wb") as f:
+                pickle.dump(basis, f)
 
         return basis, len(basis)
 
     def __get_sigmas(self) -> List[np.ndarray]:
-        sigmas = []
-        for index in range(1, self.__nb_anyons):
-            sigma = braiding_generator(
-                index, self.__nb_qudits, self.__nb_anyons_per_qudit
-            )
-            sigmas.append(np.array(sigma))
+
+        folder_path = os.path.join(
+            STORE_PATH, f"{self.__nb_qudits}_{self.__nb_anyons_per_qudit}"
+        )
+        filename = os.path.join(folder_path, "sigmas.dat")
+        try:
+            with open(filename, "rb") as f:
+                sigmas = pickle.load(f)
+        except FileNotFoundError:
+            sigmas = []
+            for index in range(1, self.__nb_anyons):
+                sigma = braiding_generator(
+                    index, self.__nb_qudits, self.__nb_anyons_per_qudit
+                )
+                sigmas.append(np.array(sigma))
+
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            with open(filename, "wb") as f:
+                pickle.dump(sigmas, f)
+
         return sigmas
 
     def initialize(self, input_state: np.ndarray):
@@ -102,7 +133,6 @@ class AnyonicCircuit:
         else:
             self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
-
         self.__braids_history.append((m, n))
 
         self.__nb_braids += 1
@@ -112,7 +142,7 @@ class AnyonicCircuit:
         return self
 
     def braid_sequence(self, braid: Sequence[Sequence[int]]):
-        """ Takes a sequence of [sigma operator, power], and applies the
+        """Takes a sequence of [sigma operator, power], and applies the
         successive operators to the 'power'.
         The first operator in the sequence is the first to be applied.
         """
@@ -120,11 +150,15 @@ class AnyonicCircuit:
             if not isinstance(ind, int) or not isinstance(power, int):
                 raise ValueError("Indices and powers must be integers!")
             if ind < 1:
-                raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
-                                 f"The operators indices must be >= 1.")
+                raise ValueError(
+                    f"sigma_{ind} is not a valid braiding operator! "
+                    f"The operators indices must be >= 1."
+                )
             if ind >= self.__nb_anyons:
-                raise ValueError(f"sigma_{ind} is not a valid braiding operator! "
-                                 f"The operators indices must be < {self.__nb_anyons}.")
+                raise ValueError(
+                    f"sigma_{ind} is not a valid braiding operator! "
+                    f"The operators indices must be < {self.__nb_anyons}."
+                )
             # Computing m and n
             m = n = 0
             if power > 0:
@@ -188,12 +222,12 @@ class AnyonicCircuit:
             for sigma, p in power_sigmas:
                 # Inverses of sigmas (negative powers)
                 if sigma[0] == "i":
-                    latex += "\sigma_{"f"{sigma[2:]}""}^{"f"{-p}""}"
+                    latex += "\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
                 # Sigmas (positive powers)
                 else:
-                    latex += "\sigma_{"f"{sigma[1:]}""}"
+                    latex += "\sigma_{" f"{sigma[1:]}" "}"
                     if p > 1:  # Only add exponents != 1
-                        latex += "^{"f"{p}""}"
+                        latex += "^{" f"{p}" "}"
 
             latex = "$ " + latex + "$"
             return latex
