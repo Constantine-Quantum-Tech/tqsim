@@ -17,7 +17,6 @@ class DrawerAnyon:
     def __str__(self):
         return f"{self.__label} (color: {self.__color}"
 
-
     @property
     def label(self):
         return self.__label
