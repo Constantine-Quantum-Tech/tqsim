@@ -1,15 +1,13 @@
-from typing import List, Tuple, Sequence
-import numpy as np
-
-from .lib.basis_generator import gen_basis
-from .lib.get_generators import braiding_generator
-from .lib.drawer import Drawer
 import os
 import pickle
+from typing import List, Sequence, Tuple
 
-PROGRAM_NAME = "cqt_anyons"
-CONFIG_PATH = os.path.join(os.path.expanduser("~"), f".{PROGRAM_NAME}")
-STORE_PATH = os.path.join(CONFIG_PATH, "store")
+import numpy as np
+
+from .config import STORE_PATH
+from .lib.basis_generator import gen_basis
+from .lib.drawer import Drawer
+from .lib.get_generators import braiding_generator
 
 
 class AnyonicCircuit:
@@ -100,7 +98,7 @@ class AnyonicCircuit:
 
         input_state = np.array(input_state)
         if not np.size(input_state) == self.__dim:
-            raise ValueError("The state has wrong dimension. Should be {self.__dim}")
+            raise ValueError(f"The state has wrong dimension. Should be {self.__dim}")
 
         norm = np.sum(np.real(input_state * input_state.conjugate()))
         if not np.isclose(norm, 1, 5):

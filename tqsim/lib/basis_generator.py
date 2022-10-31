@@ -1,5 +1,6 @@
-import numpy as np
 from typing import List
+
+import numpy as np
 
 
 def check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:

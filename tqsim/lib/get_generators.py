@@ -1,6 +1,8 @@
-from .basis_generator import gen_basis
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
+
+from .basis_generator import gen_basis
 
 
 def F(a1, a2, a3, outcome):

@@ -1,8 +1,11 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from typing import List, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 from .drawer_anyon import DrawerAnyon
 from .utils import matplotlib_close_if_inline
+
 
 class Drawer:
     def __init__(
@@ -31,6 +34,7 @@ class Drawer:
                 self.__anyons[id] = DrawerAnyon(
                     id, (i * (self.__nb_anyons_per_qudit + 1) + j)
                 )
+
     @property
     def anyons(self):
         return self.__anyons
@@ -80,6 +84,7 @@ class Drawer:
 
         # Renaming
         self.__idx_map[n], self.__idx_map[m] = self.__idx_map[m], self.__idx_map[n]
+
     def __fuse(self, idx_anyon_top, idx_anyon_bot):
         self.__anyons[idx_anyon_bot].x = (
             self.__anyons[idx_anyon_bot].get_last_x() + self._i
@@ -111,22 +116,25 @@ class Drawer:
             for j in range(self.__nb_anyons_per_qudit - 1):
                 # Idle anyons
                 for k in range(j + 2, self.__nb_anyons_per_qudit):
-                    final_idx = i * self.__nb_anyons_per_qudit + k + self.__STARTING_INDEX
+                    final_idx = (
+                        i * self.__nb_anyons_per_qudit + k + self.__STARTING_INDEX
+                    )
                     idx = self.__idx_map[final_idx]
                     self.__anyons[idx].add_identity()
 
                 # Fusing
-                final_bot_idx = i * self.__nb_anyons_per_qudit + j + self.__STARTING_INDEX
-                
+                final_bot_idx = (
+                    i * self.__nb_anyons_per_qudit + j + self.__STARTING_INDEX
+                )
+
                 idx_anyon_bot = self.__idx_map[final_bot_idx]
                 idx_anyon_top = self.__idx_map[final_bot_idx + 1]
 
                 self.__fuse(idx_anyon_top, idx_anyon_bot)
 
-
         # Fusing qudits
         for i in range(1, self.__nb_qudits):
-            # 1 -> None 
+            # 1 -> None
             # 2 -> 1
             # 3 -> 1, 2
 
@@ -134,20 +142,22 @@ class Drawer:
             for k in range(i + 1, self.__nb_qudits):
                 # 2 -> None
                 # 3 -> 2
-                final_idx = (k + 1) * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
+                final_idx = (
+                    (k + 1) * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
+                )
                 idx = self.__idx_map[final_idx]
                 self.__anyons[idx].add_identity()
 
             # Fusing
-            final_bot_idx  = i * self.__nb_anyons_per_qudit +  self.__STARTING_INDEX - 1
-            final_top_idx = (i + 1) * self.__nb_anyons_per_qudit +  self.__STARTING_INDEX - 1
+            final_bot_idx = i * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
+            final_top_idx = (
+                (i + 1) * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
+            )
 
             idx_anyon_bot = self.__idx_map[final_bot_idx]
             idx_anyon_top = self.__idx_map[final_top_idx]
 
             self.__fuse(idx_anyon_top, idx_anyon_bot)
-                
-
 
     def draw(self):
         width = self.__anyons[1].get_last_x() * 0.5
