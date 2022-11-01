@@ -253,11 +253,9 @@ class AnyonicCircuit:
         if self.__measured:
             raise Exception("System already measured! Cannot perform further braiding!")
 
-        if abs(n - m) != 1:
-            raise Exception("You can only braid adjacent anyons!")
-
         if not isinstance(m, int) or not isinstance(n, int):
             raise ValueError("n, m must be integers")
+
         if m < 1 or n < 1:
             raise ValueError("n, m must be higher than 0!")
 
@@ -266,6 +264,9 @@ class AnyonicCircuit:
             raise ValueError(
                 f"The system has only {self.__nb_anyons} anyons! n, m are erroneous!"
             )
+
+        if abs(n - m) != 1:
+            raise Exception("You can only braid adjacent anyons!")
 
         if n < m:
             self.__unitary = self.__sigmas[n - 1] @ self.__unitary
