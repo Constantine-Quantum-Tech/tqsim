@@ -278,8 +278,26 @@ def gen_sigma(index, state_i, state_f):
     return braket * amplitude
 
 
-def braiding_generator(index, nb_qudits, nb_anyons_per_qudit):
+def braiding_generator(index: int, nb_qudits: int, nb_anyons_per_qudit: int):
+    """Generates the braiding operator of index 'index' for a system of
+    a given number of qudits and anyons per qudit.
+    This operator braids anyons at positions 'index' and 'index'+1.
 
+    Parameters
+    ----------
+    index : int
+        The operator's index.
+    nb_qudits : int
+        Number of qudits in the circuit.
+    nb_anyons_per_qudit : int
+        Number of anyons in each qudit.
+
+    Returns
+    -------
+    List
+        Matrix representation of the braiding operator.
+
+    """
     basis = gen_basis(nb_qudits, nb_anyons_per_qudit)
 
     sigmas = []
