@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pytest
 
-from tqsim import AnyonicCircuit, braiding_generator, gen_basis
+from tqsim import AnyonicCircuit, generate_braiding_operator, generate_basis
 
 
 def test_init_1():
