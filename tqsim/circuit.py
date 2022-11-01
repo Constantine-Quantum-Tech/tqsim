@@ -52,6 +52,7 @@ class AnyonicCircuit:
         List of all the basis states.
 
     """
+
     def __init__(self, nb_qudits: int = 1, nb_anyons_per_qudit: int = 3):
         """
         Parameters
@@ -215,7 +216,7 @@ class AnyonicCircuit:
             raise ValueError(f"The state has wrong dimension. Should be {self.__dim}")
 
         norm = np.sum(np.real(input_state * input_state.conjugate()))
-        if not np.isclose(norm, 1, 5):
+        if not np.isclose(norm, 1):
             raise ValueError("The input state is not normalized correctly!")
 
         self.__initial_state = np.reshape(input_state, (self.__dim, 1))
@@ -407,10 +408,10 @@ class AnyonicCircuit:
             for sigma, p in power_sigmas:
                 # Inverses of sigmas (negative powers)
                 if sigma[0] == "i":
-                    latex += "\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
+                    latex += r"\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
                 # Sigmas (positive powers)
                 else:
-                    latex += "\sigma_{" f"{sigma[1:]}" "}"
+                    latex += r"\sigma_{" f"{sigma[1:]}" "}"
                     if p > 1:  # Only add exponents != 1
                         latex += "^{" f"{p}" "}"
 
