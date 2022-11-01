@@ -17,7 +17,7 @@ from typing import List, Sequence, Tuple
 import numpy as np
 
 from .config import STORE_PATH  # For caching the bases and sigmas.
-from .lib.basis_generator import gen_basis
+from .lib.basis_generator import generate_basis
 from .lib.drawer import Drawer
 from .lib.get_generators import braiding_generator
 
@@ -151,7 +151,7 @@ class AnyonicCircuit:
             with open(filename, "rb") as f:
                 basis = pickle.load(f)
         except FileNotFoundError:
-            basis = gen_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
+            basis = generate_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, "wb") as f:
                 pickle.dump(basis, f)

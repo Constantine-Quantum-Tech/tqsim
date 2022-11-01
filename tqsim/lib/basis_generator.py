@@ -94,7 +94,7 @@ def gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
     return state
 
 
-def gen_basis(nb_qudits: int, nb_anyons_per_qudit: int):
+def generate_basis(nb_qudits: int, nb_anyons_per_qudit: int):
     """Generates all the basis states for a system of a given number of
     qudits, and a given number of anyons per qudit.
 

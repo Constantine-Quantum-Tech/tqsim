@@ -14,7 +14,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from .basis_generator import gen_basis
+from .basis_generator import generate_basis
 
 
 def F(a1, a2, a3, outcome):
@@ -310,7 +310,7 @@ def braiding_generator(index: int, nb_qudits: int, nb_anyons_per_qudit: int):
         Matrix representation of the braiding operator.
 
     """
-    basis = gen_basis(nb_qudits, nb_anyons_per_qudit)
+    basis = generate_basis(nb_qudits, nb_anyons_per_qudit)
 
     sigmas = []
     for f, base_f in enumerate(basis):
