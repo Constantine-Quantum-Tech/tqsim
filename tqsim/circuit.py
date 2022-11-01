@@ -19,7 +19,7 @@ import numpy as np
 from .config import STORE_PATH  # For caching the bases and sigmas.
 from .lib.basis_generator import generate_basis
 from .lib.drawer import Drawer
-from .lib.get_generators import braiding_generator
+from .lib.get_generators import generate_braiding_operator
 
 
 class AnyonicCircuit:
@@ -170,7 +170,7 @@ class AnyonicCircuit:
         except FileNotFoundError:
             sigmas = []
             for index in range(1, self.__nb_anyons):
-                sigma = braiding_generator(
+                sigma = generate_braiding_operator(
                     index, self.__nb_qudits, self.__nb_anyons_per_qudit
                 )
                 sigmas.append(np.array(sigma))
