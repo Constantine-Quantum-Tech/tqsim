@@ -19,7 +19,7 @@ import numpy as np
 from .config import STORE_PATH  # For caching the bases and sigmas.
 from .lib.basis_generator import generate_basis
 from .lib.drawer import Drawer
-from .lib.get_generators import generate_braiding_operator
+from .lib.operator_generator import generate_braiding_operator
 
 
 class AnyonicCircuit:
