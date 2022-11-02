@@ -88,7 +88,7 @@ Output:
 ```
 
 ## Authors and Citations
-*Abdellah Tounsi, Mohamed Messaoud Louamri, Mohamed Taha Rouabah, and Nacer eddine Belaloui – Constantine Quantum Technologies.*
+*Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, and Mohamed Taha Rouabah – Constantine Quantum Technologies.*
 
 If you have used TQSim in your work, please use the [BibTeX file](citation.bib) to cite the authors.
 
