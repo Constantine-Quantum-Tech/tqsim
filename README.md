@@ -19,7 +19,8 @@ pip install --upgrade tqsim
 
 ## Usage
 
-### Basic Example
+### 1. Basic Example
+In this example, we create a circuit with 2 qudits, made of 3 anyons each. We then braid the anyons manually.
 ```python
 from tqsim import AnyonicCircuit
 
@@ -48,6 +49,41 @@ Output:
        4, 2, 4, 4, 0, 2])}
 ```
 
+### 2. Simulating a Hadamard gate
+Here we simulate the application of a Hadamard gate on a single qudit with 3 anyons.
+Unlike the previous example, we will use a braiding sequence of braiding operators and their corresponding powers.
+```python
+from tqsim import AnyonicCircuit
+
+circuit = AnyonicCircuit(nb_qudits=1, nb_anyons_per_qudit=3)  # Create a circuit with 1 qudit composed of 3 anyons
+circuit.initialize([0,0,1])  # We initialize the circuit in the last state (state 2).
+                            # For this circuit, we have 3 basis states: [0, 1, 2].
+
+# The Hadamard gate braiding sequence in terms of braiding operators
+had_sequence = [[1, 2], [2, 2], [1, -2], [2, -2], [1, 2], [2, 4], [1, -2], [2, 2],
+                [1, 2], [2, -2], [1, 2], [2, -2], [1, 4]]
+
+circuit.braid_sequence(had_sequence)  # We apply the braiding sequence.
+                                      # This should put our qudit in a superposition of the states 2 and 1.
+circuit.measure()  # Measure the system by fusing the anyons
+circuit.draw()  # Draw the circuit
+```
+The Hadamard braid looks like this
+
+![Circuit Output](https://i.ibb.co/5kDVWgf/example-hadamard.png)
+
+Simulating the circuit:
+
+```python
+result = circuit.run(shots = 1000)
+print(result['counts'])
+
+```
+
+Output:
+```bash
+{'1': 493, '2': 507}
+```
 
 ## License
 
