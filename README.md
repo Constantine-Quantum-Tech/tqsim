@@ -5,11 +5,8 @@
 [![License](https://img.shields.io/pypi/dm/tqsim?style=flat-square)](https://pypi.org/project/tqsim/)
 [![License](https://img.shields.io/github/license/Constantine-Quantum-Tech/tqsim?style=flat-square)](LICENSE)
 
-TQSim is an anyon-based Topological Quantum Computing simulator.
 
-TQSim, for Topological Quantum Simulator, simulates a topological quantum computer based Anyons. It simulates topological quantum circuits with qudits composed of an arbitrary number of anyons.
-
-This package can serve as a tool for research on TQC, as well as for educational and training purposes.
+TQSim stands for Topological Quantum Simulator. It is an open-source library for simulating topological quantum computer based on anyons. 
 
 
 ## Installation
@@ -20,9 +17,36 @@ You can install TQSim from pip using
 pip install --upgrade tqsim
 ```
 
-## Documentation
+## Usage
 
-\[Link to doc\]
+### Basic Example
+```python
+from tqsim import AnyonicCircuit
+
+circuit = AnyonicCircuit(2, 3) # Create a circuit having 2 qudits and 3 anyons per qudits
+circuit.braid(1, 2) # Braids the first with the second anyon
+circuit.braid(3, 4) # Braids the first with the second anyon
+circuit.braid(2, 1)
+circuit.measure() # Measure the system by fusing the anyons
+circuit.draw() # Draw the circuit
+```
+Here is the output of the `draw()` method:
+
+![Circuit Output](https://i.ibb.co/3z9pFmQ/example.png)
+
+Simulating the circuit:
+
+```python
+circuit.run(shots = 50)
+
+```
+
+Output:
+```bash
+{'counts': {'0': 16, '2': 20, '4': 14}, 'memory': array([4, 2, 2, 2, 2, 2, 2, 4, 2, 4, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 0, 4,
+       2, 4, 0, 2, 0, 0, 0, 0, 4, 4, 2, 2, 2, 4, 2, 2, 0, 0, 2, 4, 2, 2,
+       4, 2, 4, 4, 0, 2])}
+```
 
 
 ## License
