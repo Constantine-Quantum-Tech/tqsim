@@ -1,3 +1,5 @@
+<img align="right" width="70" src="images/cqtech_logo.png" alt="CQTech">
+
 # TQSim
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/Constantine-Quantum-Tech/tqsim/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/Constantine-Quantum-Tech/tqsim/tree/main)
@@ -84,6 +86,11 @@ Output:
 ```bash
 {'1': 493, '2': 507}
 ```
+
+## Authors and Citations
+*Abdellah Tounsi, Mohamed Messaoud Louamri, Mohamed Taha Rouabah, and Nacer eddine Belaloui – Constantine Quantum Technologies.*
+
+If you have used TQSim in your work, please use the [BibTeX file](citation.bib) to cite the authors.
 
 ## License
 
