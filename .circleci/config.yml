@@ -29,6 +29,11 @@ jobs:
     # CircleCI will report the results back to your VCS provider.
     steps:
       - checkout
+      - run:
+          name: Install the latest version of Poetry
+          command: |
+            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
+            curl -sSL https://install.python-poetry.org | python3 -
       - python/install-packages:
           pkg-manager: poetry
           # app-dir: ~/project/package-directory/  # If you're requirements.txt isn't in the root directory.
