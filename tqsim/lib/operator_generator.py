@@ -1,8 +1,20 @@
+# This code is part of TQSim.
+#
+# (C) Copyright CQTech 2022.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from copy import deepcopy
 
 import numpy as np
 
-from .basis_generator import gen_basis
+from .basis_generator import generate_basis
 
 
 def F(a1, a2, a3, outcome):
@@ -278,9 +290,27 @@ def gen_sigma(index, state_i, state_f):
     return braket * amplitude
 
 
-def braiding_generator(index, nb_qudits, nb_anyons_per_qudit):
+def generate_braiding_operator(index: int, nb_qudits: int, nb_anyons_per_qudit: int):
+    """Generates the braiding operator of index 'index' for a system of
+    a given number of qudits and anyons per qudit.
+    This operator braids anyons at positions 'index' and 'index'+1.
 
-    basis = gen_basis(nb_qudits, nb_anyons_per_qudit)
+    Parameters
+    ----------
+    index : int
+        The operator's index.
+    nb_qudits : int
+        Number of qudits in the circuit.
+    nb_anyons_per_qudit : int
+        Number of anyons in each qudit.
+
+    Returns
+    -------
+    List
+        Matrix representation of the braiding operator.
+
+    """
+    basis = generate_basis(nb_qudits, nb_anyons_per_qudit)
 
     sigmas = []
     for f, base_f in enumerate(basis):

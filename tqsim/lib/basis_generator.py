@@ -1,9 +1,39 @@
+# This code is part of TQSim.
+#
+# (C) Copyright CQTech 2022.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 from typing import List
 
 import numpy as np
 
 
 def check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:
+    """ Returns True if 'anyon1 x anyon2 = outcome' obeys the Fibonacci
+    fusion rules, returns False otherwise.
+
+    Parameters
+    ----------
+    anyon1 : int
+        Anyon charge of the 1st anyon.
+    anyon2 : int
+        Anyon charge of the 2nd anyon.
+    outcome : int
+        Anyon charge of the fusion result.
+
+    Returns
+    -------
+    bool
+        True if the Fibonacci fusion rules are obeyed, False otherwise.
+
+    """
     if anyon1 and anyon2:
         return True
     elif (anyon1 or anyon2) and outcome == 1:
@@ -22,7 +52,6 @@ def check_outcomes(outcomes: List[int]) -> bool:
             previous_outcome = outcome
         else:
             return False
-
     return True
 
 
@@ -47,7 +76,6 @@ def check_state(state) -> bool:
             previous_outcome = outcome
         else:
             return False
-
     return True
 
 
@@ -66,8 +94,22 @@ def gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
     return state
 
 
-def gen_basis(nb_qudits: int, nb_anyons_per_qudit: int):
+def generate_basis(nb_qudits: int, nb_anyons_per_qudit: int):
+    """Generates all the basis states for a system of a given number of
+    qudits, and a given number of anyons per qudit.
 
+    Parameters
+    ----------
+    nb_qudits : int
+        Number of qudits in the circuit.
+    nb_anyons_per_qudit : int
+        Number of anyons in each qudit.
+
+    Returns
+    -------
+    basis : List[basis states]
+        A list of basis states.
+    """
     nb_roots = nb_qudits - 1
     qudit_len = nb_anyons_per_qudit - 1
     nb_labels = nb_qudits * qudit_len + nb_roots

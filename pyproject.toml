@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "tqsim"
+version = "0.0.1"
+description = "TQSim is a Topological Quantum Computing simulator based on Anyon models"
+authors = [ "Mohamed Messaoud Louamri <mm.louamri@gmail.com>", 
+            "Abdellah Tounsi <abdellah.tounsi@umc.edu.dz>",
+            "Nacer eddine Belaloui <n.aityahia.belaloui@gmail.com>",
+            "Mohamed Taha Rouabah <m.t.rouabah@gmail.com>"]
+license = "Apache-2.0"
+repository = "https://github.com/Constantine-Quantum-Tech/tqsim"
+keywords = ["topological quantum computing", "quantum", "quantum computing", "anyons", "simulator"] 
+
+
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.23.4"
+matplotlib = "^3.6.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+pytest = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
