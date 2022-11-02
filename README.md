@@ -75,8 +75,8 @@ The Hadamard braid looks like this
 Simulating the circuit:
 
 ```python
-result = circuit.run(shots = 1000)
-print(result['counts'])
+result = circuit.run(shots = 1000)  # Run the circuit 1000 times.
+print(result['counts'])  # Show the counts only.
 
 ```
 
