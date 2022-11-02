@@ -1,28 +1,30 @@
 # TQSim
 
+
+[![Version](https://img.shields.io/pypi/v/tqsim?style=flat-square)](https://pypi.org/project/tqsim/)
+[![License](https://img.shields.io/pypi/dm/tqsim?style=flat-square)](https://pypi.org/project/tqsim/)
+[![License](https://img.shields.io/github/license/Constantine-Quantum-Tech/tqsim?style=flat-square)](LICENSE)
+
 TQSim is an anyon-based Topological Quantum Computing simulator.
 
-TQSim, for Topological Quantum Simulator, simulates a topological quantum computer based on Fibonacci Anyons. It simulates topological quantum circuits with qudits composed of an arbitrary number of anyons.
+TQSim, for Topological Quantum Simulator, simulates a topological quantum computer based Anyons. It simulates topological quantum circuits with qudits composed of an arbitrary number of anyons.
 
 This package can serve as a tool for research on TQC, as well as for educational and training purposes.
-
-
-## Documentation
-
-\[Link to doc\]
 
 
 ## Installation
 
 You can install TQSim from pip using
 
+```bash
+pip install --upgrade tqsim
 ```
-pip install tqsim
-```
+
+## Documentation
+
+\[Link to doc\]
 
 
 ## License
 
-[Apache License 2.0](LICENSE)
-
-Copyright (c) CQTech - 2022.
+Copyright © 2022, [Constantine Quantum Technologies](https://cqtech.org). Released under the [Apache License 2.0](LICENSE).
