@@ -87,7 +87,7 @@ Output:
 {'1': 493, '2': 507}
 ```
 
-## Authors and Citations
+## Authors and Citation
 *Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, and Mohamed Taha Rouabah – Constantine Quantum Technologies.*
 
 If you have used TQSim in your work, please use the [BibTeX file](citation.bib) to cite the authors.
