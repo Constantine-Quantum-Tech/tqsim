@@ -450,14 +450,14 @@ class AnyonicCircuit:
         """
         return self.__unitary
 
-    def run(self, shots: int = 1024):
+    def run(self, shots: int = 1000):
         """Simulates the quantum circuit for 'shots' number of times and
         returns the measurement results.
 
         Parameters
         ----------
         shots : int, optional
-            Number of times the circuit is simulated. The default is 1024.
+            Number of times the circuit is simulated. The default is 1000.
 
         Raises
         ------
