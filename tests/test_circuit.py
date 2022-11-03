@@ -15,7 +15,7 @@ import os
 import numpy as np
 import pytest
 
-from tqsim import AnyonicCircuit, generate_braiding_operator, generate_basis
+from tqsim import AnyonicCircuit, generate_basis, generate_braiding_operator
 
 
 def test_init_1():
@@ -25,6 +25,10 @@ def test_init_1():
     assert circuit.nb_qudits == 1
     assert circuit.nb_anyons_per_qudits == 3
     assert circuit.dim == 3
+    assert circuit.braiding_operators
+    assert circuit.basis
+    assert len(circuit.braiding_operators) == 2
+    assert circuit.braiding_operators[0].shape == (3, 3)
 
 
 def test_init_2():
