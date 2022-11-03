@@ -2,7 +2,8 @@
 name = "tqsim"
 version = "0.0.1"
 description = "TQSim is a Topological Quantum Computing simulator based on Anyon models"
-authors = [ "Mohamed Messaoud Louamri <mm.louamri@gmail.com>", 
+authors = [ "CQTech.org <constantinequantumtech@gmail.com>",
+            "Mohamed Messaoud Louamri <mm.louamri@gmail.com>", 
             "Abdellah Tounsi <abdellah.tounsi@umc.edu.dz>",
             "Nacer eddine Belaloui <n.aityahia.belaloui@gmail.com>",
             "Mohamed Taha Rouabah <m.t.rouabah@gmail.com>"]
