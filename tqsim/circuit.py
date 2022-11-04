@@ -142,6 +142,18 @@ class AnyonicCircuit:
         """
         return self.__basis
 
+    @property
+    def braiding_operators(self):
+        """Returns a list of all the braiding operators.
+
+        Returns
+        -------
+        List
+            List of all the braiding operators.
+
+        """
+        return self.__sigmas
+
     def __get_basis(self) -> Tuple[np.ndarray, int]:
         folder_path = os.path.join(
             STORE_PATH, f"{self.__nb_qudits}_{self.__nb_anyons_per_qudit}"
