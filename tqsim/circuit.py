@@ -235,16 +235,16 @@ class AnyonicCircuit:
 
         return self
 
-    def braid(self, n: int, m: int):
-        """Braids the two anyons at positions 'n' and 'm'.
-        If n < m, they are braided in a clockwise direction,
-        if n > m, they are braided in a counterclockwise direction.
+    def braid(self, m: int, n: int):
+        """Braids the two anyons at positions 'm' and 'n'.
+        If m < n, they are braided in a clockwise direction,
+        if m > n, they are braided in a counterclockwise direction.
 
         Parameters
         ----------
-        n : int
-            The 1st anyon's position.
         m : int
+            The 1st anyon's position.
+        n : int
             The 2nd anyon's position.
 
         Raises
@@ -280,8 +280,8 @@ class AnyonicCircuit:
         if abs(n - m) != 1:
             raise Exception("You can only braid adjacent anyons!")
 
-        if n < m:
-            self.__unitary = self.__sigmas[n - 1] @ self.__unitary
+        if m < n:
+            self.__unitary = self.__sigmas[m - 1] @ self.__unitary
         else:
             self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
@@ -331,16 +331,16 @@ class AnyonicCircuit:
             # Computing m and n
             m = n = 0
             if power > 0:
-                n = ind
-                m = ind + 1
-            elif power < 0:
                 m = ind
                 n = ind + 1
+            elif power < 0:
+                n = ind
+                m = ind + 1
             else:  # if power=0, do nothing (identity)
                 continue
 
             for _ in range(abs(power)):
-                self.braid(n, m)
+                self.braid(m, n)
 
         return self
 
