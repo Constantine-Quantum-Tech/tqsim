@@ -347,11 +347,19 @@ class AnyonicCircuit:
     def measure(self):
         """Performs a measurement on the whole circuit.
 
+        Raises
+        ------
+        Exception
+            Is raised if a measurement has already been carried.
+
         Returns
         -------
         AnyonicCircuit
             A reference to the same circuit.
         """
+        if self.__measured:
+            raise Exception("Cannot carry the measurements twice!")
+
         self.__measured = True
         self.drawer.measure()
         return self
