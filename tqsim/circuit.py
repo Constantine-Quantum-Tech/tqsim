@@ -384,7 +384,7 @@ class AnyonicCircuit:
             raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
 
         if output == "raw":
-            return self.__braids_history
+            return self.__braids_history[::-1]
 
         elif output == "sigmas":
             ret = []
