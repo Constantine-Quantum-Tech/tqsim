@@ -285,7 +285,7 @@ class AnyonicCircuit:
         else:
             self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
-        self.__braids_history.append((m, n))
+        self.__braids_history.append((n, m))
 
         self.__nb_braids += 1
 
@@ -396,7 +396,7 @@ class AnyonicCircuit:
 
         elif output == "sigmas":
             ret = []
-            for (m, n) in self.__braids_history:
+            for (n, m) in self.__braids_history:
                 if m < n:
                     ret.append(f"is{m}")
                 else:
