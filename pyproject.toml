@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tqsim"
-version = "0.0.1"
+version = "0.0.2"
 description = "TQSim is a Topological Quantum Computing simulator based on Anyon models"
 authors = [ "CQTech.org <constantinequantumtech@gmail.com>",
             "Mohamed Messaoud Louamri <mm.louamri@gmail.com>", 
