@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/Constantine-Quantum-Tech/tqsim?style=flat-square)](LICENSE)
 
 
-TQSim stands for Topological Quantum Simulator. It is an open-source library for simulating topological quantum computer based on anyons. 
+TQSim stands for Topological Quantum Simulator. It is an open-source library for simulating topological quantum computers based on Fibonacci anyons. 
 
 
 ## Installation
