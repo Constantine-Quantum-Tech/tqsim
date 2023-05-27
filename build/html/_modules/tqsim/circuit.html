@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tqsim.circuit &mdash; TQSim 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            TQSim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Front-end:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../frontend/anyonic_circuit.html">AnyonicCircuit Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../frontend/drawer.html">Drawer Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../frontend/drawer_anyon.html">HOW_TO_CALL_THIS Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../frontend/utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Back-end:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../backend/basis_generator.html">Basis Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backend/operator_generator.html">Operator Generator</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TQSim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tqsim.circuit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tqsim.circuit</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This code is part of TQSim.</span>
+<span class="c1">#</span>
+<span class="c1"># (C) Copyright Constantine Quantum Technologies, 2022.</span>
+<span class="c1">#</span>
+<span class="c1"># This code is licensed under the Apache License, Version 2.0. You may</span>
+<span class="c1"># obtain a copy of this license in the LICENSE.txt file in the root directory</span>
+<span class="c1"># of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.</span>
+<span class="c1">#</span>
+<span class="c1"># Any modifications or derivative works of this code must retain this</span>
+<span class="c1"># copyright notice, and modified files need to carry a notice indicating</span>
+<span class="c1"># that they have been altered from the originals.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span> 
+
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">STORE_PATH</span>  <span class="c1"># For caching the bases and sigmas.</span>
+<span class="kn">from</span> <span class="nn">.lib.basis_generator</span> <span class="kn">import</span> <span class="n">generate_basis</span>
+<span class="kn">from</span> <span class="nn">.lib.drawer</span> <span class="kn">import</span> <span class="n">Drawer</span>
+<span class="kn">from</span> <span class="nn">.lib.operator_generator</span> <span class="kn">import</span> <span class="n">generate_braiding_operator</span>
+
+
+<div class="viewcode-block" id="AnyonicCircuit"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit">[docs]</a><span class="k">class</span> <span class="nc">AnyonicCircuit</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class represents an anyon-based topological quantum circuit.</span>
+<span class="sd">    Such a circuit is described by the number of qudits it contains, and</span>
+<span class="sd">    the number of anyons each qudit contains.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nb_qudits : int, optional</span>
+<span class="sd">        Number of qudits in the circuit. The default is 1.</span>
+<span class="sd">    nb_anyons_per_qudit : int, optional</span>
+<span class="sd">        Number of anyons in each qudit. The default is 3.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    ---------</span>
+<span class="sd">    TODO: ADD SOME TEXT HERE</span>
+
+<span class="sd">    &gt;&gt;&gt; circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)</span>
+<span class="sd">                This circuit has 2 qudits, with 3 anyons each. The circuit has</span>
+<span class="sd">                a total of 2*3=6 anyons.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nb_qudits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nb_qudits : int, optional</span>
+<span class="sd">            Number of qudits in the circuit. The default is 1.</span>
+<span class="sd">        nb_anyons_per_qudit : int, optional</span>
+<span class="sd">            Number of anyons in each qudit. The default is 3.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span> <span class="o">=</span> <span class="n">nb_qudits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span> <span class="o">=</span> <span class="n">nb_anyons_per_qudit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span> <span class="o">=</span> <span class="n">nb_qudits</span> <span class="o">*</span> <span class="n">nb_anyons_per_qudit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nb_braids</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__braids_history</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__measured</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__basis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_basis</span><span class="p">()</span>
+
+        <span class="n">input_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">input_state</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state</span> <span class="o">=</span> <span class="n">input_state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sigmas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_sigmas</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawer</span> <span class="o">=</span> <span class="n">Drawer</span><span class="p">(</span><span class="n">nb_qudits</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nb_qudits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of qudits in the circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of qudits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nb_anyons_per_qudits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of anyons for each qudit in the circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of anyons per qudit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">drawer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Drawer</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the drawer object for the circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Drawer</span>
+<span class="sd">            The circuit&#39;s drawer object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the dimension of the fusion space.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Dimension of the fusion space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dim</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all the basis states for the circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List</span>
+<span class="sd">            List of all the basis states.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basis</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">braiding_operators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all the braiding operators.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List</span>
+<span class="sd">            List of all the braiding operators.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sigmas</span>
+
+    <span class="k">def</span> <span class="nf">__get_basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="n">folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">STORE_PATH</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="s2">&quot;basis.dat&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">basis</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">basis</span> <span class="o">=</span> <span class="n">generate_basis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">basis</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_sigmas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+
+        <span class="n">folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">STORE_PATH</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="s2">&quot;sigmas.dat&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">sigmas</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">sigmas</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span><span class="p">):</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">generate_braiding_operator</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_qudits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons_per_qudit</span>
+                <span class="p">)</span>
+                <span class="n">sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sigmas</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sigmas</span>
+
+<div class="viewcode-block" id="AnyonicCircuit.initialize"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes the circuit in the state input_state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_state : np.ndarray</span>
+<span class="sd">            A normalized quantum state with the same dimensions as the</span>
+<span class="sd">            fusion space.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Will be raised if an initialization is attempted after performing</span>
+<span class="sd">            braiding operations.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Will be raised if the input state has the wrong dimension or</span>
+<span class="sd">            is not normalized.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AnyonicCircuit</span>
+<span class="sd">            A reference to the same circuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_braids</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Initialization should happen before any braiding operation is performed!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">input_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">input_state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">input_state</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The state has wrong dimension. Should be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">input_state</span> <span class="o">*</span> <span class="n">input_state</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input state is not normalized correctly!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">input_state</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.braid"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.braid">[docs]</a>    <span class="k">def</span> <span class="nf">braid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Braids the two anyons at positions &#39;n&#39; and &#39;m&#39;.</span>
+<span class="sd">        If n &lt; m, they are braided in a clockwise direction,</span>
+<span class="sd">        if n &gt; m, they are braided in a counterclockwise direction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            The 1st anyon&#39;s position.</span>
+<span class="sd">        m : int</span>
+<span class="sd">            The 2nd anyon&#39;s position.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Exceptions are raised if a braiding is attempted after a</span>
+<span class="sd">            measurement, or if trying to braid two non-adjacent anyons.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Is raised if the parameters are not strictly positive integers,</span>
+<span class="sd">            or if incorrect positions are passed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AnyonicCircuit</span>
+<span class="sd">            A reference to the same circuit.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__measured</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;System already measured! Cannot perform further braiding!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n, m must be integers&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n, m must be higher than 0!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span><span class="p">:</span>
+            <span class="c1">## Check if correct</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The system has only </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span><span class="si">}</span><span class="s2"> anyons! n, m are erroneous!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;You can only braid adjacent anyons!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sigmas</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sigmas</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__braids_history</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nb_braids</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">drawer</span><span class="o">.</span><span class="n">braid</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.braid_sequence"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.braid_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">braid_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">braid</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a sequence of [sigma operator, power], and applies the</span>
+<span class="sd">        successive operators to the &#39;power&#39;.</span>
+<span class="sd">        The first operator in the sequence is the first to be applied.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        braid : Sequence[Sequence[int]]</span>
+<span class="sd">            A sequence of pairs of integers representing a braiding operator</span>
+<span class="sd">            and an exponent.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Is raised if one of the operators&#39; indices is not an integer</span>
+<span class="sd">            greater or equal to 1, or is an incorrect index.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AnyonicCircuit</span>
+<span class="sd">            A reference to the same circuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="n">braid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">power</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Indices and powers must be integers!&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;sigma_</span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s2"> is not a valid braiding operator! &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The operators indices must be &gt;= 1.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;sigma_</span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s2"> is not a valid braiding operator! &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The operators indices must be &lt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__nb_anyons</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># Computing m and n</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">ind</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">ind</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># if power=0, do nothing (identity)</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">power</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">braid</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.measure"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.measure">[docs]</a>    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs a measurement on the whole circuit.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Is raised if a measurement has already been carried.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AnyonicCircuit</span>
+<span class="sd">            A reference to the same circuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__measured</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot carry the measurements twice!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__measured</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drawer</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.history"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.history">[docs]</a>    <span class="k">def</span> <span class="nf">history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the history of all braiding operations that were performed</span>
+<span class="sd">        in the circuit.</span>
+<span class="sd">        Its output can either be the raw braiding operations (n, m), a list of</span>
+<span class="sd">        braiding operators (sigmas), or a LaTeX string containing the product</span>
+<span class="sd">        of all the braiding operators.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output : str, optional</span>
+<span class="sd">            Can either be &quot;raw&quot;, &quot;sigmas&quot;, or &quot;latex&quot;. The default is &quot;raw&quot;.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Is raised if an incorrect output format is chosen.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List or String</span>
+<span class="sd">            Either a list of (n, m) operations, a list of braiding operators,</span>
+<span class="sd">            or a LaTeX string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;sigmas&quot;</span><span class="p">,</span> <span class="s2">&quot;latex&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output should be either: &quot;raw&quot;, &quot;sigmas&quot; or &quot;latex&quot;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;raw&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__braids_history</span>
+
+        <span class="k">elif</span> <span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;sigmas&quot;</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__braids_history</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;is</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;s</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigmas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s2">&quot;sigmas&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Converting to a sigma notation with powers</span>
+            <span class="n">power_sigmas</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">last_sigma</span> <span class="o">=</span> <span class="n">sigmas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">sigma</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">sigmas</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">sigma</span> <span class="o">==</span> <span class="n">last_sigma</span><span class="p">:</span>
+                    <span class="n">power</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Done counting the powers of the last sigma, adding it</span>
+                <span class="n">power_sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">last_sigma</span><span class="p">,</span> <span class="n">power</span><span class="p">))</span>
+                <span class="c1"># resetting</span>
+                <span class="n">power</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">last_sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+
+            <span class="c1"># Handling the last sigma</span>
+            <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">power_sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">last_sigma</span><span class="p">,</span> <span class="n">power</span><span class="p">))</span>
+
+            <span class="c1"># Converting to LaTeX</span>
+            <span class="n">latex</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">power_sigmas</span><span class="p">:</span>
+                <span class="c1"># Inverses of sigmas (negative powers)</span>
+                <span class="k">if</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;i&quot;</span><span class="p">:</span>
+                    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s2">&quot;\sigma_{&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;}^{&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="o">-</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;}&quot;</span>
+                <span class="c1"># Sigmas (positive powers)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s2">&quot;\sigma_{&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;}&quot;</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Only add exponents != 1</span>
+                        <span class="n">latex</span> <span class="o">+=</span> <span class="s2">&quot;^{&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;}&quot;</span>
+
+            <span class="n">latex</span> <span class="o">=</span> <span class="s2">&quot;$ &quot;</span> <span class="o">+</span> <span class="n">latex</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span>
+            <span class="k">return</span> <span class="n">latex</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.draw"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Draws the topological quantum circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Figure</span>
+<span class="sd">            The braid describing the topological quantum circuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">drawer</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.statevector"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.statevector">[docs]</a>    <span class="k">def</span> <span class="nf">statevector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Computes and returns the current state vector of the circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            The state vector of the circuit.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.unitary"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.unitary">[docs]</a>    <span class="k">def</span> <span class="nf">unitary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the unitary representation of the quantum circuit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            The unitary matrix for the circuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unitary</span></div>
+
+<div class="viewcode-block" id="AnyonicCircuit.run"><a class="viewcode-back" href="../../frontend/anyonic_circuit.html#tqsim.AnyonicCircuit.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simulates the quantum circuit for &#39;shots&#39; number of times and</span>
+<span class="sd">        returns the measurement results.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shots : int, optional</span>
+<span class="sd">            Number of times the circuit is simulated. The default is 1000.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Is raised if the circuit is run without a measurement.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Contains the number of measurements for each measured state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Needs to be measured?</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__measured</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The system was not measured!&quot;</span><span class="p">)</span>
+
+        <span class="n">statevector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevector</span><span class="p">()</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">statevector</span> <span class="o">*</span> <span class="n">statevector</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()))</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dim</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">shots</span><span class="p">)</span>
+
+        <span class="n">idx</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">memory</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">counts_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)):</span>
+            <span class="n">counts_dict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;counts&quot;</span><span class="p">:</span> <span class="n">counts_dict</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="n">memory</span><span class="p">}</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, Mohamed Taha Rouabah.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

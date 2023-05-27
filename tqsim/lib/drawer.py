@@ -16,10 +16,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from .drawer_anyon import DrawerAnyon
-from .utils import matplotlib_close_if_inline
+from .utils import __matplotlib_close_if_inline
 
 
 class Drawer:
+    """
+    TODO: ADD SOME TEXT HERE
+    """
     def __init__(
         self,
         nb_qudits: int,
@@ -48,7 +51,10 @@ class Drawer:
                 )
 
     @property
-    def anyons(self):
+    def anyons(self) -> dict[int, DrawerAnyon]:
+        """
+        TODO: ADD SOME TEXT HERE
+        """
         return self.__anyons
 
     def _sigmoid(self, x):
@@ -172,6 +178,9 @@ class Drawer:
             self.__fuse(idx_anyon_top, idx_anyon_bot)
 
     def draw(self):
+        """
+        TODO: ADD SOME TEXT HERE
+        """
         width = self.__anyons[1].get_last_x() * 0.5
         height = self.__nb_anyons * 0.3
         fig, ax = plt.subplots(1, 1, figsize=(width, height))
@@ -191,5 +200,5 @@ class Drawer:
                 )
         ax.axis("off")
         if fig:
-            matplotlib_close_if_inline(fig)
+            __matplotlib_close_if_inline(fig)
         return fig

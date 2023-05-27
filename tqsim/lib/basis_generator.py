@@ -15,7 +15,7 @@ from typing import List
 import numpy as np
 
 
-def check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:
+def __check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:
     """ Returns True if 'anyon1 x anyon2 = outcome' obeys the Fibonacci
     fusion rules, returns False otherwise.
 
@@ -44,24 +44,24 @@ def check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:
         return False
 
 
-def check_outcomes(outcomes: List[int]) -> bool:
+def __check_outcomes(outcomes: List[int]) -> bool:
     previous_outcome = 1
 
     for outcome in outcomes:
-        if check_rule(previous_outcome, 1, outcome):
+        if __check_rule(previous_outcome, 1, outcome):
             previous_outcome = outcome
         else:
             return False
     return True
 
 
-def check_state(state) -> bool:
+def __check_state(state) -> bool:
     nb_qudits = len(state["qudits"])
     qudit_len = len(state["qudits"][0])
 
     for qudit in state["qudits"]:
         if len(qudit) == qudit_len:
-            if not check_outcomes(qudit):
+            if not __check_outcomes(qudit):
                 return False
         else:
             return False
@@ -72,14 +72,14 @@ def check_state(state) -> bool:
     previous_outcome = state["qudits"][0][-1]
 
     for i, outcome in enumerate(state["roots"]):
-        if check_rule(previous_outcome, state["qudits"][i + 1][-1], outcome):
+        if __check_rule(previous_outcome, state["qudits"][i + 1][-1], outcome):
             previous_outcome = outcome
         else:
             return False
     return True
 
 
-def gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
+def __gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
     state = {"qudits": [], "roots": []}
 
     for i, label in enumerate(comb):
@@ -119,9 +119,9 @@ def generate_basis(nb_qudits: int, nb_anyons_per_qudit: int):
     curr_comb = [0] * nb_labels
     final_comb = [1] * nb_labels
 
-    curr_state = gen_state(curr_comb, nb_qudits, qudit_len)
+    curr_state = __gen_state(curr_comb, nb_qudits, qudit_len)
 
-    if check_state(curr_state):
+    if __check_state(curr_state):
         basis.append(curr_state)
 
     while not np.all(curr_comb == final_comb):
@@ -132,9 +132,9 @@ def generate_basis(nb_qudits: int, nb_anyons_per_qudit: int):
             else:
                 curr_comb[i] = 0
 
-        curr_state = gen_state(curr_comb, nb_qudits, qudit_len)
+        curr_state = __gen_state(curr_comb, nb_qudits, qudit_len)
 
-        if check_state(curr_state):
+        if __check_state(curr_state):
             basis.append(curr_state)
 
     return basis

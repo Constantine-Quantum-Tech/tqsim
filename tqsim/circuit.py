@@ -15,6 +15,7 @@ import pickle
 from typing import List, Sequence, Tuple
 
 import numpy as np
+from matplotlib.figure import Figure 
 
 from .config import STORE_PATH  # For caching the bases and sigmas.
 from .lib.basis_generator import generate_basis
@@ -27,29 +28,21 @@ class AnyonicCircuit:
     Such a circuit is described by the number of qudits it contains, and
     the number of anyons each qudit contains.
 
-    Example: >>>circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)
-                This circuit has 2 qudits, with 3 anyons each. The circuit has
-                a total of 2*3=6 anyons.
-
     Parameters
     ----------
     nb_qudits : int, optional
         Number of qudits in the circuit. The default is 1.
     nb_anyons_per_qudit : int, optional
         Number of anyons in each qudit. The default is 3.
+    
+    Examples
+    ---------
+    TODO: ADD SOME TEXT HERE
 
-    Attributes
-    ----------
-    nb_qudits : int
-        Number of qudits in the circuit.
-    nb_anyons_per_qudit : int
-        Number of anyons in each qudit.
-    drawer : Drawer
-        A drawer object that handles the drawing of the quantum circuit.
-    dim : int
-        The dimension of the fusion space for the quantum circuit.
-    basis : List
-        List of all the basis states.
+    >>> circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)
+                This circuit has 2 qudits, with 3 anyons each. The circuit has
+                a total of 2*3=6 anyons.
+
 
     """
 
@@ -87,7 +80,7 @@ class AnyonicCircuit:
         self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudit)
 
     @property
-    def nb_qudits(self):
+    def nb_qudits(self) -> int:
         """Returns the number of qudits in the circuit.
 
         Returns
@@ -98,7 +91,7 @@ class AnyonicCircuit:
         return self.__nb_qudits
 
     @property
-    def nb_anyons_per_qudits(self):
+    def nb_anyons_per_qudits(self) -> int:
         """Returns the number of anyons for each qudit in the circuit.
 
         Returns
@@ -109,7 +102,7 @@ class AnyonicCircuit:
         return self.__nb_anyons_per_qudit
 
     @property
-    def drawer(self):
+    def drawer(self) -> Drawer:
         """Returns the drawer object for the circuit.
 
         Returns
@@ -120,7 +113,7 @@ class AnyonicCircuit:
         return self.__drawer
 
     @property
-    def dim(self):
+    def dim(self) -> int:
         """Returns the dimension of the fusion space.
 
         Returns
@@ -201,9 +194,7 @@ class AnyonicCircuit:
         input_state : np.ndarray
             A normalized quantum state with the same dimensions as the
             fusion space.
-            Example:    for a 1-qudit circuit with 3 anyons, input_state must
-                        be a 3 dimensional vector with norm 1.
-
+        
         Raises
         ------
         Exception
@@ -439,7 +430,7 @@ class AnyonicCircuit:
             latex = "$ " + latex + "$"
             return latex
 
-    def draw(self):
+    def draw(self) -> Figure:
         """Draws the topological quantum circuit.
 
         Returns

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AnyonicCircuit Class &mdash; TQSim 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Drawer Class" href="drawer.html" />
+    <link rel="prev" title="Welcome to TQSim’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TQSim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Front-end:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AnyonicCircuit Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawer.html">Drawer Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawer_anyon.html">HOW_TO_CALL_THIS Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Back-end:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../backend/basis_generator.html">Basis Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backend/operator_generator.html">Operator Generator</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TQSim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AnyonicCircuit Class</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/frontend/anyonic_circuit.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="anyoniccircuit-class">
+<span id="anyonic-circuit"></span><h1>AnyonicCircuit Class<a class="headerlink" href="#anyoniccircuit-class" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tqsim.</span></span><span class="sig-name descname"><span class="pre">AnyonicCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_qudits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_anyons_per_qudit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit" title="Permalink to this definition"></a></dt>
+<dd><p>This class represents an anyon-based topological quantum circuit.
+Such a circuit is described by the number of qudits it contains, and
+the number of anyons each qudit contains.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_qudits</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of qudits in the circuit. The default is 1.</p></li>
+<li><p><strong>nb_anyons_per_qudit</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of anyons in each qudit. The default is 3.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>TODO: ADD SOME TEXT HERE</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">circuit</span> <span class="o">=</span> <span class="n">AnyonicCircuit</span><span class="p">(</span><span class="n">nb_qudits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">            This circuit has 2 qudits, with 3 anyons each. The circuit has</span>
+<span class="go">            a total of 2*3=6 anyons.</span>
+</pre></div>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.basis">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis</span></span><a class="headerlink" href="#tqsim.AnyonicCircuit.basis" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of all the basis states for the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of all the basis states.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.braid">
+<span class="sig-name descname"><span class="pre">braid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.braid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.braid" title="Permalink to this definition"></a></dt>
+<dd><p>Braids the two anyons at positions ‘n’ and ‘m’.
+If n &lt; m, they are braided in a clockwise direction,
+if n &gt; m, they are braided in a counterclockwise direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – The 1st anyon’s position.</p></li>
+<li><p><strong>m</strong> (<em>int</em>) – The 2nd anyon’s position.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Exception</strong> – Exceptions are raised if a braiding is attempted after a
+    measurement, or if trying to braid two non-adjacent anyons.</p></li>
+<li><p><strong>ValueError</strong> – Is raised if the parameters are not strictly positive integers,
+    or if incorrect positions are passed.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A reference to the same circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#tqsim.AnyonicCircuit" title="tqsim.AnyonicCircuit">AnyonicCircuit</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.braid_sequence">
+<span class="sig-name descname"><span class="pre">braid_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">braid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.braid_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.braid_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Takes a sequence of [sigma operator, power], and applies the
+successive operators to the ‘power’.
+The first operator in the sequence is the first to be applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>braid</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>) – A sequence of pairs of integers representing a braiding operator
+and an exponent.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Is raised if one of the operators’ indices is not an integer
+    greater or equal to 1, or is an incorrect index.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A reference to the same circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#tqsim.AnyonicCircuit" title="tqsim.AnyonicCircuit">AnyonicCircuit</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.braiding_operators">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">braiding_operators</span></span><a class="headerlink" href="#tqsim.AnyonicCircuit.braiding_operators" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of all the braiding operators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of all the braiding operators.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.dim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#tqsim.AnyonicCircuit.dim" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the dimension of the fusion space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dimension of the fusion space.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.draw">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.draw" title="Permalink to this definition"></a></dt>
+<dd><p>Draws the topological quantum circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The braid describing the topological quantum circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.drawer">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">drawer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="drawer.html#tqsim.lib.drawer.Drawer" title="tqsim.lib.drawer.Drawer"><span class="pre">Drawer</span></a></em><a class="headerlink" href="#tqsim.AnyonicCircuit.drawer" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the drawer object for the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The circuit’s drawer object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="drawer.html#tqsim.lib.drawer.Drawer" title="tqsim.lib.drawer.Drawer">Drawer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.history">
+<span class="sig-name descname"><span class="pre">history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'raw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.history" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the history of all braiding operations that were performed
+in the circuit.
+Its output can either be the raw braiding operations (n, m), a list of
+braiding operators (sigmas), or a LaTeX string containing the product
+of all the braiding operators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> (<em>str</em><em>, </em><em>optional</em>) – Can either be “raw”, “sigmas”, or “latex”. The default is “raw”.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Is raised if an incorrect output format is chosen.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Either a list of (n, m) operations, a list of braiding operators,
+or a LaTeX string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List or String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.initialize" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the circuit in the state input_state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_state</strong> (<em>np.ndarray</em>) – A normalized quantum state with the same dimensions as the
+fusion space.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>Exception</strong> – Will be raised if an initialization is attempted after performing
+    braiding operations.</p></li>
+<li><p><strong>ValueError</strong> – Will be raised if the input state has the wrong dimension or
+    is not normalized.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A reference to the same circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#tqsim.AnyonicCircuit" title="tqsim.AnyonicCircuit">AnyonicCircuit</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.measure">
+<span class="sig-name descname"><span class="pre">measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.measure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.measure" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a measurement on the whole circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – Is raised if a measurement has already been carried.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A reference to the same circuit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#tqsim.AnyonicCircuit" title="tqsim.AnyonicCircuit">AnyonicCircuit</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.nb_anyons_per_qudits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nb_anyons_per_qudits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#tqsim.AnyonicCircuit.nb_anyons_per_qudits" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the number of anyons for each qudit in the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of anyons per qudit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.nb_qudits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nb_qudits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#tqsim.AnyonicCircuit.nb_qudits" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the number of qudits in the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of qudits.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.run" title="Permalink to this definition"></a></dt>
+<dd><p>Simulates the quantum circuit for ‘shots’ number of times and
+returns the measurement results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shots</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of times the circuit is simulated. The default is 1000.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – Is raised if the circuit is run without a measurement.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Contains the number of measurements for each measured state.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.statevector">
+<span class="sig-name descname"><span class="pre">statevector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.statevector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.statevector" title="Permalink to this definition"></a></dt>
+<dd><p>Computes and returns the current state vector of the circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The state vector of the circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tqsim.AnyonicCircuit.unitary">
+<span class="sig-name descname"><span class="pre">unitary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/tqsim/circuit.html#AnyonicCircuit.unitary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.AnyonicCircuit.unitary" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the unitary representation of the quantum circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The unitary matrix for the circuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to TQSim’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="drawer.html" class="btn btn-neutral float-right" title="Drawer Class" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, Mohamed Taha Rouabah.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

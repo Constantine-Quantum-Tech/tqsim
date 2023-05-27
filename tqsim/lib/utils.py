@@ -35,8 +35,11 @@ MATPLOTLIB_INLINE_BACKENDS = {
 }
 
 
-def matplotlib_close_if_inline(figure):
-    """Close the given matplotlib figure if the backend in use draws figures inline.
+def __matplotlib_close_if_inline(figure):
+    """
+    :noindex:
+
+    Close the given matplotlib figure if the backend in use draws figures inline.
     If the backend does not draw figures inline, this does nothing.  This function is to prevent
     duplicate images appearing; the inline backends will capture the figure in preparation and
     display it as well, whereas the drawers want to return the figure to be displayed."""
@@ -92,7 +95,7 @@ def cplot(cmatrix, sigma=0.5, title=''):
     fig, (pl, sc) = plt.subplots(nrows=1, ncols=2, sharex=False)
                                  #figsize=[8, 25])
     sc.imshow(img)
-    pl.imshow(scale(sigma=sigma), extent=(-1, 1, -1, 1))
+    pl.imshow(__scale(sigma=sigma), extent=(-1, 1, -1, 1))
     pl.set_xlabel('Re')
     pl.set_ylabel('Img')
     pl.grid(True)
@@ -100,8 +103,10 @@ def cplot(cmatrix, sigma=0.5, title=''):
     plt.show()
     return
 
-def scale(sigma=0.5):
+def __scale(sigma=0.5):
     """
+    :noindex:
+    
     Plot the scaling spectrum of the complex plane [-1, 1, -i, i]
     """
     img = []

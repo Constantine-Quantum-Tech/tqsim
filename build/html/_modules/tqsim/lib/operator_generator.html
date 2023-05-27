@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tqsim.lib.operator_generator &mdash; TQSim 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            TQSim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Front-end:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../frontend/anyonic_circuit.html">AnyonicCircuit Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../frontend/drawer.html">Drawer Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../frontend/drawer_anyon.html">HOW_TO_CALL_THIS Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../frontend/utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Back-end:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../backend/basis_generator.html">Basis Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backend/operator_generator.html">Operator Generator</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TQSim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tqsim.lib.operator_generator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tqsim.lib.operator_generator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This code is part of TQSim.</span>
+<span class="c1">#</span>
+<span class="c1"># (C) Copyright Constantine Quantum Technologies, 2022.</span>
+<span class="c1">#</span>
+<span class="c1"># This code is licensed under the Apache License, Version 2.0. You may</span>
+<span class="c1"># obtain a copy of this license in the LICENSE.txt file in the root directory</span>
+<span class="c1"># of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.</span>
+<span class="c1">#</span>
+<span class="c1"># Any modifications or derivative works of this code must retain this</span>
+<span class="c1"># copyright notice, and modified files need to carry a notice indicating</span>
+<span class="c1"># that they have been altered from the originals.</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.basis_generator</span> <span class="kn">import</span> <span class="n">generate_basis</span>
+
+
+<span class="k">def</span> <span class="nf">__F</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    F matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inv_phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># inverse of golden number</span>
+    <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+
+    <span class="c1"># a1 + a2 + a3 + outcome = 4</span>
+    <span class="k">if</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">inv_phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">inv_phi</span><span class="p">)],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">inv_phi</span><span class="p">),</span> <span class="o">-</span><span class="n">inv_phi</span><span class="p">]])</span>
+    <span class="c1"># a1 + a2 + a3 + outcome = 3</span>
+    <span class="k">elif</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="c1"># a1 + a2 + a3 + outcome = 2</span>
+    <span class="k">elif</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">a3</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="c1"># a1 + a2 + a3 + outcome = 1</span>
+    <span class="c1"># a1 + a2 + a3 + outcome = 0</span>
+    <span class="k">elif</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a3</span> <span class="o">+</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">f_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">f_matrix</span>
+
+
+<span class="k">def</span> <span class="nf">__R</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    R matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">r_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)]]</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">r_matrix</span>
+
+
+<span class="k">def</span> <span class="nf">__B</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">outcome</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Braiding matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">b_matrix</span> <span class="o">=</span> <span class="n">__F</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="o">@</span> <span class="n">__R</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="o">@</span> <span class="n">__F</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">b_matrix</span>
+
+
+<span class="k">def</span> <span class="nf">__sigma</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">state_f</span><span class="p">,</span> <span class="n">state_i</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Amplitude of getting state_f by applying the braiding operator</span>
+<span class="sd">    sigma_{index} on state_i.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the component (state_f, state_i) of the sigma_{index} matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">state_i</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;index value is not valid!&quot;</span><span class="p">)</span>
+
+    <span class="n">stt_f</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">state_f</span>
+    <span class="n">stt_i</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">state_i</span>
+
+    <span class="k">if</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">a0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">a0</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">outcome</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">stt_i</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">stt_f</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">amplitude</span> <span class="o">=</span> <span class="n">__B</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+
+    <span class="n">ket</span> <span class="o">=</span> <span class="n">stt_i</span>
+    <span class="n">ket</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="n">bra</span> <span class="o">=</span> <span class="n">stt_f</span>
+    <span class="k">if</span> <span class="n">ket</span> <span class="o">==</span> <span class="n">bra</span><span class="p">:</span>
+        <span class="n">braket</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">braket</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="n">braket</span>
+
+
+<span class="k">def</span> <span class="nf">__L</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">i_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">jj_</span><span class="p">,</span> <span class="n">jj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    L matrix component that is used in calculation of braiding between</span>
+<span class="sd">    two anyons separated in two qudits.</span>
+<span class="sd">    (see report)</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        k: int: k</span>
+<span class="sd">        h: int: i_{m(q-1)}</span>
+<span class="sd">        i_: int: i&#39;_{mq}</span>
+<span class="sd">        i: int: i_{mq}</span>
+<span class="sd">        jj_: list: [i&#39;_{(m+1)1},....i&#39;_{(m+1)q}]</span>
+<span class="sd">        jj: list: [i_{(m+1)1},....i_{(m+1)q}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
+
+    <span class="n">qudit_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+    <span class="n">jjj_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">jj_</span><span class="p">)</span>
+    <span class="n">jjj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+    <span class="n">jjj_</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">jjj_</span>
+    <span class="n">jjj</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">jjj</span>
+
+    <span class="n">init_p</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">qudit_len</span>
+    <span class="n">final_p</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">qudit_len</span>
+    <span class="n">new_p</span> <span class="o">=</span> <span class="n">init_p</span>
+    <span class="k">while</span> <span class="n">new_p</span> <span class="o">!=</span> <span class="n">final_p</span><span class="p">:</span>
+        <span class="n">pp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_p</span><span class="p">)</span>
+        <span class="n">pp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">qudit_len</span><span class="p">):</span>
+            <span class="n">product</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">product</span>
+                <span class="o">*</span> <span class="n">__F</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">jjj</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()[</span><span class="n">jjj</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span>
+                <span class="o">*</span> <span class="n">__F</span><span class="p">(</span><span class="n">i_</span><span class="p">,</span> <span class="n">jjj_</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])[</span><span class="n">pp</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">jjj_</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="p">)</span>
+
+        <span class="n">product</span> <span class="o">=</span> <span class="n">product</span> <span class="o">*</span> <span class="n">__B</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="n">i</span><span class="p">,</span> <span class="n">i_</span><span class="p">]</span>
+        <span class="n">component</span> <span class="o">+=</span> <span class="n">product</span>
+        <span class="c1"># iterate</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_p</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_p</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_p</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># final iteration</span>
+    <span class="n">pp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_p</span><span class="p">)</span>
+    <span class="n">pp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">qudit_len</span><span class="p">):</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">product</span>
+            <span class="o">*</span> <span class="n">__F</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">jjj</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()[</span><span class="n">jjj</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span>
+            <span class="o">*</span> <span class="n">__F</span><span class="p">(</span><span class="n">i_</span><span class="p">,</span> <span class="n">jjj_</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])[</span><span class="n">pp</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">jjj_</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+        <span class="p">)</span>
+
+    <span class="n">product</span> <span class="o">=</span> <span class="n">product</span> <span class="o">*</span> <span class="n">__B</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pp</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="n">i</span><span class="p">,</span> <span class="n">i_</span><span class="p">]</span>
+    <span class="n">component</span> <span class="o">+=</span> <span class="n">product</span>
+
+    <span class="k">return</span> <span class="n">component</span>
+
+
+<span class="k">def</span> <span class="nf">__S</span><span class="p">(</span><span class="n">jm</span><span class="p">,</span> <span class="n">jmo</span><span class="p">,</span> <span class="n">jmoo</span><span class="p">,</span> <span class="n">jmo_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">i_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">jj_</span><span class="p">,</span> <span class="n">jj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    S matrix or sewing matrix is used in calculation of braiding operator</span>
+<span class="sd">    between two anyons separated between two qudits not fused imedialtely.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        jm: int: j_m</span>
+<span class="sd">        jmo: int: j_{m-1}</span>
+<span class="sd">        jmoo: int: j_{m-2}</span>
+<span class="sd">        jmo_: int: j&#39;_{m-1}</span>
+<span class="sd">        h: int: i_{m(q-1)}</span>
+<span class="sd">        i_: int: i&#39;_{mq}</span>
+<span class="sd">        i: int: i_{mq}</span>
+<span class="sd">        jj_: list: [i&#39;_{(m+1)1},....i&#39;_{(m+1)q}]</span>
+<span class="sd">        jj: list: [i_{(m+1)1},....i_{(m+1)q}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">0</span><span class="n">j</span>
+
+    <span class="k">for</span> <span class="n">kk</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+        <span class="n">component</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">__F</span><span class="p">(</span><span class="n">jmoo</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">jj</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">jm</span><span class="p">)[</span><span class="n">jmo</span><span class="p">,</span> <span class="n">kk</span><span class="p">]</span>
+            <span class="o">*</span> <span class="n">__L</span><span class="p">(</span><span class="n">kk</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">i_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">jj_</span><span class="p">,</span> <span class="n">jj</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">__F</span><span class="p">(</span><span class="n">jmoo</span><span class="p">,</span> <span class="n">i_</span><span class="p">,</span> <span class="n">jj_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">jm</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()[</span><span class="n">kk</span><span class="p">,</span> <span class="n">jmo_</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">component</span>
+
+
+<span class="k">def</span> <span class="nf">__gen_sigma</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">state_i</span><span class="p">,</span> <span class="n">state_f</span><span class="p">):</span>
+    <span class="n">qudit_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">nb_anyons_per_qudit</span> <span class="o">=</span> <span class="n">qudit_len</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">amplitude</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">braket</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">index</span> <span class="o">%</span> <span class="n">nb_anyons_per_qudit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">index</span> <span class="o">//</span> <span class="n">nb_anyons_per_qudit</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">index</span> <span class="o">%</span> <span class="n">nb_anyons_per_qudit</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">__sigma</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">],</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">qudit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">qudit</span> <span class="o">!=</span> <span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">braket</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">root</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">root</span> <span class="o">!=</span> <span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">braket</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span> <span class="o">//</span> <span class="n">nb_anyons_per_qudit</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">new_state_i</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_i</span><span class="p">)</span>
+        <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            jm: int: j_m</span>
+<span class="sd">            jmo: int: j_{m-1}</span>
+<span class="sd">            jmoo: int: j_{m-2}</span>
+<span class="sd">            jmo_: int: j&#39;_{m-1}</span>
+<span class="sd">            h: int: i_{m(q-1)}</span>
+<span class="sd">            i_: int: i&#39;_{mq}</span>
+<span class="sd">            i: int: i_{mq}</span>
+<span class="sd">            jj_: list: [i&#39;_{(m+1)1},....i&#39;_{(m+1)q}]</span>
+<span class="sd">            jj: list: [i_{(m+1)1},....i_{(m+1)q}]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">jj_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">jj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">jmo_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">jmoo</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">jmo</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">jm</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_f</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">jj_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">jj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">jmo_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">jmoo</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">jmo</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">jm</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="n">jj_</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">jj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">jmo_</span> <span class="o">=</span> <span class="n">new_state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">jmoo</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">jmo</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;qudits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">jm</span> <span class="o">=</span> <span class="n">state_i</span><span class="p">[</span><span class="s2">&quot;roots&quot;</span><span class="p">][</span><span class="n">m</span><span class="p">]</span>
+
+        <span class="n">amplitude</span> <span class="o">+=</span> <span class="n">__S</span><span class="p">(</span><span class="n">jm</span><span class="p">,</span> <span class="n">jmo</span><span class="p">,</span> <span class="n">jmoo</span><span class="p">,</span> <span class="n">jmo_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">i_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">jj_</span><span class="p">,</span> <span class="n">jj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_state_i</span> <span class="o">!=</span> <span class="n">state_f</span><span class="p">:</span>
+            <span class="n">braket</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">braket</span> <span class="o">*</span> <span class="n">amplitude</span>
+
+
+<div class="viewcode-block" id="generate_braiding_operator"><a class="viewcode-back" href="../../../backend/operator_generator.html#tqsim.lib.operator_generator.generate_braiding_operator">[docs]</a><span class="k">def</span> <span class="nf">generate_braiding_operator</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nb_qudits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates the braiding operator of index &#39;index&#39; for a system of</span>
+<span class="sd">    a given number of qudits and anyons per qudit.</span>
+<span class="sd">    This operator braids anyons at positions &#39;index&#39; and &#39;index&#39;+1.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index : int</span>
+<span class="sd">        The operator&#39;s index.</span>
+<span class="sd">    nb_qudits : int</span>
+<span class="sd">        Number of qudits in the circuit.</span>
+<span class="sd">    nb_anyons_per_qudit : int</span>
+<span class="sd">        Number of anyons in each qudit.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List</span>
+<span class="sd">        Matrix representation of the braiding operator.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">generate_basis</span><span class="p">(</span><span class="n">nb_qudits</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="p">)</span>
+
+    <span class="n">sigmas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">base_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">):</span>
+        <span class="n">sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">base_i</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">:</span>
+            <span class="n">sigmas</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">__gen_sigma</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">base_i</span><span class="p">,</span> <span class="n">base_f</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">sigmas</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, Mohamed Taha Rouabah.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

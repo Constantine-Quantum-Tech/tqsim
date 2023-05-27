@@ -17,7 +17,7 @@ import numpy as np
 from .basis_generator import generate_basis
 
 
-def F(a1, a2, a3, outcome):
+def __F(a1, a2, a3, outcome):
     """
     F matrix
     """
@@ -52,7 +52,7 @@ def F(a1, a2, a3, outcome):
     return f_matrix
 
 
-def R(a1, a2):
+def __R(a1, a2):
     """
     R matrix
     """
@@ -66,16 +66,16 @@ def R(a1, a2):
     return r_matrix
 
 
-def B(a0, a1, a2, outcome):
+def __B(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    b_matrix = F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).T.conjugate()
+    b_matrix = __F(a0, a1, a2, outcome) @ __R(a1, a2) @ __F(a0, a2, a1, outcome).T.conjugate()
 
     return b_matrix
 
 
-def sigma(index, state_f, state_i):
+def __sigma(index, state_f, state_i):
     """
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -99,7 +99,7 @@ def sigma(index, state_f, state_i):
     outcome = state_i[index - 1]
     a = stt_i[index - 1]
     b = stt_f[index - 1]
-    amplitude = B(a0, 1, 1, outcome)[a, b]
+    amplitude = __B(a0, 1, 1, outcome)[a, b]
 
     ket = stt_i
     ket[index - 1] = b
@@ -111,7 +111,7 @@ def sigma(index, state_f, state_i):
     return amplitude * braket
 
 
-def L(k, h, i_, i, jj_, jj):
+def __L(k, h, i_, i, jj_, jj):
     """
     L matrix component that is used in calculation of braiding between
     two anyons separated in two qudits.
@@ -143,11 +143,11 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
-                * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+                * __F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+                * __F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
-        product = product * B(h, 1, 1, pp[0])[i, i_]
+        product = product * __B(h, 1, 1, pp[0])[i, i_]
         component += product
         # iterate
         for ii, label in enumerate(new_p):
@@ -164,17 +164,17 @@ def L(k, h, i_, i, jj_, jj):
     for ii in range(qudit_len):
         product = (
             product
-            * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
-            * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+            * __F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+            * __F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
         )
 
-    product = product * B(h, 1, 1, pp[0])[i, i_]
+    product = product * __B(h, 1, 1, pp[0])[i, i_]
     component += product
 
     return component
 
 
-def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+def __S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
     """
     S matrix or sewing matrix is used in calculation of braiding operator
     between two anyons separated between two qudits not fused imedialtely.
@@ -194,15 +194,15 @@ def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
 
     for kk in [0, 1]:
         component += (
-            F(jmoo, i, jj[-1], jm)[jmo, kk]
-            * L(kk, h, i_, i, jj_, jj)
-            * F(jmoo, i_, jj_[-1], jm).T.conjugate()[kk, jmo_]
+            __F(jmoo, i, jj[-1], jm)[jmo, kk]
+            * __L(kk, h, i_, i, jj_, jj)
+            * __F(jmoo, i_, jj_[-1], jm).T.conjugate()[kk, jmo_]
         )
 
     return component
 
 
-def gen_sigma(index, state_i, state_f):
+def __gen_sigma(index, state_i, state_f):
     qudit_len = len(state_i["qudits"][0])
     nb_anyons_per_qudit = qudit_len + 1
 
@@ -213,7 +213,7 @@ def gen_sigma(index, state_i, state_f):
 
         m = index // nb_anyons_per_qudit
         idx = index % nb_anyons_per_qudit
-        amplitude = sigma(idx, state_f["qudits"][m], state_i["qudits"][m])
+        amplitude = __sigma(idx, state_f["qudits"][m], state_i["qudits"][m])
 
         for i, qudit in enumerate(state_i["qudits"]):
             if i == m:
@@ -283,7 +283,7 @@ def gen_sigma(index, state_i, state_f):
             jmo = state_i["qudits"][0][-1]
             jm = state_i["roots"][m]
 
-        amplitude += S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+        amplitude += __S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
         if new_state_i != state_f:
             braket = 0
 
@@ -316,6 +316,6 @@ def generate_braiding_operator(index: int, nb_qudits: int, nb_anyons_per_qudit: 
     for f, base_f in enumerate(basis):
         sigmas.append([])
         for base_i in basis:
-            sigmas[f].append(gen_sigma(index, base_i, base_f))
+            sigmas[f].append(__gen_sigma(index, base_i, base_f))
 
     return sigmas

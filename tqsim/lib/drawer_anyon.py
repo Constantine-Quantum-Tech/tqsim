@@ -14,6 +14,10 @@ import numpy as np
 
 
 class DrawerAnyon:
+    """
+    TODO: ADD SOME TEXT HERE
+    """
+    
     def __init__(self, initial_id, pos):
         self.__i = np.linspace(0, 1)
         self.__one = np.ones_like(self.__i)
