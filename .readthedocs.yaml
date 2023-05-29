@@ -22,3 +22,8 @@ sphinx:
 # If using Sphinx, optionally build your docs in additional formats such as PDF
 # formats:
 #    - pdf
+python:
+  version: 3.7
+  install:
+    - method: pip
+      path: .
