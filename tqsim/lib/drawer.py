@@ -21,7 +21,7 @@ from .utils import __matplotlib_close_if_inline
 
 class Drawer:
     """
-    TODO: ADD SOME TEXT HERE
+    TODO: ADD DOCSTRING
     """
     def __init__(
         self,
@@ -53,7 +53,7 @@ class Drawer:
     @property
     def anyons(self) -> dict[int, DrawerAnyon]:
         """
-        TODO: ADD SOME TEXT HERE
+        TODO: ADD DOCSTRING
         """
         return self.__anyons
 
@@ -179,7 +179,7 @@ class Drawer:
 
     def draw(self):
         """
-        TODO: ADD SOME TEXT HERE
+        TODO: ADD DOCSTRING
         """
         width = self.__anyons[1].get_last_x() * 0.5
         height = self.__nb_anyons * 0.3
