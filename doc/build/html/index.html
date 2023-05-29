@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TQSim &mdash; TQSim 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AnyonicCircuit Class" href="frontend/anyonic_circuit.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            TQSim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Simulator:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="frontend/anyonic_circuit.html">AnyonicCircuit Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frontend/drawer_anyon.html">DrawerAnyon Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frontend/utils.html">Utility module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="backend/basis_generator.html">Basis Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend/operator_generator.html">Operator Generator</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">TQSim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">TQSim</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tqsim">
+<h1>TQSim<a class="headerlink" href="#tqsim" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/main/images/cqtech_logo.png"><img alt="CQTech" class="align-right" src="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/main/images/cqtech_logo.png" style="width: 70px;" /></a>
+<p>TQSim stands for Topological Quantum Simulator. It is an open-source library for simulating
+topological quantum computers based on Fibonacci anyons.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>You can install TQSim from pip using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --upgrade tqsim
+</pre></div>
+</div>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Simulator:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="frontend/anyonic_circuit.html">AnyonicCircuit Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frontend/drawer_anyon.html">DrawerAnyon Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frontend/utils.html">Utility module</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Core:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="backend/basis_generator.html">Basis Generator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend/operator_generator.html">Operator Generator</a></li>
+</ul>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<section id="basic-example">
+<h3>1. Basic Example<a class="headerlink" href="#basic-example" title="Permalink to this heading"></a></h3>
+<p>In this example, we create a circuit with 2 qudits, made of 3 anyons each. We then braid the anyons manually.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tqsim</span> <span class="kn">import</span> <span class="n">AnyonicCircuit</span>
+
+<span class="n">circuit</span> <span class="o">=</span> <span class="n">AnyonicCircuit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># Create a circuit having 2 qudits and 3 anyons per qudits</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">braid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># Braids the first with the second anyon</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">braid</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># Braids the first with the second anyon</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">braid</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span> <span class="c1"># Measure the system by fusing the anyons</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1"># Draw the circuit</span>
+</pre></div>
+</div>
+<p>Here is the output of the <cite>draw()</cite> method:</p>
+<img alt="Circuit Output" src="https://i.ibb.co/3z9pFmQ/example.png" />
+<p>Simulating the circuit:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">circuit</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">shots</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">{</span><span class="s1">&#39;counts&#39;</span>: <span class="o">{</span><span class="s1">&#39;0&#39;</span>: <span class="m">16</span>, <span class="s1">&#39;2&#39;</span>: <span class="m">20</span>, <span class="s1">&#39;4&#39;</span>: <span class="m">14</span><span class="o">}</span>, <span class="s1">&#39;memory&#39;</span>: array<span class="o">([</span><span class="m">4</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">4</span>, <span class="m">2</span>, <span class="m">4</span>, <span class="m">2</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">4</span>, <span class="m">0</span>, <span class="m">4</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">4</span>,
+       <span class="m">2</span>, <span class="m">4</span>, <span class="m">0</span>, <span class="m">2</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">4</span>, <span class="m">4</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">4</span>, <span class="m">2</span>, <span class="m">2</span>, <span class="m">0</span>, <span class="m">0</span>, <span class="m">2</span>, <span class="m">4</span>, <span class="m">2</span>, <span class="m">2</span>,
+       <span class="m">4</span>, <span class="m">2</span>, <span class="m">4</span>, <span class="m">4</span>, <span class="m">0</span>, <span class="m">2</span><span class="o">])}</span>
+</pre></div>
+</div>
+</section>
+<section id="simulating-a-hadamard-gate">
+<h3>2. Simulating a Hadamard gate<a class="headerlink" href="#simulating-a-hadamard-gate" title="Permalink to this heading"></a></h3>
+<p>Here we simulate the application of a Hadamard gate on a single qudit with 3 anyons.
+Unlike the previous example, we will use a braiding sequence of braiding operators and their corresponding powers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tqsim</span> <span class="kn">import</span> <span class="n">AnyonicCircuit</span>
+
+<span class="n">circuit</span> <span class="o">=</span> <span class="n">AnyonicCircuit</span><span class="p">(</span><span class="n">nb_qudits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nb_anyons_per_qudit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Create a circuit with 1 qudit composed of 3 anyons</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">initialize</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># We initialize the circuit in the last state (state 2).</span>
+                            <span class="c1"># For this circuit, we have 3 basis states: [0, 1, 2].</span>
+
+<span class="c1"># The Hadamard gate braiding sequence in terms of braiding operators</span>
+<span class="n">had_sequence</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+
+<span class="n">circuit</span><span class="o">.</span><span class="n">braid_sequence</span><span class="p">(</span><span class="n">had_sequence</span><span class="p">)</span>  <span class="c1"># We apply the braiding sequence.</span>
+                                      <span class="c1"># This should put our qudit in a superposition of the states 2 and 1.</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>  <span class="c1"># Measure the system by fusing the anyons</span>
+<span class="n">circuit</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>  <span class="c1"># Draw the circuit</span>
+</pre></div>
+</div>
+<p>The Hadamard braid looks like this</p>
+<img alt="Circuit Output" src="https://i.ibb.co/5kDVWgf/example-hadamard.png" />
+<p>Simulating the circuit:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">shots</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Run the circuit 1000 times.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">])</span>  <span class="c1"># Show the counts only.</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">{</span><span class="s1">&#39;1&#39;</span>: <span class="m">493</span>, <span class="s1">&#39;2&#39;</span>: <span class="m">507</span><span class="o">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="authors-and-citation">
+<h2>Authors and Citation<a class="headerlink" href="#authors-and-citation" title="Permalink to this heading"></a></h2>
+<p><em>Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, and Mohamed Taha Rouabah – Constantine Quantum Technologies.</em></p>
+<p>If you have used TQSim in your work, please use the <a class="reference external" href="citation.bib">BibTeX file</a> to cite the authors.</p>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="frontend/anyonic_circuit.html" class="btn btn-neutral float-right" title="AnyonicCircuit Class" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Constantine Quantum Technologies (Abdellah Tounsi, Mohamed Messaoud Louamri, Nacer eddine Belaloui, Mohamed Taha Rouabah).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
