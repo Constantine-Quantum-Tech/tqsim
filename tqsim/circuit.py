@@ -37,11 +37,11 @@ class AnyonicCircuit:
     
     Examples
     ---------
-    TODO: ADD SOME TEXT HERE
+    Here is an example of how to create a circuit 
+    with 2 qudits and 3 anyons per qudits. The circuit 
+    has a total of 6 anyons (2 * 3).
 
     >>> circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)
-                This circuit has 2 qudits, with 3 anyons each. The circuit has
-                a total of 2*3=6 anyons.
 
 
     """
@@ -285,7 +285,7 @@ class AnyonicCircuit:
         return self
 
     def braid_sequence(self, braid: Sequence[Sequence[int]]):
-        """Takes a sequence of [sigma operator, power], and applies the
+        """Takes a sequence of [index of the sigma operator, power], and applies the
         successive operators to the 'power'.
         The first operator in the sequence is the first to be applied.
 

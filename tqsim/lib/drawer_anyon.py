@@ -35,10 +35,16 @@ class DrawerAnyon:
 
     @property
     def label(self):
+        """
+        Put something here
+        """
         return self.__label
 
     @label.setter
     def label(self, new):
+        """
+        Put something here
+        """
         self.__label = new
 
     @property
