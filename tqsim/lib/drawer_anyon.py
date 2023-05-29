@@ -15,7 +15,10 @@ import numpy as np
 
 class DrawerAnyon:
     """
-    TODO: ADD SOME TEXT HERE
+    This class represents an anyon object in the circuit drawer, and is used
+    to set the colors and labels for each anyon in the circuit.
+    It is not meant to be used directly, and is used by the Drawer class to
+    draw individual anyons.
     """
     
     def __init__(self, initial_id, pos):
@@ -36,19 +39,37 @@ class DrawerAnyon:
     @property
     def label(self):
         """
-        Put something here
+        Get or set the label of the anyon.
+
+        This property represents the label assigned to the anyon.
+        It can be either a string, an integer, or a float. (or anything
+        that can be passed to matplotlib.axes.Axes.text).
+
+        Returns
+        -------
+            Union[str, int, float]
+                The current label of the anyon.
         """
         return self.__label
 
     @label.setter
     def label(self, new):
-        """
-        Put something here
-        """
         self.__label = new
 
     @property
     def color(self):
+        """
+        Get or set the color of the anyon.
+
+        This property represents the color assigned to the anyon. Since
+        the drawing is done with matplotlib, its value must be on of the
+        color values that are accepted by matplotlib.
+
+        Returns
+        -------
+            str
+                The color of the anyon's worldline.
+        """
         return self.__color
 
     @color.setter
