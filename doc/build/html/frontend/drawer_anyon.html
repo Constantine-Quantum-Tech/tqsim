@@ -83,11 +83,42 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="tqsim.lib.drawer_anyon.DrawerAnyon">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tqsim.lib.drawer_anyon.</span></span><span class="sig-name descname"><span class="pre">DrawerAnyon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tqsim/lib/drawer_anyon.html#DrawerAnyon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tqsim.lib.drawer_anyon.DrawerAnyon" title="Permalink to this definition"></a></dt>
-<dd><p>TODO: ADD SOME TEXT HERE</p>
+<dd><p>This class represents an anyon object in the circuit drawer, and is used
+to set the colors and labels for each anyon in the circuit.
+It is not meant to be used directly, and is used by the Drawer class to
+draw individual anyons.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="tqsim.lib.drawer_anyon.DrawerAnyon.color">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">color</span></span><a class="headerlink" href="#tqsim.lib.drawer_anyon.DrawerAnyon.color" title="Permalink to this definition"></a></dt>
+<dd><p>Get or set the color of the anyon.</p>
+<p>This property represents the color assigned to the anyon. Since
+the drawing is done with matplotlib, its value must be on of the
+color values that are accepted by matplotlib.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The color of the anyon’s worldline.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="tqsim.lib.drawer_anyon.DrawerAnyon.label">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#tqsim.lib.drawer_anyon.DrawerAnyon.label" title="Permalink to this definition"></a></dt>
-<dd><p>Put something here</p>
+<dd><p>Get or set the label of the anyon.</p>
+<p>This property represents the label assigned to the anyon.
+It can be either a string, an integer, or a float. (or anything
+that can be passed to matplotlib.axes.Axes.text).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current label of the anyon.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[str, int, float]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

@@ -93,7 +93,10 @@
 
 <div class="viewcode-block" id="DrawerAnyon"><a class="viewcode-back" href="../../../frontend/drawer_anyon.html#tqsim.lib.drawer_anyon.DrawerAnyon">[docs]</a><span class="k">class</span> <span class="nc">DrawerAnyon</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    TODO: ADD SOME TEXT HERE</span>
+<span class="sd">    This class represents an anyon object in the circuit drawer, and is used</span>
+<span class="sd">    to set the colors and labels for each anyon in the circuit.</span>
+<span class="sd">    It is not meant to be used directly, and is used by the Drawer class to</span>
+<span class="sd">    draw individual anyons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_id</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
@@ -114,19 +117,37 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Put something here</span>
+<span class="sd">        Get or set the label of the anyon.</span>
+
+<span class="sd">        This property represents the label assigned to the anyon.</span>
+<span class="sd">        It can be either a string, an integer, or a float. (or anything</span>
+<span class="sd">        that can be passed to matplotlib.axes.Axes.text).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Union[str, int, float]</span>
+<span class="sd">                The current label of the anyon.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
 
     <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Put something here</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">new</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get or set the color of the anyon.</span>
+
+<span class="sd">        This property represents the color assigned to the anyon. Since</span>
+<span class="sd">        the drawing is done with matplotlib, its value must be on of the</span>
+<span class="sd">        color values that are accepted by matplotlib.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            str</span>
+<span class="sd">                The color of the anyon&#39;s worldline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__color</span>
 
     <span class="nd">@color</span><span class="o">.</span><span class="n">setter</span>
