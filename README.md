@@ -4,12 +4,14 @@
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/Constantine-Quantum-Tech/tqsim/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/Constantine-Quantum-Tech/tqsim/tree/main)
 [![Version](https://img.shields.io/pypi/v/tqsim?style=flat-square)](https://pypi.org/project/tqsim/)
+[![Documentation](https://img.shields.io/readthedocs/tqsim?style=flat-square)](https://tqsim.readthedocs.io/en/latest/index.html)
 [![License](https://img.shields.io/pypi/dm/tqsim?style=flat-square)](https://pypi.org/project/tqsim/)
 [![License](https://img.shields.io/github/license/Constantine-Quantum-Tech/tqsim?style=flat-square)](LICENSE)
 
 
 TQSim stands for Topological Quantum Simulator. It is an open-source library for simulating topological quantum computers based on Fibonacci anyons. 
 
+Documentation for the latest stable version of TQSim is available [here](https://tqsim.readthedocs.io/en/latest/index.html).
 
 ## Installation
 
