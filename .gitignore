@@ -2,5 +2,6 @@ __pycache__/
 .vscode/
 .ipynb_checkpoints/
 dist/
+.pytest_cache/
 
 *.pyc
