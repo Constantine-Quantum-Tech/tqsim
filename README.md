@@ -1,4 +1,4 @@
-<img align="right" width="70" src="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/main/images/cqtech_logo.png" alt="CQTech">
+<img align="right" height="70" src="./images/cqtech_logo.png" alt="CQTech">
 
 # TQSim
 
