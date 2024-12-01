@@ -1,4 +1,8 @@
-<img align="right" width="70" src="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/main/images/cqtech_logo.png" alt="CQTech">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/refs/heads/logo-update/images/cqtech_logo_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/refs/heads/logo-update/images/cqtech_logo_blue.png">
+  <img alt="CQTech's Logo" align="right" height="70" src="https://raw.githubusercontent.com/Constantine-Quantum-Tech/tqsim/refs/heads/logo-update/images/cqtech_logo_blue.png">
+</picture>
 
 # TQSim
 
