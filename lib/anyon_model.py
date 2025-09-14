@@ -1,6 +1,17 @@
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2022.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import numpy as np
 from lib.utils import einsum_with_names
-from typing import List
 
 
 class AnyonModel:
@@ -10,9 +21,11 @@ class AnyonModel:
         self.F_matrix = F_matrix
         self.R_matrix = R_matrix
         self.braiding_matrix = self._compute_braiding_matrix()
-    
-    def check_rule(self, anyon1: np.ndarray, anyon2: np.ndarray, outcome: np.ndarray) -> np.ndarray:
-        """ Returns True if 'anyon1 x anyon2 = outcome' obeys the Fibonacci
+
+    def check_rule(
+        self, anyon1: np.ndarray, anyon2: np.ndarray, outcome: np.ndarray
+    ) -> np.ndarray:
+        """Returns True if 'anyon1 x anyon2 = outcome' obeys the Fibonacci
         fusion rules, returns False otherwise.
 
         Parameters
@@ -32,11 +45,12 @@ class AnyonModel:
         """
         # check that N_symbols[anyon1[i], anyon2[i], outcome[i]] == 1 for all i
         return self.N_symbols[anyon1, anyon2, outcome] == np.ones_like(anyon1)
-    
-    def _compute_braiding_matrix(self):
-        r""" Computes the braiding matrix for the anyon model.
 
-        [ B_{abc}^j ]_{im} = sum_l [ F_{abc}^j ]_{il} R_{bc}^l [ F_{acb}^j ]^dag_{lm}
+    def _compute_braiding_matrix(self):
+        r"""Computes the braiding matrix for the anyon model.
+
+        [ B_{abc}^j ]_{im} = sum_l [ F_{abc}^j ]_{il} R_{bc}^l
+                             [ F_{acb}^j ]^dag_{lm}
 
         Returns
         -------
@@ -44,12 +58,16 @@ class AnyonModel:
             The braiding matrix.
 
         """
-        b_matrix = np.einsum('abcjil, bcl, acbjml -> abcjim',
-                             self.F_matrix, self.R_matrix, self.F_matrix.conjugate())
+        b_matrix = np.einsum(
+            "abcjil, bcl, acbjml -> abcjim",
+            self.F_matrix,
+            self.R_matrix,
+            self.F_matrix.conjugate(),
+        )
         return b_matrix
 
     def _compute_L_matrix(self, q: int):
-        r""" 
+        r"""
         [L_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{p(q+1)}]^{
         i(m,q) i(m+1,0) ... i(m+1,q)
         }_{
@@ -57,11 +75,18 @@ class AnyonModel:
         }
         =
         \sum_{p(1), .., p(q), i'(m,q), i'(m+1,1), .., i'(m+1,q)}
-        prod_{r=1}^{q} [ F_{i(m, q), i(m+1, q-r), a(m+1, q-r+1)}^{p(q-r+2)} ].dag^{i(m+1, q-r+1)}_{p(q-r+1)}
+        prod_{r=1}^{q} [ F_{i(m, q), i(m+1, q-r),
+                         a(m+1, q-r+1)}^{p(q-r+2)}
+                        ].dag^{i(m+1, q-r+1)}_{p(q-r+1)}
         [ B^{p(1)}_{i(m,q-1), a(m, q), a(m+1, 0)} ]^{i(m, q)}_{i'(m, q)}
-        prod_{r=1}^{q} [ F_{i'(m, q), i'(m+1, q-r), a(m+1, q-r+1)}^{p(q-r+2)} ]^{p(q-r+1)}_{i'(m+1, q-r+1)}
+        prod_{r=1}^{q} [ F_{i'(m, q), i'(m+1, q-r),
+                         a(m+1, q-r+1)}^{p(q-r+2)}
+                        ]^{p(q-r+1)}_{i'(m+1, q-r+1)}
         """
-        assert q > 0, "q must be strictly positive. For q=0, R is just the braiding matrix."
+        assert (
+            q > 0
+        ), ("q must be strictly positive. "
+            "For q=0, L is just the braiding matrix.")
         terms = []
 
         # --- Left product of q dagger-F factors
@@ -82,8 +107,12 @@ class AnyonModel:
 
         # --- B tensor
         B_labels = (
-            "p(1)", f"i(m,{q-1})", f"a(m,{q})", "a(m+1,0)",
-            f"i(m,{q})", f"ip(m,{q})"
+            "p(1)",
+            f"i(m,{q-1})",
+            f"a(m,{q})",
+            "a(m+1,0)",
+            f"i(m,{q})",
+            f"ip(m,{q})",
         )
         terms.append((self.braiding_matrix, B_labels))
 
@@ -96,7 +125,7 @@ class AnyonModel:
                 f"a(m+1,{q-r+1})",
                 f"p({q-r+2})",
                 f"p({q-r+1})",
-                f"ip(m+1,{q-r+1})"
+                f"ip(m+1,{q-r+1})",
             )
             terms.append((self.F_matrix, labels))
             r += 1
@@ -108,19 +137,23 @@ class AnyonModel:
         # i'(m,q), i'(m+1,0) ... i'(m+1,q)
         # }
         out_labels = (
-            [f"a(m,{q})"] + [f"a(m+1,0)"] + [f"a(m+1,{q-r+1})" for r in range(1, q+1)] +
-            [f"i(m,{q-1})"] + [f"p({q+1})"] +
-            [f"i(m,{q})"] + [f"i(m+1,{r})" for r in range(0, q+1)] +
-            [f"ip(m,{q})"] + [f"ip(m+1,{r})" for r in range(0, q+1)]
+            [f"a(m,{q})"]
+            + ["a(m+1,0)"]
+            + [f"a(m+1,{q-r+1})" for r in range(1, q + 1)]
+            + [f"i(m,{q-1})"]
+            + [f"p({q+1})"]
+            + [f"i(m,{q})"]
+            + [f"i(m+1,{r})" for r in range(0, q + 1)]
+            + [f"ip(m,{q})"]
+            + [f"ip(m+1,{r})" for r in range(0, q + 1)]
         )
 
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
-            
 
     def compute_knitting_matrix(self, q: int):
         r"""
-        See Appendix of https://arxiv.org/abs/2307.01892 
+        See Appendix of https://arxiv.org/abs/2307.01892
 
         [K_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{j(m-2), j(m)}]^{
         j(m-1) i(m,q)i(m+1,0) ... i(m+1,q)
@@ -129,22 +162,31 @@ class AnyonModel:
         }
         =
         \sum_{k}
-        [ F^{j(m)}_{j(m-2), i(m,q), i(m+1,q)} ]^{j(m-1)}_{k} 
+        [ F^{j(m)}_{j(m-2), i(m,q), i(m+1,q)} ]^{j(m-1)}_{k}
         [L_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{k}]^{
         i(m,q) i(m+1,0) ... i(m+1,q)
         }_{
         i'(m,q), i'(m+1,0) ... i'(m+1,q)
         }
-        [ F^{j(m)}_{j(m-2), i'(m,q), i'(m+1,q)} ].dagger^{k}_{j'(m-1)} 
+        [ F^{j(m)}_{j(m-2), i'(m,q), i'(m+1,q)} ].dagger^{k}_{j'(m-1)}
 
         """
-        assert q > 0, "q must be strictly positive. For q=0, K is just the braiding matrix."
+        assert (
+            q > 0
+        ), ("q must be strictly positive. "
+            "For q=0, K is just the braiding matrix.")
         terms = []
 
         # --- Left F factor ---
         # Example label order (must match how F is actually stored):
-        F_labels = (f"j(m-2)", f"i(m,{q})", f"i(m+1,{q})",
-                    f"j(m)", f"j(m-1)", "k")
+        F_labels = (
+            "j(m-2)",
+            f"i(m,{q})",
+            f"i(m+1,{q})",
+            "j(m)",
+            "j(m-1)",
+            "k",
+        )
         terms.append((self.F_matrix, F_labels))
 
         # --- L factor ---
@@ -158,10 +200,14 @@ class AnyonModel:
         #     [f"ip(m,{q})"] + [f"ip(m+1,{r})" for r in range(0, q+1)]
         # )
         L_labels = (
-            f"a(m,{q})", *[f"a(m+1,{r})" for r in range(0, q+1)],
-            f"i(m,{q-1})", "k",
-            f"i(m,{q})", *[f"i(m+1,{r})" for r in range(0, q+1)],
-            f"ip(m,{q})", *[f"ip(m+1,{r})" for r in range(0, q+1)]
+            f"a(m,{q})",
+            *[f"a(m+1,{r})" for r in range(0, q + 1)],
+            f"i(m,{q-1})",
+            "k",
+            f"i(m,{q})",
+            *[f"i(m+1,{r})" for r in range(0, q + 1)],
+            f"ip(m,{q})",
+            *[f"ip(m+1,{r})" for r in range(0, q + 1)],
         )
         L_matrix = self._compute_L_matrix(q)
         terms.append((L_matrix, L_labels))
@@ -169,8 +215,14 @@ class AnyonModel:
         # --- Right F dagger factor ---
         # dagger = conjugate and swapaxes(5,4): swap 'k' and 'j(m-1)'
         F_dag = np.conjugate(np.swapaxes(self.F_matrix, 5, 4))
-        F_labels_dag = (f"j(m-2)", f"ip(m,{q})", f"ip(m+1,{q})",
-                        f"j(m)", "k", "jp(m-1)")
+        F_labels_dag = (
+            "j(m-2)",
+            f"ip(m,{q})",
+            f"ip(m+1,{q})",
+            "j(m)",
+            "k",
+            "jp(m-1)",
+        )
         terms.append((F_dag, F_labels_dag))
 
         # --- Output labels for K ---
@@ -180,10 +232,17 @@ class AnyonModel:
         # j'(m-1), i'(m,q), i'(m+1,0) ... i'(m+1,q)
         # }
         out_labels = (
-            f"a(m,{q})", *[f"a(m+1,{r})" for r in range(0, q+1)],
-            f"i(m,{q-1})", f"j(m-2)", f"j(m)",
-            f"j(m-1)", f"i(m,{q})", *[f"i(m+1,{r})" for r in range(0, q+1)],
-            f"jp(m-1)", f"ip(m,{q})", *[f"ip(m+1,{r})" for r in range(0, q+1)]
+            f"a(m,{q})",
+            *[f"a(m+1,{r})" for r in range(0, q + 1)],
+            f"i(m,{q-1})",
+            "j(m-2)",
+            "j(m)",
+            "j(m-1)",
+            f"i(m,{q})",
+            *[f"i(m+1,{r})" for r in range(0, q + 1)],
+            "jp(m-1)",
+            f"ip(m,{q})",
+            *[f"ip(m+1,{r})" for r in range(0, q + 1)],
         )
 
         # Perform contraction
