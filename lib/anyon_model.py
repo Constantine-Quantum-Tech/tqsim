@@ -190,17 +190,17 @@ class AnyonModel:
         See Appendix of https://arxiv.org/abs/2307.01892
 
         [K_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{j(m-2), j(m)}]^{
-        j(m-1) i(m,q)i(m+1,0) ... i(m+1,q)
+        j(m-1) i(m,q)i(m+1,1) ... i(m+1,q)
         }_{
-        j'(m-1), i'(m,q), i'(m+1,0) ... i'(m+1,q)
+        j'(m-1), i'(m,q), i'(m+1,1) ... i'(m+1,q)
         }
         =
         \sum_{k}
         [ F^{j(m)}_{j(m-2), i(m,q), i(m+1,q)} ]^{j(m-1)}_{k}
         [L_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{k}]^{
-        i(m,q) i(m+1,0) ... i(m+1,q)
+        i(m,q) i(m+1,1) ... i(m+1,q)
         }_{
-        i'(m,q), i'(m+1,0) ... i'(m+1,q)
+        i'(m,q), i'(m+1,1) ... i'(m+1,q)
         }
         [ F^{j(m)}_{j(m-2), i'(m,q), i'(m+1,q)} ].dagger^{k}_{j'(m-1)}
 
@@ -222,10 +222,10 @@ class AnyonModel:
             "j(m)",
             "j(m-1)",
             f"i(m,{q})",
-            *[f"i(m+1,{r})" for r in range(0, q + 1)],
+            *[f"i(m+1,{r})" for r in range(1, q + 1)],
             "jp(m-1)",
             f"ip(m,{q})",
-            *[f"ip(m+1,{r})" for r in range(0, q + 1)],
+            *[f"ip(m+1,{r})" for r in range(1, q + 1)],
 
         """
         assert q > 0, (
@@ -262,9 +262,9 @@ class AnyonModel:
             f"i(m,{q-1})",
             "k",
             f"i(m,{q})",
-            *[f"i(m+1,{r})" for r in range(0, q + 1)],
+            *[f"i(m+1,{r})" for r in range(1, q + 1)],
             f"ip(m,{q})",
-            *[f"ip(m+1,{r})" for r in range(0, q + 1)],
+            *[f"ip(m+1,{r})" for r in range(1, q + 1)],
         )
         L_matrix = self._compute_L_matrix(q)
         terms.append((L_matrix, L_labels))
@@ -296,10 +296,10 @@ class AnyonModel:
             "j(m)",
             "j(m-1)",
             f"i(m,{q})",
-            *[f"i(m+1,{r})" for r in range(0, q + 1)],
+            *[f"i(m+1,{r})" for r in range(1, q + 1)],
             "jp(m-1)",
             f"ip(m,{q})",
-            *[f"ip(m+1,{r})" for r in range(0, q + 1)],
+            *[f"ip(m+1,{r})" for r in range(1, q + 1)],
         )
 
         # Perform contraction
