@@ -93,7 +93,7 @@ class AnyonModel:
         Inputs
         ------
         q : int
-            Number of anyons per qudit.
+            Number of anyons per qudit minus one.
         Returns
         -------
         np.ndarray
