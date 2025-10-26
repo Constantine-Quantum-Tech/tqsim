@@ -43,3 +43,18 @@ def einsum_with_names(
     einsum_args.append(out_idxs)
 
     return np.einsum(*einsum_args)
+
+
+def gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
+    state = {"qudits": [], "roots": []}
+
+    for i, label in enumerate(comb):
+        if i < nb_qudits * qudit_len:
+            if i % qudit_len:
+                state["qudits"][-1].append(label)
+            else:
+                state["qudits"].append([label])
+        else:
+            state["roots"].append(label)
+
+    return state

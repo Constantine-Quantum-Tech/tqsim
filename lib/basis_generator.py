@@ -1,23 +1,35 @@
-"""
-Module for generating basis states for anyonic systems.
-"""
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2022.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+# Module for generating basis states for anyonic systems.
+
 import numpy as np
 from copy import deepcopy
 from lib.anyon_state import AnyonState, StandardAnyonState, SparseAnyonState
 from lib.anyon_model import AnyonModel
 
 
-
 class BasisGenerator:
     """Abstract class to generate basis states for anyonic systems according to
-     the specified model and state structure."""
+    the specified model and state structure."""
+
     pass
+
 
 class StandardBasisGenerator(BasisGenerator):
     """Generates basis states for a system of anyons in the standard basis."""
+
     def __init__(self, model: AnyonModel):
         self.model = model
-    
+
     def generate_basis(self, nb_anyons: int):
         """Generates all the basis states for a system of a given number of anyons.
 
@@ -40,7 +52,9 @@ class StandardBasisGenerator(BasisGenerator):
         curr_comb = np.zeros(nb_labels, dtype=int)
         final_comb = np.ones(nb_labels, dtype=int)
 
-        curr_state = StandardAnyonState(curr_comb[:nb_anyons], curr_comb[nb_anyons:])
+        curr_state = StandardAnyonState(
+            curr_comb[:nb_anyons], curr_comb[nb_anyons:]
+        )
 
         if curr_state.is_valid(self.model):
             basis.append(deepcopy(curr_state))
@@ -51,15 +65,19 @@ class StandardBasisGenerator(BasisGenerator):
             curr_comb[:idx] = 0
             curr_comb[idx] = 1
 
-            curr_state = StandardAnyonState(curr_comb[:nb_anyons], curr_comb[nb_anyons:])
+            curr_state = StandardAnyonState(
+                curr_comb[:nb_anyons], curr_comb[nb_anyons:]
+            )
 
             if curr_state.is_valid(self.model):
                 basis.append(deepcopy(curr_state))
 
         return basis
 
+
 class SparseBasisGenerator(BasisGenerator):
     """Generates basis states for a system of anyons in the sparse basis."""
+
     def __init__(self, model: AnyonModel):
         self.model = model
 
@@ -88,7 +106,9 @@ class SparseBasisGenerator(BasisGenerator):
         curr_comb = np.zeros(nb_labels, dtype=int)
         final_comb = np.ones(nb_labels, dtype=int)
 
-        curr_state = SparseAnyonState(curr_comb, nb_qudits, nb_anyons_per_qudit)
+        curr_state = SparseAnyonState(
+            curr_comb, nb_qudits, nb_anyons_per_qudit
+        )
 
         if curr_state.is_valid(self.model):
             basis.append(deepcopy(curr_state))
@@ -99,7 +119,9 @@ class SparseBasisGenerator(BasisGenerator):
             curr_comb[:idx] = 0
             curr_comb[idx] = 1
 
-            curr_state = SparseAnyonState(curr_comb, nb_qudits, nb_anyons_per_qudit)
+            curr_state = SparseAnyonState(
+                curr_comb, nb_qudits, nb_anyons_per_qudit
+            )
 
             if curr_state.is_valid(self.model):
                 basis.append(deepcopy(curr_state))

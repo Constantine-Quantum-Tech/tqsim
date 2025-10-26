@@ -86,8 +86,8 @@ class AnyonModel:
                          a(m+1, q-r+1)}^{p(q-r+2)}
                         ]^{p(q-r+1)}_{i'(m+1, q-r+1)}
 
-        such that 
-            p_{q+1} = k, 
+        such that
+            p_{q+1} = k,
             i'(m+1,0) = i(m+1,0) = a_{m, q}.
 
         Inputs
@@ -185,7 +185,7 @@ class AnyonModel:
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
 
-    def compute_knitting_matrix(self, q: int, return_L = False):
+    def compute_knitting_matrix(self, q: int, return_L=False):
         r"""
         See Appendix of https://arxiv.org/abs/2307.01892
 
@@ -439,7 +439,7 @@ class AnyonModel:
             fusion_tree = []
         """
         pass
-    
+
     def compute_standard_braid_component(
         self,
         initial_state: StandardAnyonState,
@@ -468,8 +468,8 @@ class AnyonModel:
         ), "initial_state must be a StandardAnyonState"
         assert initial_state.is_valid(self), "initial_state must be valid"
         assert final_state.is_valid(self), "final_state must be valid"
-        assert (
-            len(initial_state.inputs) == len(final_state.inputs)
+        assert len(initial_state.inputs) == len(
+            final_state.inputs
         ), "initial_state and final_state must have the same number of anyons"
 
         intial_inputs = deepcopy(initial_state.inputs)
@@ -482,7 +482,7 @@ class AnyonModel:
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(intial_inputs, final_inputs):
             return 0.0 + 0.0j
-        
+
         initial_outcomes = initial_state.outcomes
         final_outcomes = deepcopy(final_state.outcomes)
         final_outcomes[braid_index - 1] = initial_outcomes[braid_index - 1]
@@ -503,7 +503,7 @@ class AnyonModel:
         m = final_state.outcomes[braid_index - 1]
         amplitude = self.braiding_matrix[a, b, c, j, i, m]
         return amplitude
-        
+
     def compute_sparse_braid_inner_product(
         self,
         initial_state: SparseAnyonState,
@@ -555,17 +555,17 @@ class AnyonModel:
         if not np.array_equal(initial_inputs, final_inputs):
             print("inputs do not match")
             return 0.0 + 0.0j
-        
+
         initial_outcomes = deepcopy(
             initial_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + nb_qudits * (nb_anyons_per_qudit - 1) ::
+                + nb_qudits * (nb_anyons_per_qudit - 1) : :
             ]
         )
         final_outcomes = deepcopy(
             final_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + nb_qudits * (nb_anyons_per_qudit - 1) ::
+                + nb_qudits * (nb_anyons_per_qudit - 1) : :
             ]
         )
         if not np.array_equal(initial_outcomes, final_outcomes):
@@ -583,17 +583,17 @@ class AnyonModel:
             """
             for qudit in range(nb_qudits):
                 if not np.array_equal(
-                    initial_state.get_qudit_state(qudit), 
-                    final_state.get_qudit_state(qudit)
-                    ):
+                    initial_state.get_qudit_state(qudit),
+                    final_state.get_qudit_state(qudit),
+                ):
                     if qudit != qudit_index:
                         return 0.0 + 0.0j
 
             # create standard basis states for initial and final single qudit states
             amplitude = self.compute_standard_braid_component(
-                initial_state.get_qudit_state(qudit_index), 
-                remainder, 
-                final_state.get_qudit_state(qudit_index)
+                initial_state.get_qudit_state(qudit_index),
+                remainder,
+                final_state.get_qudit_state(qudit_index),
             )
             return amplitude
         else:
@@ -616,53 +616,59 @@ class AnyonModel:
             q = nb_anyons_per_qudit - 1
             """
             q_ = nb_anyons_per_qudit - 1
-            # a charges of the state a(m,q) a(m+1, 0), ..., a(m+1, q), 
+            # a charges of the state a(m,q) a(m+1, 0), ..., a(m+1, q),
             a = []
             m = first_qudit_index
             a.append(initial_state.charges[(m + 1) * q_ - 1])
             for r in range(0, q_ + 1):
-                a.append(
-                    initial_state.charges[
-                        (m + 1) * q_ + r
-                    ]
-                )
+                a.append(initial_state.charges[(m + 1) * q_ + r])
             # i charges of the state i(m,q-1), i(m,q)i(m+1,0) ... i(m+1,q)
             i = []
             # i(m,q-1)
-            i.append(initial_state.charges[
-                nb_qudits * nb_anyons_per_qudit
-                + (m + 1) * (nb_anyons_per_qudit - 1)
-                - 2
-            ])
-            # i(m,q)
-            i.append(initial_state.charges[
-                nb_qudits * nb_anyons_per_qudit
-                + (m + 1) * (nb_anyons_per_qudit - 1)
-                - 1
-            ])
-            # i(m+1,0) ... i(m+1,q)
-            for r in range(0, q_ + 1):
-                i.append(initial_state.charges[
+            i.append(
+                initial_state.charges[
                     nb_qudits * nb_anyons_per_qudit
                     + (m + 1) * (nb_anyons_per_qudit - 1)
-                    + r
-                ])
-            
+                    - 2
+                ]
+            )
+            # i(m,q)
+            i.append(
+                initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + (m + 1) * (nb_anyons_per_qudit - 1)
+                    - 1
+                ]
+            )
+            # i(m+1,0) ... i(m+1,q)
+            for r in range(0, q_ + 1):
+                i.append(
+                    initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + (m + 1) * (nb_anyons_per_qudit - 1)
+                        + r
+                    ]
+                )
+
             # i_prime charges of the final state i'(m,q),i'(m+1,0) ... i'(m+1,q)
             i_prime = []
             # i'(m,q)
-            i_prime.append(final_state.charges[
-                nb_qudits * nb_anyons_per_qudit
-                + (m + 1) * (nb_anyons_per_qudit - 1)
-                - 1
-            ])
-            # i'(m+1,0) ... i'(m+1,q)
-            for r in range(0, q_ + 1):
-                i_prime.append(final_state.charges[
+            i_prime.append(
+                final_state.charges[
                     nb_qudits * nb_anyons_per_qudit
                     + (m + 1) * (nb_anyons_per_qudit - 1)
-                    + r
-                ])
+                    - 1
+                ]
+            )
+            # i'(m+1,0) ... i'(m+1,q)
+            for r in range(0, q_ + 1):
+                i_prime.append(
+                    final_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + (m + 1) * (nb_anyons_per_qudit - 1)
+                        + r
+                    ]
+                )
             # root j charges of the state
             # j(m-2), j(m-1), j(m)
             # j are indiced from 0 to nb_qudits - 1
@@ -670,55 +676,75 @@ class AnyonModel:
             j = []
             if m == 0:
                 j.append(0)  # dummy value for j(m-2)
-                j.append(initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_anyons_per_qudit - 1
-                    - 1
-                ]) # j(m - 1)
-                j.append(initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + 0
-                ]) # j(m)
-            elif m == 1:
-                j.append(initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_anyons_per_qudit - 1
-                    - 1
-                ]) # j(m - 2)
-                j.append(initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + 0
-                ]) # j(m - 1)
-                j.append(initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + 1
-                ]) # j(m)
-            else:
-                for r in [m-2, m-1, m]:
-                    j.append(initial_state.charges[
+                j.append(
+                    initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_anyons_per_qudit
+                        - 1
+                        - 1
+                    ]
+                )  # j(m - 1)
+                j.append(
+                    initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
                         + nb_qudits * (nb_anyons_per_qudit - 1)
-                        + r
-                    ])
-            
+                        + 0
+                    ]
+                )  # j(m)
+            elif m == 1:
+                j.append(
+                    initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_anyons_per_qudit
+                        - 1
+                        - 1
+                    ]
+                )  # j(m - 2)
+                j.append(
+                    initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + 0
+                    ]
+                )  # j(m - 1)
+                j.append(
+                    initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + 1
+                    ]
+                )  # j(m)
+            else:
+                for r in [m - 2, m - 1, m]:
+                    j.append(
+                        initial_state.charges[
+                            nb_qudits * nb_anyons_per_qudit
+                            + nb_qudits * (nb_anyons_per_qudit - 1)
+                            + r
+                        ]
+                    )
+
             # j'(m-1)
             # j' are indiced from 1 to nb_qudits - 1
             j_prime = []
             if m == 0:
-                j_prime.append(final_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_anyons_per_qudit - 1
-                    - 1
-                ])
+                j_prime.append(
+                    final_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_anyons_per_qudit
+                        - 1
+                        - 1
+                    ]
+                )
             else:
-                j_prime.append(final_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + (m-1) - 1
-                ])
+                j_prime.append(
+                    final_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + (m - 1)
+                        - 1
+                    ]
+                )
 
             """
             Return
@@ -731,7 +757,9 @@ class AnyonModel:
             j'(m-1), i'(m,q), i'(m+1,0) ... i'(m+1,q)
             }
             """
-            knitting_matrix = self.compute_knitting_matrix(q=nb_anyons_per_qudit-1)
+            knitting_matrix = self.compute_knitting_matrix(
+                q=nb_anyons_per_qudit - 1
+            )
             print(knitting_matrix)
 
             """
@@ -748,4 +776,6 @@ class AnyonModel:
             *[f"ip(m+1,{r})" for r in range(0, q + 1)],
             """
 
-            return knitting_matrix[*a, i[0],j[0], j[2], j[1], *i[1::], j_prime[0], *i_prime]
+            return knitting_matrix[
+                *a, i[0], j[0], j[2], j[1], *i[1::], j_prime[0], *i_prime
+            ]

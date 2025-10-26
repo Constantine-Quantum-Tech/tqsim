@@ -22,7 +22,9 @@ def F(a1, a2, a3, outcome):
 
     # a1 + a2 + a3 + outcome = 4
     if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+        f_matrix = np.array(
+            [[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]]
+        )
     # a1 + a2 + a3 + outcome = 3
     elif a1 + a2 + a3 + outcome == 3:
         f_matrix = np.array([[0, 0], [0, 1]])
@@ -47,6 +49,7 @@ def F(a1, a2, a3, outcome):
 
     return f_matrix
 
+
 def R(a1, a2):
     """
     R matrix
@@ -59,6 +62,7 @@ def R(a1, a2):
         r_matrix = np.array([[1, 0], [0, 1]])
 
     return r_matrix
+
 
 F_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
 R_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
