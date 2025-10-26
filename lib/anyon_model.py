@@ -132,10 +132,10 @@ class AnyonModel:
 
         # --- B tensor
         B_labels = (
-            "p(1)",
             f"i(m,{q-1})",
             f"a(m,{q})",
             "a(m+1,0)",
+            "p(1)",
             f"i(m,{q})",
             f"ip(m,{q})",
         )
