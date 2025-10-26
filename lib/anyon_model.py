@@ -71,13 +71,13 @@ class AnyonModel:
 
     def _compute_L_matrix(self, q: int):
         r"""
-        [L_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{p(q+1)}]^{
-        i(m,q) i(m+1,0) ... i(m+1,q)
+        [L_{ a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{p(q+1)}]^{
+        i(m,q) i(m+1,1) ... i(m+1,q)
         }_{
-        i'(m,q), i'(m+1,0) ... i'(m+1,q)
+        i'(m,q), i'(m+1,1) ... i'(m+1,q)
         }
         =
-        \sum_{p(1), .., p(q), i'(m,q), i'(m+1,1), .., i'(m+1,q)}
+        \sum_{p(1), .., p(q)}
         prod_{r=1}^{q} [ F_{i(m, q), i(m+1, q-r),
                          a(m+1, q-r+1)}^{p(q-r+2)}
                         ].dag^{i(m+1, q-r+1)}_{p(q-r+1)}
@@ -86,10 +86,14 @@ class AnyonModel:
                          a(m+1, q-r+1)}^{p(q-r+2)}
                         ]^{p(q-r+1)}_{i'(m+1, q-r+1)}
 
+        such that 
+            p_{q+1} = k, 
+            i'(m+1,0) = i(m+1,0) = a_{m, q}.
+
         Inputs
         ------
         q : int
-            Number of anyons per qudit minus one.
+            Number of anyons per qudit.
         Returns
         -------
         np.ndarray
@@ -97,7 +101,7 @@ class AnyonModel:
         """
         assert q > 0, (
             "q must be strictly positive. "
-            "For q=0, L is just the braiding matrix."
+            "For q=1, L is just the braiding matrix."
         )
         terms = []
 
@@ -112,6 +116,15 @@ class AnyonModel:
                 f"i(m+1,{q-r+1})",
                 f"p({q-r+1})",
             )
+            if r == q:
+                labels = (
+                    f"i(m,{q})",
+                    f"a(m,{q})",
+                    f"a(m+1,{q-r+1})",
+                    f"p({q-r+2})",
+                    f"i(m+1,{q-r+1})",
+                    f"p({q-r+1})",
+                )
             # conj + swap last two axes for dagger
             F_dag = np.conjugate(self.F_matrix).swapaxes(-1, -2)
             terms.append((F_dag, labels))
@@ -139,6 +152,15 @@ class AnyonModel:
                 f"p({q-r+1})",
                 f"ip(m+1,{q-r+1})",
             )
+            if r == q:
+                labels = (
+                    f"ip(m,{q})",
+                    f"a(m,{q})",
+                    f"a(m+1,{q-r+1})",
+                    f"p({q-r+2})",
+                    f"p({q-r+1})",
+                    f"ip(m+1,{q-r+1})",
+                )
             terms.append((self.F_matrix, labels))
             r += 1
 
@@ -155,15 +177,15 @@ class AnyonModel:
             + [f"i(m,{q-1})"]
             + [f"p({q+1})"]
             + [f"i(m,{q})"]
-            + [f"i(m+1,{r})" for r in range(0, q + 1)]
+            + [f"i(m+1,{r})" for r in range(1, q + 1)]
             + [f"ip(m,{q})"]
-            + [f"ip(m+1,{r})" for r in range(0, q + 1)]
+            + [f"ip(m+1,{r})" for r in range(1, q + 1)]
         )
 
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
 
-    def compute_knitting_matrix(self, q: int):
+    def compute_knitting_matrix(self, q: int, return_L = False):
         r"""
         See Appendix of https://arxiv.org/abs/2307.01892
 
@@ -282,6 +304,8 @@ class AnyonModel:
 
         # Perform contraction
         K = einsum_with_names(terms, out_labels)
+        if return_L:
+            return K, L_matrix
         return K
 
     def check_state(self, state) -> bool:
@@ -379,6 +403,10 @@ class AnyonModel:
             check = self.check_standard_basis_state(inputs, outcomes)
             if not check:
                 return False
+
+        if nb_qudits == 1:
+            return True
+
         indices = [
             nb_qudits * nb_anyons_per_qudit
             + (i + 1) * (nb_anyons_per_qudit - 1)
@@ -411,7 +439,71 @@ class AnyonModel:
             fusion_tree = []
         """
         pass
+    
+    def compute_standard_braid_component(
+        self,
+        initial_state: StandardAnyonState,
+        braid_index: int,
+        final_state: StandardAnyonState,
+    ):
+        """
+        Computes the probability amplitudes of getting a final anyon state
+        from braiding two anyons (of indices i and i+1) in the initial anyon state.
 
+        Inputs:
+        -------
+            initial_state: StandardAnyonState
+            braid_index  : int = i+1 (the index of the first braided anyon)
+            final_state  : StandardAnyonState
+
+        Returns:
+            Complex number.
+        """
+        assert braid_index > 0, "braid_index must be greater than 0"
+        assert braid_index < len(
+            initial_state.inputs
+        ), "braid_index must be less than the total number of anyons"
+        assert isinstance(
+            initial_state, StandardAnyonState
+        ), "initial_state must be a StandardAnyonState"
+        assert initial_state.is_valid(self), "initial_state must be valid"
+        assert final_state.is_valid(self), "final_state must be valid"
+        assert (
+            len(initial_state.inputs) == len(final_state.inputs)
+        ), "initial_state and final_state must have the same number of anyons"
+
+        intial_inputs = deepcopy(initial_state.inputs)
+        final_inputs = deepcopy(final_state.inputs)
+
+        # Permute the anyons i and i+1 in the initial inputs
+        temp = intial_inputs[braid_index]
+        intial_inputs[braid_index] = intial_inputs[braid_index - 1]
+        intial_inputs[braid_index - 1] = temp
+        # Check if the permuted initial inputs match the final inputs
+        if not np.array_equal(intial_inputs, final_inputs):
+            return 0.0 + 0.0j
+        
+        initial_outcomes = initial_state.outcomes
+        final_outcomes = deepcopy(final_state.outcomes)
+        final_outcomes[braid_index - 1] = initial_outcomes[braid_index - 1]
+        if not np.array_equal(initial_outcomes, final_outcomes):
+            return 0.0 + 0.0j
+
+        a = initial_state.inputs[braid_index - 1]
+        b = initial_state.inputs[braid_index]
+        if braid_index == len(initial_state.inputs) - 1:
+            c = 0  # vacuum
+        else:
+            c = initial_state.outcomes[braid_index - 1]
+        i = initial_state.outcomes[braid_index - 1]
+        if braid_index == 1:
+            j = 0  # vacuum
+        else:
+            j = initial_state.outcomes[braid_index - 2]
+        m = final_state.outcomes[braid_index - 1]
+        amplitude = self.braiding_matrix[a, b, c, j, i, m]
+        return amplitude
+        
     def compute_sparse_braid_inner_product(
         self,
         initial_state: SparseAnyonState,
@@ -431,6 +523,10 @@ class AnyonModel:
         Returns:
             Complex number.
         """
+        assert braid_index > 0, "braid_index must be greater than 0"
+        assert braid_index < (
+            initial_state.nb_qudits * initial_state.nb_anyons_per_qudit
+        ), "braid_index must be less than the total number of anyons"
         assert isinstance(
             initial_state, SparseAnyonState
         ), "initial_state must be a SparseAnyonState"
@@ -446,12 +542,10 @@ class AnyonModel:
 
         nb_qudits = initial_state.nb_qudits
         nb_anyons_per_qudit = initial_state.nb_anyons_per_qudit
-        initial_inputs = deepcopy(
-            initial_state.charges[0 : nb_qudits * nb_anyons_per_qudit]
-        )
-        final_inputs = deepcopy(
-            final_state.charges[0 : nb_qudits * nb_anyons_per_qudit]
-        )
+
+        # Get initial and final inputs
+        initial_inputs = initial_state.get_inputs()
+        final_inputs = final_state.get_inputs()
 
         # Permute the anyons i and i+1 in the initial inputs
         temp = initial_inputs[braid_index]
@@ -459,58 +553,55 @@ class AnyonModel:
         initial_inputs[braid_index - 1] = temp
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(initial_inputs, final_inputs):
+            print("inputs do not match")
+            return 0.0 + 0.0j
+        
+        initial_outcomes = deepcopy(
+            initial_state.charges[
+                nb_qudits * nb_anyons_per_qudit
+                + nb_qudits * (nb_anyons_per_qudit - 1) ::
+            ]
+        )
+        final_outcomes = deepcopy(
+            final_state.charges[
+                nb_qudits * nb_anyons_per_qudit
+                + nb_qudits * (nb_anyons_per_qudit - 1) ::
+            ]
+        )
+        if not np.array_equal(initial_outcomes, final_outcomes):
+            print("outcomes do not match")
             return 0.0 + 0.0j
 
         remainder = braid_index % nb_anyons_per_qudit
         if remainder > 0:
             # Braiding within a qudit
+            print("braiding within a qudit")
             qudit_index = braid_index // nb_anyons_per_qudit
-            if braid_index == 1:
-                a = 0
-            elif braid_index == 2:
-                a = initial_state.charges[0]
-            else:
-                a = initial_state[
-                    nb_qudits * nb_anyons_per_qudit
-                    - 1
-                    + qudit_index * (nb_anyons_per_qudit - 1)
-                    + remainder
-                    - 2
-                ]
-            b = initial_state.charges[braid_index - 1]
-            c = initial_state.charges[braid_index]
-            j = initial_state[
-                nb_qudits * nb_anyons_per_qudit
-                - 1
-                + qudit_index * (nb_anyons_per_qudit - 1)
-                + remainder
-            ]
+            """
+            [ B^{a(m,r-1), a(m,r)}_{i(m,r-1), a(m,r), a(m,r+1)} ]^{i(m,r)}_{i'(m,r)}
+            r = remainder
+            """
+            for qudit in range(nb_qudits):
+                if not np.array_equal(
+                    initial_state.get_qudit_state(qudit), 
+                    final_state.get_qudit_state(qudit)
+                    ):
+                    if qudit != qudit_index:
+                        return 0.0 + 0.0j
 
-            if braid_index == 1:
-                i = initial_state.charges[0]
-            else:
-                i = initial_state[
-                    nb_qudits * nb_anyons_per_qudit
-                    - 1
-                    + qudit_index * (nb_anyons_per_qudit - 1)
-                    + remainder
-                    - 1
-                ]
-
-            m = final_state[
-                nb_qudits * nb_anyons_per_qudit
-                - 1
-                + qudit_index * (nb_anyons_per_qudit - 1)
-                + remainder
-                - 1
-            ]
-
-            amplitude = self.braiding_matrix[a, b, c, j, i, m]
+            # create standard basis states for initial and final single qudit states
+            amplitude = self.compute_standard_braid_component(
+                initial_state.get_qudit_state(qudit_index), 
+                remainder, 
+                final_state.get_qudit_state(qudit_index)
+            )
             return amplitude
         else:
             # Braiding between two qudits
+            print("braiding between two qudits")
             first_qudit_index = (braid_index // nb_anyons_per_qudit) - 1
             second_qudit_index = braid_index // nb_anyons_per_qudit
+            print(f"first_qudit_index: {first_qudit_index}")
 
             """
             [K_{
@@ -521,37 +612,39 @@ class AnyonModel:
             }_{
             j'(m-1), i'(m,q), i'(m+1,0) ... i'(m+1,q)
             }
+
+            q = nb_anyons_per_qudit - 1
             """
+            q_ = nb_anyons_per_qudit - 1
             # a charges of the state a(m,q) a(m+1, 0), ..., a(m+1, q), 
             a = []
             m = first_qudit_index
-            a.append(initial_state.charges[m * nb_anyons_per_qudit])
-            for r in range(1, nb_anyons_per_qudit + 1):
+            a.append(initial_state.charges[(m + 1) * q_ - 1])
+            for r in range(0, q_ + 1):
                 a.append(
                     initial_state.charges[
-                        (m) * nb_anyons_per_qudit + r
+                        (m + 1) * q_ + r
                     ]
                 )
             # i charges of the state i(m,q-1), i(m,q)i(m+1,0) ... i(m+1,q)
             i = []
             # i(m,q-1)
-            q_ = nb_anyons_per_qudit
             i.append(initial_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + m * (nb_anyons_per_qudit - 1)
-                + q_-1
+                + (m + 1) * (nb_anyons_per_qudit - 1)
+                - 2
             ])
             # i(m,q)
             i.append(initial_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + m * (nb_anyons_per_qudit - 1)
-                + q_
+                + (m + 1) * (nb_anyons_per_qudit - 1)
+                - 1
             ])
             # i(m+1,0) ... i(m+1,q)
-            for r in range(1, q_ + 1):
+            for r in range(0, q_ + 1):
                 i.append(initial_state.charges[
                     nb_qudits * nb_anyons_per_qudit
-                    + (m+1) * (nb_anyons_per_qudit - 1)
+                    + (m + 1) * (nb_anyons_per_qudit - 1)
                     + r
                 ])
             
@@ -560,35 +653,71 @@ class AnyonModel:
             # i'(m,q)
             i_prime.append(final_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + m * (nb_anyons_per_qudit - 1)
-                + q_
+                + (m + 1) * (nb_anyons_per_qudit - 1)
+                - 1
             ])
             # i'(m+1,0) ... i'(m+1,q)
-            for r in range(1, q_+1):
-                i.append(final_state.charges[
+            for r in range(0, q_ + 1):
+                i_prime.append(final_state.charges[
                     nb_qudits * nb_anyons_per_qudit
-                    + (m+1) * (nb_anyons_per_qudit - 1)
+                    + (m + 1) * (nb_anyons_per_qudit - 1)
                     + r
                 ])
-            
+            # root j charges of the state
             # j(m-2), j(m-1), j(m)
-            # j are indiced from 1 to nb_qudits - 1
+            # j are indiced from 0 to nb_qudits - 1
+            # (nb_qudits - 1) j indices total
             j = []
-            for r in [m-2, m-1, m]:
+            if m == 0:
+                j.append(0)  # dummy value for j(m-2)
+                j.append(initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_anyons_per_qudit - 1
+                    - 1
+                ]) # j(m - 1)
                 j.append(initial_state.charges[
                     nb_qudits * nb_anyons_per_qudit
                     + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + r
-                ])
+                    + 0
+                ]) # j(m)
+            elif m == 1:
+                j.append(initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_anyons_per_qudit - 1
+                    - 1
+                ]) # j(m - 2)
+                j.append(initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1)
+                    + 0
+                ]) # j(m - 1)
+                j.append(initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1)
+                    + 1
+                ]) # j(m)
+            else:
+                for r in [m-2, m-1, m]:
+                    j.append(initial_state.charges[
+                        nb_qudits * nb_anyons_per_qudit
+                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + r
+                    ])
             
             # j'(m-1)
             # j' are indiced from 1 to nb_qudits - 1
             j_prime = []
-            for r in [m-1]:
+            if m == 0:
+                j_prime.append(final_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_anyons_per_qudit - 1
+                    - 1
+                ])
+            else:
                 j_prime.append(final_state.charges[
                     nb_qudits * nb_anyons_per_qudit
                     + nb_qudits * (nb_anyons_per_qudit - 1)
-                    + r
+                    + (m-1) - 1
                 ])
 
             """
@@ -603,6 +732,7 @@ class AnyonModel:
             }
             """
             knitting_matrix = self.compute_knitting_matrix(q=nb_anyons_per_qudit-1)
+            print(knitting_matrix)
 
             """
             f"a(m,{q})",
