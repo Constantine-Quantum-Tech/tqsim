@@ -32,8 +32,8 @@ TODO:
     - Translate to Cpp
 """
 import numpy as np
-import braiding_generators.ising_qudit as ising
-from braiding_generators.ising_qudit import F, B
+import tools.braiding_generators.ising_qudit as ising
+from tools.braiding_generators.ising_qudit import F, B
 from copy import deepcopy
 from tools.cplot import cplot
 

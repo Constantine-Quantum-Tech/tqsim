@@ -32,8 +32,8 @@ TODO:
     - Translate to Cpp
 """
 
-import braiding_generators.fib_qudit as fibo
-from braiding_generators.fib_qudit import F, B
+import tools.braiding_generators.fib_qudit as fibo
+from tools.braiding_generators.fib_qudit import F, B
 from copy import deepcopy
 from tools.cplot import cplot
 
