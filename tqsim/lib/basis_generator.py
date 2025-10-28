@@ -9,132 +9,188 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
-from typing import List
+# Module for generating basis states for anyonic systems.
 
 import numpy as np
+from copy import deepcopy
+from tqsim.lib.anyon_state import (
+    AnyonState, 
+    StandardAnyonState, 
+    SparseAnyonState,
+    ComputationalSparseAnyonState
+)
+from tqsim.lib.anyon_model import AnyonModel
 
 
-def check_rule(anyon1: int, anyon2: int, outcome: int) -> bool:
-    """ Returns True if 'anyon1 x anyon2 = outcome' obeys the Fibonacci
-    fusion rules, returns False otherwise.
+class BasisGenerator:
+    """Abstract class to generate basis states for anyonic systems according to
+    the specified model and state structure."""
 
-    Parameters
-    ----------
-    anyon1 : int
-        Anyon charge of the 1st anyon.
-    anyon2 : int
-        Anyon charge of the 2nd anyon.
-    outcome : int
-        Anyon charge of the fusion result.
-
-    Returns
-    -------
-    bool
-        True if the Fibonacci fusion rules are obeyed, False otherwise.
-
-    """
-    if anyon1 and anyon2:
-        return True
-    elif (anyon1 or anyon2) and outcome == 1:
-        return True
-    elif not (anyon1 or anyon2) and outcome == 0:
-        return True
-    else:
-        return False
+    pass
 
 
-def check_outcomes(outcomes: List[int]) -> bool:
-    previous_outcome = 1
+class StandardBasisGenerator(BasisGenerator):
+    """Generates basis states for a system of anyons in the standard basis."""
 
-    for outcome in outcomes:
-        if check_rule(previous_outcome, 1, outcome):
-            previous_outcome = outcome
-        else:
-            return False
-    return True
+    def __init__(self, model: AnyonModel):
+        self.model = model
+
+    def generate_basis(self, nb_anyons: int):
+        """Generates all the basis states for a system of a given number of anyons.
+
+        Parameters
+        ----------
+        nb_anyons : int
+            The number of anyons in the system.
+
+        Returns
+        -------
+        List[AnyonState]
+            A list of valid AnyonState instances representing the basis states.
+
+        """
+        nb_roots = nb_anyons - 1
+        nb_labels = nb_anyons + nb_roots
+
+        basis = []
+
+        curr_comb = np.zeros(nb_labels, dtype=int)
+        final_comb = np.ones(nb_labels, dtype=int)
+
+        curr_state = StandardAnyonState(
+            deepcopy(curr_comb[:nb_anyons]), deepcopy(curr_comb[nb_anyons:])
+        )
+
+        if curr_state.is_valid(self.model):
+            basis.append(deepcopy(curr_state))
+
+        while not np.all(curr_comb == final_comb):
+            # Increment curr_comb as a binary counter using numpy
+            idx = np.argmax(curr_comb == 0)
+            curr_comb[:idx] = 0
+            curr_comb[idx] = 1
+
+            curr_state = StandardAnyonState(
+                deepcopy(curr_comb[:nb_anyons]), deepcopy(curr_comb[nb_anyons:])
+            )
+
+            if curr_state.is_valid(self.model):
+                basis.append(deepcopy(curr_state))
+
+        return basis
 
 
-def check_state(state) -> bool:
-    nb_qudits = len(state["qudits"])
-    qudit_len = len(state["qudits"][0])
+class SparseBasisGenerator(BasisGenerator):
+    """Generates basis states for a system of anyons in the sparse basis."""
 
-    for qudit in state["qudits"]:
-        if len(qudit) == qudit_len:
-            if not check_outcomes(qudit):
-                return False
-        else:
-            return False
+    def __init__(self, model: AnyonModel):
+        self.model = model
 
-    if nb_qudits != len(state["roots"]) + 1:
-        return False
+    def generate_basis(self, nb_qudits: int, nb_anyons_per_qudit: int):
+        """Generates all the basis states for a system of a given number of
+        qudits, and a given number of anyons per qudit.
 
-    previous_outcome = state["qudits"][0][-1]
+        Parameters
+        ----------
+        nb_qudits : int
+            Number of qudits in the circuit.
+        nb_anyons_per_qudit : int
+            Number of anyons in each qudit.
 
-    for i, outcome in enumerate(state["roots"]):
-        if check_rule(previous_outcome, state["qudits"][i + 1][-1], outcome):
-            previous_outcome = outcome
-        else:
-            return False
-    return True
+        Returns
+        -------
+        basis : List[SparseAnyonState]
+            A list of basis states in the Sparse basis.
+        """
+        nb_roots = nb_qudits - 1
+        qudit_len = nb_anyons_per_qudit - 1
+        nb_labels = nb_qudits * (2 * qudit_len + 1) + nb_roots
+
+        basis = []
+
+        curr_comb = np.zeros(nb_labels, dtype=int)
+        final_comb = np.ones(nb_labels, dtype=int)
+
+        curr_state = SparseAnyonState(
+            deepcopy(curr_comb), nb_qudits, nb_anyons_per_qudit
+        )
+
+        if curr_state.is_valid(self.model):
+            basis.append(deepcopy(curr_state))
+
+        while not np.all(curr_comb == final_comb):
+            # Increment curr_comb as a binary counter using numpy
+            idx = np.argmax(curr_comb == 0)
+            curr_comb[:idx] = 0
+            curr_comb[idx] = 1
+
+            curr_state = SparseAnyonState(
+                deepcopy(curr_comb), nb_qudits, nb_anyons_per_qudit
+            )
+
+            if curr_state.is_valid(self.model):
+                basis.append(deepcopy(curr_state))
+
+        return basis
 
 
-def gen_state(comb: List[int], nb_qudits: int, qudit_len: int):
-    state = {"qudits": [], "roots": []}
+class ComputationalSparseBasisGenerator(BasisGenerator):
+    """Generates Computational basis states for a system of anyons 
+    in the sparse basis."""
 
-    for i, label in enumerate(comb):
-        if i < nb_qudits * qudit_len:
-            if i % qudit_len:
-                state["qudits"][-1].append(label)
-            else:
-                state["qudits"].append([label])
-        else:
-            state["roots"].append(label)
+    def __init__(self, model: AnyonModel):
+        self.model = model
 
-    return state
+    def generate_basis(self, nb_qudits: int, nb_anyons_per_qudit: int, input_charge: int):
+        """Generates all the computational basis states for a system of 
+        - a given number of qudits, 
+        - a given number of anyons per qudit, and
+        - a specific input anyon charge
 
+        Parameters
+        ----------
+        nb_qudits : int
+            Number of qudits in the circuit.
+        nb_anyons_per_qudit : int
+            Number of anyons in each qudit.
+        input_charge: int
+            Charge of the input anyons
 
-def generate_basis(nb_qudits: int, nb_anyons_per_qudit: int):
-    """Generates all the basis states for a system of a given number of
-    qudits, and a given number of anyons per qudit.
+        Returns
+        -------
+        basis : List[SparseAnyonState]
+            A list of basis states in the Sparse basis.
+        """
+        nb_roots = nb_qudits - 1
+        qudit_len = nb_anyons_per_qudit - 1
+        nb_labels = nb_qudits * (
+            qudit_len) + nb_roots
 
-    Parameters
-    ----------
-    nb_qudits : int
-        Number of qudits in the circuit.
-    nb_anyons_per_qudit : int
-        Number of anyons in each qudit.
+        basis = []
 
-    Returns
-    -------
-    basis : List[basis states]
-        A list of basis states.
-    """
-    nb_roots = nb_qudits - 1
-    qudit_len = nb_anyons_per_qudit - 1
-    nb_labels = nb_qudits * qudit_len + nb_roots
+        curr_comb = np.zeros(nb_labels, dtype=int)
+        final_comb = np.ones(nb_labels, dtype=int)
 
-    basis = []
+        curr_state = ComputationalSparseAnyonState(
+            deepcopy(curr_comb), 
+            nb_qudits, nb_anyons_per_qudit, input_charge
+        )
 
-    curr_comb = [0] * nb_labels
-    final_comb = [1] * nb_labels
+        if curr_state.is_valid(self.model):
+            basis.append(deepcopy(curr_state))
 
-    curr_state = gen_state(curr_comb, nb_qudits, qudit_len)
+        while not np.all(curr_comb == final_comb):
+            # Increment curr_comb as a binary counter using numpy
+            idx = np.argmax(curr_comb == 0)
+            curr_comb[:idx] = 0
+            curr_comb[idx] = 1
 
-    if check_state(curr_state):
-        basis.append(curr_state)
+            curr_state = ComputationalSparseAnyonState(
+                deepcopy(curr_comb), 
+                nb_qudits, nb_anyons_per_qudit, input_charge
+            )
 
-    while not np.all(curr_comb == final_comb):
-        for i, label in enumerate(curr_comb):
-            if label == 0:
-                curr_comb[i] = 1
-                break
-            else:
-                curr_comb[i] = 0
+            if curr_state.is_valid(self.model):
+                basis.append(deepcopy(curr_state))
 
-        curr_state = gen_state(curr_comb, nb_qudits, qudit_len)
-
-        if check_state(curr_state):
-            basis.append(curr_state)
-
-    return basis
+        return basis
