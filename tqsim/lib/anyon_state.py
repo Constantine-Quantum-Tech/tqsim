@@ -179,6 +179,17 @@ class SparseAnyonState(AnyonState):
         total_inputs = self.nb_qudits * self.nb_anyons_per_qudit
         return self.charges[:total_inputs]
 
+    def get_outcomes(self):
+        """Retrieve the outcomes of the SparseAnyonState.
+
+        Returns
+        -------
+        np.ndarray
+            The outcomes of the SparseAnyonState.
+        """
+        total_outcomes = self.nb_qudits - 1
+        return self.charges[-total_outcomes:]
+
     def inner_product(self, other):
         """Compute the inner product between two SparseAnyonState instances.
 

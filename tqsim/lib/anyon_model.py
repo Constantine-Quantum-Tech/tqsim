@@ -10,9 +10,11 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+import os
 import numpy as np
 from typing import Tuple, List
 from copy import deepcopy
+from tqsim.config import STORE_PATH
 from tqsim.lib.utils import einsum_with_names
 from tqsim.lib.anyon_state import (
     AnyonState, StandardAnyonState, SparseAnyonState,
@@ -27,6 +29,7 @@ class AnyonModel:
         self.F_matrix = F_matrix
         self.R_matrix = R_matrix
         self.braiding_matrix = self._compute_braiding_matrix()
+        self.__K_matrices = {}
 
         if name is None:
             self.name == f"model-{np.random.randint(1000)}"
@@ -236,10 +239,20 @@ class AnyonModel:
             *[f"ip(m+1,{r})" for r in range(1, q + 1)],
 
         """
+        # Check if K matrix is already computed
+        folder_path = os.path.join(
+            STORE_PATH, f"{self.name}-q-{q}"
+        )
+        filename = os.path.join(folder_path, "-knitting-matrix.npy")
+        if os.path.exists(filename):
+            return np.load(filename)
+
+        # Compute K matrix
         assert q > 0, (
             "q must be strictly positive. "
             "For q=0, K is just the braiding matrix."
         )
+
         terms = []
 
         # --- Left F factor ---
@@ -312,6 +325,12 @@ class AnyonModel:
 
         # Perform contraction
         K = einsum_with_names(terms, out_labels)
+        self.__K_matrices[q] = K
+
+        # Store K matrix to file
+        os.makedirs(folder_path, exist_ok=True)
+        np.save(filename, K)
+
         if return_L:
             return K, L_matrix
         return K
@@ -480,37 +499,50 @@ class AnyonModel:
             final_state.inputs
         ), "initial_state and final_state must have the same number of anyons"
 
-        intial_inputs = deepcopy(initial_state.inputs)
+        initial_inputs = deepcopy(initial_state.inputs)
         final_inputs = deepcopy(final_state.inputs)
 
         # Permute the anyons i and i+1 in the initial inputs
-        temp = deepcopy(intial_inputs[braid_index])
-        intial_inputs[braid_index] = deepcopy(intial_inputs[braid_index - 1])
-        intial_inputs[braid_index - 1] = deepcopy(temp)
+        temp = deepcopy(initial_inputs[braid_index])
+        initial_inputs[braid_index] = deepcopy(initial_inputs[braid_index - 1])
+        initial_inputs[braid_index - 1] = deepcopy(temp)
         # Check if the permuted initial inputs match the final inputs
-        if not np.array_equal(intial_inputs, final_inputs):
-            print("(Standard) )inputs do not match")
+        if not np.array_equal(initial_inputs, final_inputs):
+            # print("(Standard) )inputs do not match")
             return 0.0 + 0.0j
 
         initial_outcomes = deepcopy(initial_state.outcomes)
         final_outcomes = deepcopy(final_state.outcomes)
-        final_outcomes[braid_index - 1] = deepcopy(initial_outcomes[braid_index - 1])
+        if braid_index >= 2:
+            final_outcomes[braid_index - 2] = deepcopy(initial_outcomes[braid_index - 2])
+        
         if not np.array_equal(initial_outcomes, final_outcomes):
-            print("(Standard) outcomes do not match")
+            # print("(Standard) outcomes do not match")
             return 0.0 + 0.0j
 
-        a = deepcopy(initial_state.inputs[braid_index - 1])
-        b = deepcopy(initial_state.inputs[braid_index])
-        if braid_index == len(initial_state.inputs) - 1:
-            c = 0  # vacuum
-        else:
-            c = deepcopy(initial_state.outcomes[braid_index - 1])
-        i = deepcopy(initial_state.outcomes[braid_index - 1])
         if braid_index == 1:
-            j = 0  # vacuum
+            # Braiding the first two anyons
+            # print("braiding first two anyons")
+            a = 0  # vacuum
+        elif braid_index == 2:
+            a = deepcopy(initial_state.inputs[0])
         else:
-            j = deepcopy(initial_state.outcomes[braid_index - 2])
-        m = deepcopy(final_state.outcomes[braid_index - 1])
+            a = deepcopy(initial_state.outcomes[braid_index - 3])
+
+        b = deepcopy(initial_state.inputs[braid_index - 1])
+
+        c = deepcopy(initial_state.inputs[braid_index])
+
+        
+        if braid_index == 1:
+            i = deepcopy(initial_state.inputs[0])
+            m = deepcopy(final_state.inputs[0])
+        else:
+            i = deepcopy(initial_state.outcomes[braid_index - 2])
+            m = deepcopy(final_state.outcomes[braid_index - 2])
+
+        j = deepcopy(final_state.outcomes[braid_index - 1])
+
         amplitude = self.braiding_matrix[a, b, c, j, i, m]
         return amplitude
 
@@ -563,13 +595,13 @@ class AnyonModel:
         initial_inputs[braid_index - 1] = deepcopy(temp)
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(initial_inputs, final_inputs):
-            print("inputs do not match")
+            # print("inputs do not match")
             return 0.0 + 0.0j
 
         remainder = braid_index % nb_anyons_per_qudit
         if remainder > 0:
             # Braiding within a qudit
-            print("braiding within a qudit")
+            # print("braiding within a qudit")
             qudit_index = braid_index // nb_anyons_per_qudit
             """
             [ B^{a(m,r-1), a(m,r)}_{i(m,r-1), a(m,r), a(m,r+1)} ]^{i(m,r)}_{i'(m,r)}
@@ -581,44 +613,50 @@ class AnyonModel:
                     final_state.get_qudit_state(qudit),
                 ):
                     if qudit != qudit_index:
-                        print(initial_state.get_qudit_state(qudit).inputs, 
-                              final_state.get_qudit_state(qudit).inputs)
-                        print(initial_state.get_qudit_state(qudit).outcomes,
-                              final_state.get_qudit_state(qudit).outcomes)
-                        print(f"qudit state {qudit} does not match its final counterpart.")
+                        # print(initial_state.get_qudit_state(qudit).inputs, 
+                        #       final_state.get_qudit_state(qudit).inputs)
+                        # print(initial_state.get_qudit_state(qudit).outcomes,
+                        #       final_state.get_qudit_state(qudit).outcomes)
+                        # print(f"qudit state {qudit} does not match its final counterpart.")
                         return 0.0 + 0.0j
             
             initial_outcomes = deepcopy(
-                initial_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
-                ]
+                initial_state.get_outcomes()
             )
             final_outcomes = deepcopy(
-                final_state.charges[
-                    nb_qudits * nb_anyons_per_qudit
-                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
-                ]
+                final_state.get_outcomes()
             )
             if not np.array_equal(initial_outcomes, final_outcomes):
-                print("outcomes do not match")
+                # print("outcomes do not match")
                 return 0.0 + 0.0j
+            
+            # Check that constant nodes stay fixed
+            qubit_state_initial = deepcopy(initial_state.get_qudit_state(qudit_index))
+            qubit_state_final = deepcopy(final_state.get_qudit_state(qudit_index))
+
+            # final_outcomes = deepcopy(qubit_state_final.outcomes)
+            # initial_outcomes = deepcopy(qubit_state_initial.outcomes)
+            # final_outcomes[remainder - 1] = initial_outcomes[remainder - 1]
+
+            # if not np.array_equal(final_outcomes, initial_outcomes):
+            #     # print("some i charges do not match")
+            #     return 0.0 + 0.0j
 
             # create standard basis states for initial and final single qudit states
             amplitude = self.compute_standard_braid_component(
-                initial_state.get_qudit_state(qudit_index),
+                qubit_state_initial,
                 remainder,
-                final_state.get_qudit_state(qudit_index),
+                qubit_state_final,
             )
-            print(f"amplitude: {amplitude}")
+            # print(f"amplitude: {amplitude}")
             return amplitude
         else:
             # Braiding between two qudits
-            print("braiding between two qudits")
+            # print("braiding between two qudits")
             first_qudit_index = (braid_index // nb_anyons_per_qudit) - 1
             second_qudit_index = braid_index // nb_anyons_per_qudit
             m = first_qudit_index
-            print(f"first_qudit_index: {first_qudit_index}")
+            # print(f"first_qudit_index: {first_qudit_index}")
 
             for qudit in range(nb_qudits):
                 if not np.array_equal(
@@ -626,11 +664,11 @@ class AnyonModel:
                     final_state.get_qudit_state(qudit),
                 ):
                     if qudit not in [first_qudit_index, second_qudit_index]:
-                        print(initial_state.get_qudit_state(qudit).inputs, 
-                              final_state.get_qudit_state(qudit).inputs)
-                        print(initial_state.get_qudit_state(qudit).outcomes,
-                              final_state.get_qudit_state(qudit).outcomes)
-                        print(f"qudit state {qudit} does not match its final counterpart.")
+                        # print(initial_state.get_qudit_state(qudit).inputs, 
+                        #       final_state.get_qudit_state(qudit).inputs)
+                        # print(initial_state.get_qudit_state(qudit).outcomes,
+                        #       final_state.get_qudit_state(qudit).outcomes)
+                        # print(f"qudit state {qudit} does not match its final counterpart.")
                         return 0.0 + 0.0j
             
             initial_outcomes = deepcopy(
@@ -650,7 +688,7 @@ class AnyonModel:
                 final_outcomes[m - 1] = initial_outcomes[m - 1]
 
             if not np.array_equal(initial_outcomes, final_outcomes):
-                print("outcomes do not match")
+                # print("outcomes do not match")
                 return 0.0 + 0.0j
             
             unmodified_i_initial = initial_state.charges[
@@ -670,7 +708,7 @@ class AnyonModel:
             ]
 
             if not np.array_equal(unmodified_i_initial, unmodified_i_final):
-                print("some i charges do not match")
+                # print("some i charges do not match")
                 return 0.0 + 0.0j
 
             """
@@ -822,10 +860,9 @@ class AnyonModel:
             j'(m-1), i'(m,q), i'(m+1,1) ... i'(m+1,q)
             }
             """
-            knitting_matrix = self.compute_knitting_matrix(
+            knitting_matrix = self.__K_matrices.get(q, self.compute_knitting_matrix(
                 q=q
-            )
-            # print(knitting_matrix)
+            ))
 
             """
             f"a(m,{q})",
@@ -881,5 +918,6 @@ class AnyonModel:
                         base_f.nb_anyons_per_qudit
                     )
                     )
+                print(i, f, sigmas[f, i])
 
         return sigmas
