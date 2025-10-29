@@ -484,31 +484,33 @@ class AnyonModel:
         final_inputs = deepcopy(final_state.inputs)
 
         # Permute the anyons i and i+1 in the initial inputs
-        temp = intial_inputs[braid_index]
-        intial_inputs[braid_index] = intial_inputs[braid_index - 1]
-        intial_inputs[braid_index - 1] = temp
+        temp = deepcopy(intial_inputs[braid_index])
+        intial_inputs[braid_index] = deepcopy(intial_inputs[braid_index - 1])
+        intial_inputs[braid_index - 1] = deepcopy(temp)
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(intial_inputs, final_inputs):
+            print("(Standard) )inputs do not match")
             return 0.0 + 0.0j
 
-        initial_outcomes = initial_state.outcomes
+        initial_outcomes = deepcopy(initial_state.outcomes)
         final_outcomes = deepcopy(final_state.outcomes)
-        final_outcomes[braid_index - 1] = initial_outcomes[braid_index - 1]
+        final_outcomes[braid_index - 1] = deepcopy(initial_outcomes[braid_index - 1])
         if not np.array_equal(initial_outcomes, final_outcomes):
+            print("(Standard) outcomes do not match")
             return 0.0 + 0.0j
 
-        a = initial_state.inputs[braid_index - 1]
-        b = initial_state.inputs[braid_index]
+        a = deepcopy(initial_state.inputs[braid_index - 1])
+        b = deepcopy(initial_state.inputs[braid_index])
         if braid_index == len(initial_state.inputs) - 1:
             c = 0  # vacuum
         else:
-            c = initial_state.outcomes[braid_index - 1]
-        i = initial_state.outcomes[braid_index - 1]
+            c = deepcopy(initial_state.outcomes[braid_index - 1])
+        i = deepcopy(initial_state.outcomes[braid_index - 1])
         if braid_index == 1:
             j = 0  # vacuum
         else:
-            j = initial_state.outcomes[braid_index - 2]
-        m = final_state.outcomes[braid_index - 1]
+            j = deepcopy(initial_state.outcomes[braid_index - 2])
+        m = deepcopy(final_state.outcomes[braid_index - 1])
         amplitude = self.braiding_matrix[a, b, c, j, i, m]
         return amplitude
 
@@ -552,32 +554,16 @@ class AnyonModel:
         nb_anyons_per_qudit = initial_state.nb_anyons_per_qudit
 
         # Get initial and final inputs
-        initial_inputs = initial_state.get_inputs()
-        final_inputs = final_state.get_inputs()
+        initial_inputs = deepcopy(initial_state.get_inputs())
+        final_inputs = deepcopy(final_state.get_inputs())
 
         # Permute the anyons i and i+1 in the initial inputs
-        temp = initial_inputs[braid_index]
-        initial_inputs[braid_index] = initial_inputs[braid_index - 1]
-        initial_inputs[braid_index - 1] = temp
+        temp = deepcopy(initial_inputs[braid_index])
+        initial_inputs[braid_index] = deepcopy(initial_inputs[braid_index - 1])
+        initial_inputs[braid_index - 1] = deepcopy(temp)
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(initial_inputs, final_inputs):
             print("inputs do not match")
-            return 0.0 + 0.0j
-
-        initial_outcomes = deepcopy(
-            initial_state.charges[
-                nb_qudits * nb_anyons_per_qudit
-                + nb_qudits * (nb_anyons_per_qudit - 1) : :
-            ]
-        )
-        final_outcomes = deepcopy(
-            final_state.charges[
-                nb_qudits * nb_anyons_per_qudit
-                + nb_qudits * (nb_anyons_per_qudit - 1) : :
-            ]
-        )
-        if not np.array_equal(initial_outcomes, final_outcomes):
-            print("outcomes do not match")
             return 0.0 + 0.0j
 
         remainder = braid_index % nb_anyons_per_qudit
@@ -599,8 +585,24 @@ class AnyonModel:
                               final_state.get_qudit_state(qudit).inputs)
                         print(initial_state.get_qudit_state(qudit).outcomes,
                               final_state.get_qudit_state(qudit).outcomes)
-                        print(f"qudit state {qudit} does not much i != f")
+                        print(f"qudit state {qudit} does not match its final counterpart.")
                         return 0.0 + 0.0j
+            
+            initial_outcomes = deepcopy(
+                initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
+                ]
+            )
+            final_outcomes = deepcopy(
+                final_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
+                ]
+            )
+            if not np.array_equal(initial_outcomes, final_outcomes):
+                print("outcomes do not match")
+                return 0.0 + 0.0j
 
             # create standard basis states for initial and final single qudit states
             amplitude = self.compute_standard_braid_component(
@@ -608,13 +610,68 @@ class AnyonModel:
                 remainder,
                 final_state.get_qudit_state(qudit_index),
             )
+            print(f"amplitude: {amplitude}")
             return amplitude
         else:
             # Braiding between two qudits
             print("braiding between two qudits")
             first_qudit_index = (braid_index // nb_anyons_per_qudit) - 1
             second_qudit_index = braid_index // nb_anyons_per_qudit
+            m = first_qudit_index
             print(f"first_qudit_index: {first_qudit_index}")
+
+            for qudit in range(nb_qudits):
+                if not np.array_equal(
+                    initial_state.get_qudit_state(qudit),
+                    final_state.get_qudit_state(qudit),
+                ):
+                    if qudit not in [first_qudit_index, second_qudit_index]:
+                        print(initial_state.get_qudit_state(qudit).inputs, 
+                              final_state.get_qudit_state(qudit).inputs)
+                        print(initial_state.get_qudit_state(qudit).outcomes,
+                              final_state.get_qudit_state(qudit).outcomes)
+                        print(f"qudit state {qudit} does not match its final counterpart.")
+                        return 0.0 + 0.0j
+            
+            initial_outcomes = deepcopy(
+                initial_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
+                ]
+            )
+            final_outcomes = deepcopy(
+                final_state.charges[
+                    nb_qudits * nb_anyons_per_qudit
+                    + nb_qudits * (nb_anyons_per_qudit - 1) : :
+                ]
+            )
+
+            if m > 0:
+                final_outcomes[m - 1] = initial_outcomes[m - 1]
+
+            if not np.array_equal(initial_outcomes, final_outcomes):
+                print("outcomes do not match")
+                return 0.0 + 0.0j
+            
+            unmodified_i_initial = initial_state.charges[
+                nb_qudits * nb_anyons_per_qudit +
+                m * (nb_anyons_per_qudit - 1) :
+                nb_qudits * nb_anyons_per_qudit +
+                m * (nb_anyons_per_qudit - 1) +
+                nb_anyons_per_qudit - 2
+            ]
+
+            unmodified_i_final = final_state.charges[
+                nb_qudits * nb_anyons_per_qudit +
+                m * (nb_anyons_per_qudit - 1) :
+                nb_qudits * nb_anyons_per_qudit +
+                m * (nb_anyons_per_qudit - 1) +
+                nb_anyons_per_qudit - 2
+            ]
+
+            if not np.array_equal(unmodified_i_initial, unmodified_i_final):
+                print("some i charges do not match")
+                return 0.0 + 0.0j
 
             """
             [K_{
@@ -628,20 +685,24 @@ class AnyonModel:
 
             q = nb_anyons_per_qudit - 1
             """
-            q_ = nb_anyons_per_qudit - 1
+            q = nb_anyons_per_qudit - 1
+            m = first_qudit_index # 0 .. nb_qudits - 2
+
             # a charges of the state a(m,q) a(m+1, 0), ..., a(m+1, q),
             a = []
-            m = first_qudit_index
-            a.append(deepcopy(initial_state.charges[(m + 1) * q_ - 1]))
-            for r in range(0, q_ + 1):
-                a.append(deepcopy(initial_state.charges[(m + 1) * q_ + r]))
-            # i charges of the state i(m,q-1), i(m,q)i(m+1,0) ... i(m+1,q)
+            # a(m,q)
+            a.append(deepcopy(initial_state.charges[(m + 1) * nb_anyons_per_qudit - 1]))
+            # a(m+1,0) ... a(m+1,q)
+            for r in range(0, q + 1):
+                a.append(deepcopy(initial_state.charges[(m + 1) * nb_anyons_per_qudit + r]))
+
+            # i charges of the state i(m,q-1), i(m,q)i(m+1,1) ... i(m+1,q)
             i = []
             # i(m,q-1)
             i.append(deepcopy(
                 initial_state.charges[
                     nb_qudits * nb_anyons_per_qudit
-                    + (m + 1) * (nb_anyons_per_qudit - 1)
+                    + (m + 1) * q
                     - 2
                 ]
             ))
@@ -649,17 +710,17 @@ class AnyonModel:
             i.append(
                 deepcopy(initial_state.charges[
                     nb_qudits * nb_anyons_per_qudit
-                    + (m + 1) * (nb_anyons_per_qudit - 1)
+                    + (m + 1) * q
                     - 1
                 ])
             )
-            # i(m+1,0) ... i(m+1,q)
-            for r in range(1, q_ + 1):
+            # i(m+1,1) ... i(m+1,q)
+            for r in range(1, q + 1):
                 i.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + (m + 1) * (nb_anyons_per_qudit - 1)
-                        + r
+                        + (m + 1) * q
+                        + r - 1
                     ])
                 )
 
@@ -669,17 +730,17 @@ class AnyonModel:
             i_prime.append(
                 deepcopy(final_state.charges[
                     nb_qudits * nb_anyons_per_qudit
-                    + (m + 1) * (nb_anyons_per_qudit - 1)
+                    + (m + 1) * q
                     - 1
                 ])
             )
-            # i'(m+1,0) ... i'(m+1,q)
-            for r in range(1, q_ + 1):
+            # i'(m+1,1) ... i'(m+1,q)
+            for r in range(1, q + 1):
                 i_prime.append(
                     deepcopy(final_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + (m + 1) * (nb_anyons_per_qudit - 1)
-                        + r
+                        + (m + 1) * q
+                        + r - 1
                     ])
                 )
             # root j charges of the state
@@ -692,38 +753,32 @@ class AnyonModel:
                 j.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_anyons_per_qudit
-                        - 1
-                        - 1
+                        + q - 1
                     ])
                 )  # j(m - 1)
                 j.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_qudits * (nb_anyons_per_qudit - 1)
-                        + 0
+                        + nb_qudits * q
                     ])
                 )  # j(m)
             elif m == 1:
                 j.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_anyons_per_qudit
-                        - 1
-                        - 1
+                        + q - 1
                     ])
                 )  # j(m - 2)
                 j.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_qudits * (nb_anyons_per_qudit - 1)
-                        + 0
+                        + nb_qudits * q
                     ])
                 )  # j(m - 1)
                 j.append(
                     deepcopy(initial_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + nb_qudits * q 
                         + 1
                     ])
                 )  # j(m)
@@ -732,7 +787,7 @@ class AnyonModel:
                     j.append(
                         deepcopy(initial_state.charges[
                             nb_qudits * nb_anyons_per_qudit
-                            + nb_qudits * (nb_anyons_per_qudit - 1)
+                            + nb_qudits * q
                             + r
                         ])
                     )
@@ -744,18 +799,15 @@ class AnyonModel:
                 j_prime.append(
                     deepcopy(final_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_anyons_per_qudit
-                        - 1
-                        - 1
+                        + q - 1
                     ])
                 )
             else:
                 j_prime.append(
                     deepcopy(final_state.charges[
                         nb_qudits * nb_anyons_per_qudit
-                        + nb_qudits * (nb_anyons_per_qudit - 1)
+                        + nb_qudits * q
                         + (m - 1)
-                        - 1
                     ])
                 )
 
@@ -771,7 +823,7 @@ class AnyonModel:
             }
             """
             knitting_matrix = self.compute_knitting_matrix(
-                q=nb_anyons_per_qudit - 1
+                q=q
             )
             # print(knitting_matrix)
 
@@ -787,6 +839,7 @@ class AnyonModel:
             "jp(m-1)",
             f"ip(m,{q})",
             *[f"ip(m+1,{r})" for r in range(1, q + 1)],
+        )
             """
 
             return knitting_matrix[
