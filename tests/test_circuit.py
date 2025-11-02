@@ -15,7 +15,7 @@ import os
 import numpy as np
 import pytest
 
-from tqsim import AnyonicCircuit, generate_basis, generate_braiding_operator
+from tqsim import AnyonicCircuit
 
 
 def test_init_1():
@@ -53,9 +53,9 @@ def test_save():
     circuit = AnyonicCircuit()
     config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
     store_path = os.path.join(config_path, "store")
-    data_path = os.path.join(store_path, "1_3")
-    basis_path = os.path.join(data_path, "basis.dat")
-    sigmas_path = os.path.join(data_path, "sigmas.dat")
+    data_path = os.path.join(store_path, "Fibonacci-1-3-1")
+    basis_path = os.path.join(data_path, "-basis.dat")
+    sigmas_path = os.path.join(data_path, "-sigmas.dat")
 
     assert os.path.exists(store_path)
     assert os.path.exists(data_path)

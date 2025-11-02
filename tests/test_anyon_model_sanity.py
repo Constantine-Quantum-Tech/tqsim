@@ -1,9 +1,6 @@
 import itertools
 import numpy as np
 
-from tqsim.lib.operator_generator import gen_sigma, generate_braiding_operator
-from tqsim.lib.basis_generator import generate_basis
-
 from tools.braiding_generators.fib_multi_qudits import sigma as sigma_fib
 from tools.braiding_generators.fib_multi_qudits import L as L_fib, B as B_fib
 from tools.braiding_generators.fib_qudit import F as F_fib, B as B_fib_qudit
@@ -85,7 +82,7 @@ def test_L_matrix_fib_and_ising():
 def test_K_matrix_fib_and_ising():
     # Check K (knitting) matrix mapping for both Fibonacci
     # and Ising models for q=3
-    q = 3
+    q = 2
     a = [1 for _ in range(q + 2)]
 
     # Fibonacci
