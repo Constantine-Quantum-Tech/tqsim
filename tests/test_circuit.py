@@ -49,6 +49,26 @@ def test_init_3():
     assert circuit.dim == 34
 
 
+def test_init_model():
+    from tqsim.models.ising import ISING_MODEL
+    from tqsim.models.fibonacci import FIBONACCI_MODEL
+
+    circuit = AnyonicCircuit(nb_qudits=1, nb_anyons_per_qudit=3, model=ISING_MODEL, input_charge=1)
+    assert circuit
+    assert circuit.nb_qudits == 1
+    assert circuit.nb_anyons_per_qudits == 3
+    assert len(circuit.basis) == 2
+    assert circuit.dim == 2
+    assert len(circuit.braiding_operators) == 2
+    assert circuit.braiding_operators[0].shape == (2, 2)
+
+    try:
+        circuit.model = FIBONACCI_MODEL
+        assert False
+    except AttributeError:
+        assert True
+
+
 def test_save():
     circuit = AnyonicCircuit()
     config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
