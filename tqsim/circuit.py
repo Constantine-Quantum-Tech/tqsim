@@ -56,6 +56,23 @@ class AnyonicCircuit:
         The dimension of the fusion space for the quantum circuit.
     basis : List
         List of all the basis states.
+    
+    Example usage
+    -------------
+    >>> circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)
+    >>> circuit.braid(1, 2).braid(2, 3)
+    >>> circuit.measure()
+    >>> result = circuit.run(shots=1000)
+    >>> print(result["counts"])
+
+    Example with model
+    -----------------
+    >>> from tqsim.models.ising import ISING_MODEL
+    >>> circuit = AnyonicCircuit(nb_qudits=1, nb_anyons_per_qudit=4, model=ISING_MODEL)
+    >>> circuit.braid(1, 2).braid(2, 3).braid(3, 4)
+    >>> circuit.measure()
+    >>> result = circuit.run(shots=500)
+    >>> print(result["counts"])
 
     """
 
