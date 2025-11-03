@@ -21,12 +21,22 @@ from tqsim.models.ising import ISING_MODEL
 from tqsim.models.fibonacci import FIBONACCI_MODEL
 
 
-# move stored files to a temporary location before tests
-config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
-store_path = os.path.join(config_path, "store")
-temp_path = os.path.join(config_path, "temp_store")
-if os.path.exists(store_path):
-    os.rename(store_path, temp_path)
+import pytest
+import shutil
+from pathlib import Path
+
+def clean_cache():
+    config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+    store_path = os.path.join(config_path, "store")
+    temp_path = os.path.join(config_path, "temp_store")
+
+    if os.path.exists(store_path):
+        os.rename(store_path, temp_path)
+
+def pytest_sessionstart(session):
+    """Run before any tests are collected or executed."""
+    print("Running pre-test setup...")
+    clean_cache()
 
 
 def test_init_1():
@@ -231,8 +241,15 @@ def test_measure_1():
         assert False
 
 
-# remove temporary stored files after tests
-if os.path.exists(store_path):
-    os.rmdir(store_path)
-if os.path.exists(temp_path):
-    os.rename(temp_path, store_path)
+def pytest_sessionfinish(session, exitstatus):
+    """Called after the whole test run completes."""
+    print("\nAll tests finished. Cleaning up...")
+    # remove temporary stored files after tests
+    config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+    store_path = os.path.join(config_path, "store")
+    temp_path = os.path.join(config_path, "temp_store")
+
+    if os.path.exists(store_path):
+        os.rmdir(store_path)
+    if os.path.exists(temp_path):
+        os.rename(temp_path, store_path)
