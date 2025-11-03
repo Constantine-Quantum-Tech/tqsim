@@ -11,5 +11,6 @@
 # that they have been altered from the originals.
 
 from tqsim.circuit import AnyonicCircuit
+from tqsim.config import clean_config_path as clean_cache
 
 __version__ = "1.0.0"
