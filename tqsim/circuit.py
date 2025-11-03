@@ -16,10 +16,13 @@ from typing import List, Sequence, Tuple
 
 import numpy as np
 
-from .config import STORE_PATH  # For caching the bases and sigmas.
-from .lib.basis_generator import generate_basis
-from .lib.drawer import Drawer
-from .lib.operator_generator import generate_braiding_operator
+from tqsim.config import STORE_PATH  # For caching the bases and sigmas.
+from tqsim.models.fibonacci import FIBONACCI_MODEL
+from tqsim.lib.basis_generator import ComputationalSparseBasisGenerator
+# from tqsim.lib.basis_generator import generate_basis
+from tqsim.lib.drawer import Drawer
+# from tqsim.lib.operator_generator import generate_braiding_operator
+
 
 
 class AnyonicCircuit:
@@ -53,7 +56,11 @@ class AnyonicCircuit:
 
     """
 
-    def __init__(self, nb_qudits: int = 1, nb_anyons_per_qudit: int = 3):
+    def __init__(
+            self, nb_qudits: int = 1, 
+            nb_anyons_per_qudit: int = 3, 
+            model=FIBONACCI_MODEL, 
+            input_charge=1):
         """
         Parameters
         ----------
@@ -61,30 +68,49 @@ class AnyonicCircuit:
             Number of qudits in the circuit. The default is 1.
         nb_anyons_per_qudit : int, optional
             Number of anyons in each qudit. The default is 3.
+        model : AnyonModel, optional
+            The anyon model to use for the circuit. The default is FIBONACCI_MODEL.
+        input_charge : int, optional
+            The input anyon charge for each anyon. The default is 1.
 
         Returns
         -------
         None.
 
         """
+        self.__model = model
         self.__nb_qudits = nb_qudits
         self.__nb_anyons_per_qudit = nb_anyons_per_qudit
         self.__nb_anyons = nb_qudits * nb_anyons_per_qudit
+        self.__input_charge = input_charge
 
         self.__nb_braids: int = 0
         self.__braids_history: List[Tuple[int, int]] = []
         self.__measured: bool = False
 
-        self.__basis, self.__dim = self.__get_basis()
+        # Preparing the basis and braiding operators
+        print("Generating basis...")
+        self.__basis = self.__get_basis()
+        print(f"Basis dimension: {len(self.__basis)}")
 
         input_state = np.zeros((self.__dim, 1), dtype=np.complex128)
         input_state[0, 0] = 1
         self.__initial_state = input_state
 
+        print("Generating braiding operators...")
         self.__sigmas = self.__get_sigmas()
+        print(f"Generated {len(self.__sigmas)} elementary braid operators.")
         self.__unitary = np.eye(self.__dim)
 
         self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudit)
+
+    @property
+    def model(self):
+        return self.__model
+    
+    @property
+    def input_charge(self):
+        return self.__input_charge
 
     @property
     def nb_qudits(self):
@@ -154,36 +180,62 @@ class AnyonicCircuit:
         """
         return self.__sigmas
 
+    @basis.getter
+    def basis(self):
+        self.__basis = self.__get_basis()
+        return self.__basis
+    
+    @dim.getter
+    def dim(self):
+        self.__basis = self.__get_basis()
+        return self.__dim
+
     def __get_basis(self) -> Tuple[np.ndarray, int]:
         folder_path = os.path.join(
-            STORE_PATH, f"{self.__nb_qudits}_{self.__nb_anyons_per_qudit}"
+            STORE_PATH, f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}"
         )
-        filename = os.path.join(folder_path, "basis.dat")
+        filename = os.path.join(folder_path, "-basis.dat")
         try:
             with open(filename, "rb") as f:
                 basis = pickle.load(f)
         except FileNotFoundError:
-            basis = generate_basis(self.__nb_qudits, self.__nb_anyons_per_qudit)
+            generator = ComputationalSparseBasisGenerator(self.model)
+            basis = generator.generate_basis(
+                self.__nb_qudits,
+                self.__nb_anyons_per_qudit,
+                self.__input_charge)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, "wb") as f:
                 pickle.dump(basis, f)
+        
+        self.__dim = len(basis)
 
-        return basis, len(basis)
+        return basis
+
+    @braiding_operators.getter
+    def braiding_operators(self):
+        self.__braiding_operators = self.__get_sigmas()
+        return self.__braiding_operators
 
     def __get_sigmas(self) -> List[np.ndarray]:
-
+        """Returns a list of all the braiding operators.
+        Returns
+        -------
+        List
+            List of all the braiding operators.
+        """
         folder_path = os.path.join(
-            STORE_PATH, f"{self.__nb_qudits}_{self.__nb_anyons_per_qudit}"
+            STORE_PATH, f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}"
         )
-        filename = os.path.join(folder_path, "sigmas.dat")
+        filename = os.path.join(folder_path, "-sigmas.dat")
         try:
             with open(filename, "rb") as f:
                 sigmas = pickle.load(f)
         except FileNotFoundError:
             sigmas = []
             for index in range(1, self.__nb_anyons):
-                sigma = generate_braiding_operator(
-                    index, self.__nb_qudits, self.__nb_anyons_per_qudit
+                sigma = self.model.generate_computational_braiding_operator(
+                    index, self.basis
                 )
                 sigmas.append(np.array(sigma))
 
