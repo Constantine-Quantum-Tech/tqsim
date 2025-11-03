@@ -17,8 +17,8 @@ from tools.braiding_generators.ising_qudit import (
 )
 from tools.braiding_generators.ising_multi_qudits import S as K_ising
 
-from lib.models.fibonacci import FIBONACCI_MODEL
-from lib.models.ising import ISING_MODEL
+from tqsim.lib.models.fibonacci import FIBONACCI_MODEL
+from tqsim.lib.models.ising import ISING_MODEL
 
 
 fib_model = FIBONACCI_MODEL
