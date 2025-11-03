@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 # Module for generating basis states for anyonic systems.
 
+import itertools
 import numpy as np
 from copy import deepcopy
 from tqsim.lib.anyon_state import (
@@ -108,27 +109,15 @@ class SparseBasisGenerator(BasisGenerator):
 
         basis = []
 
-        curr_comb = np.zeros(nb_labels, dtype=int)
-        final_comb = np.ones(nb_labels, dtype=int)
-
-        curr_state = SparseAnyonState(
-            deepcopy(curr_comb), nb_qudits, nb_anyons_per_qudit
-        )
-
-        if curr_state.is_valid(self.model):
-            basis.append(deepcopy(curr_state))
-
-        while not np.all(curr_comb == final_comb):
-            # Increment curr_comb as a binary counter using numpy
-            idx = np.argmax(curr_comb == 0)
-            curr_comb[:idx] = 0
-            curr_comb[idx] = 1
+        for curr_comb in itertools.product([i for i in range(self.model.nb_charges)], repeat=nb_labels):
 
             curr_state = SparseAnyonState(
-                deepcopy(curr_comb), nb_qudits, nb_anyons_per_qudit
+                np.array(curr_comb), 
+                nb_qudits, nb_anyons_per_qudit
             )
 
             if curr_state.is_valid(self.model):
+                
                 basis.append(deepcopy(curr_state))
 
         return basis
@@ -168,29 +157,15 @@ class ComputationalSparseBasisGenerator(BasisGenerator):
 
         basis = []
 
-        curr_comb = np.zeros(nb_labels, dtype=int)
-        final_comb = np.ones(nb_labels, dtype=int)
-
-        curr_state = ComputationalSparseAnyonState(
-            deepcopy(curr_comb), 
-            nb_qudits, nb_anyons_per_qudit, input_charge
-        )
-
-        if curr_state.is_valid(self.model):
-            basis.append(deepcopy(curr_state))
-
-        while not np.all(curr_comb == final_comb):
-            # Increment curr_comb as a binary counter using numpy
-            idx = np.argmax(curr_comb == 0)
-            curr_comb[:idx] = 0
-            curr_comb[idx] = 1
+        for curr_comb in itertools.product([i for i in range(self.model.nb_charges)], repeat=nb_labels):
 
             curr_state = ComputationalSparseAnyonState(
-                deepcopy(curr_comb), 
+                np.array(curr_comb), 
                 nb_qudits, nb_anyons_per_qudit, input_charge
             )
 
             if curr_state.is_valid(self.model):
+                
                 basis.append(deepcopy(curr_state))
 
         return basis
