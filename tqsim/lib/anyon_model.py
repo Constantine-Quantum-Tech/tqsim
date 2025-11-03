@@ -30,9 +30,10 @@ class AnyonModel:
         self.R_matrix = R_matrix
         self.braiding_matrix = self._compute_braiding_matrix()
         self.__K_matrices = {}
+        self.nb_charges = self.N_symbols.shape[0]
 
         if name is None:
-            self.name == f"model-{np.random.randint(1000)}"
+            self.name = f"model-{np.random.randint(1000)}"
         else:
             self.name = name
 
@@ -918,6 +919,6 @@ class AnyonModel:
                         base_f.nb_anyons_per_qudit
                     )
                     )
-                print(i, f, sigmas[f, i])
+                # print(i, f, sigmas[f, i])
 
         return sigmas
