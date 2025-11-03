@@ -55,6 +55,8 @@ def test_init_model():
     assert circuit
     assert circuit.nb_qudits == 1
     assert circuit.nb_anyons_per_qudits == 3
+    assert circuit.input_charge == 1
+    assert circuit.model.name == "Ising"
     assert circuit.dim == 2
     assert len(circuit.braiding_operators) == 2
     assert circuit.braiding_operators[0].shape == (2, 2)
