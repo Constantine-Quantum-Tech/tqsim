@@ -87,7 +87,7 @@ def test_init_model_1():
     assert circuit
     assert circuit.nb_qudits == 1
     assert circuit.nb_anyons_per_qudit == 4
-    assert circuit.input_charge == 1 # Which charge is used for braiding
+    assert circuit.input_charge == 1  # Which charge is used for braiding
     assert circuit.model.name == "Z_N"
     assert circuit.dim == 1
     assert len(circuit.braiding_operators) == 3

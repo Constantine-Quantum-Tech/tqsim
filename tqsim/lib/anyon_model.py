@@ -27,17 +27,96 @@ from tqsim.lib.anyon_state import (
 class AnyonModel:
 
     def __init__(self, N_symbols, F_matrix, R_matrix, name=None):
-        self.N_symbols = N_symbols
-        self.F_matrix = F_matrix
-        self.R_matrix = R_matrix
-        self.braiding_matrix = self._compute_braiding_matrix()
-        self.__K_matrices = {}
+        assert N_symbols.ndim == 3, "N_symbols must be a 3D tensor"
+        assert F_matrix.ndim == 6, "F_matrix must be a 6D tensor"
+        assert R_matrix.ndim == 3, "R_matrix must be a 5D tensor"
+
+        self._N_symbols = N_symbols
+        self._F_matrix = F_matrix
+        self._R_matrix = R_matrix
+        self._B_matrix = self._compute_braiding_matrix()
+        self._K_matrices = {}
         self.nb_charges = self.N_symbols.shape[0]
 
         if name is None:
-            self.name = f"model-{np.random.randint(1000)}"
+            self._name = f"model-{np.random.randint(1000)}"
         else:
-            self.name = name
+            self._name = name
+
+    @property
+    def N_symbols(self):
+        """Returns the fusion rules N symbols tensor.
+
+        Returns
+        -------
+        np.ndarray
+            The N symbols tensor.
+
+        """
+        return self._N_symbols
+
+    @property
+    def F_matrix(self):
+        """Returns the F matrix tensor.
+
+        Returns
+        -------
+        np.ndarray
+            The F matrix tensor.
+
+        """
+        return self._F_matrix
+
+    @property
+    def R_matrix(self):
+        """Returns the R matrix tensor.
+
+        Returns
+        -------
+        np.ndarray
+            The R matrix tensor.
+
+        """
+        return self._R_matrix
+
+    @property
+    def B_matrix(self):
+        """Returns the braiding matrix tensor.
+
+        Returns
+        -------
+        np.ndarray
+            The braiding matrix tensor.
+
+        return self._B_matrix
+            The braiding matrix tensor.
+
+        """
+        return self._B_matrix
+
+    @property
+    def K_matrices(self):
+        """Returns the K matrices dictionary.
+
+        Returns
+        -------
+        dict
+            The K matrices dictionary.
+
+        """
+        return self._K_matrices
+
+    @property
+    def name(self):
+        """Returns the name of the anyon model.
+
+        Returns
+        -------
+        str
+            The name of the anyon model.
+
+        """
+        return self._name
 
     def check_rule(
         self, anyon1: np.ndarray, anyon2: np.ndarray, outcome: np.ndarray
@@ -153,7 +232,7 @@ class AnyonModel:
             f"i(m,{q})",
             f"ip(m,{q})",
         )
-        terms.append((self.braiding_matrix, B_labels))
+        terms.append((self.B_matrix, B_labels))
 
         # --- Right product of q F factors
         r = 1
@@ -326,7 +405,7 @@ class AnyonModel:
 
         # Perform contraction
         K = einsum_with_names(terms, out_labels)
-        self.__K_matrices[q] = K
+        self._K_matrices[q] = K
 
         # Store K matrix to file
         os.makedirs(folder_path, exist_ok=True)
@@ -545,7 +624,7 @@ class AnyonModel:
 
         j = deepcopy(final_state.outcomes[braid_index - 1])
 
-        amplitude = self.braiding_matrix[a, b, c, j, i, m]
+        amplitude = self.B_matrix[a, b, c, j, i, m]
         return amplitude
 
     def compute_sparse_braid_inner_product(
@@ -891,7 +970,7 @@ class AnyonModel:
             j'(m-1), i'(m,q), i'(m+1,1) ... i'(m+1,q)
             }
             """
-            knitting_matrix = self.__K_matrices.get(
+            knitting_matrix = self._K_matrices.get(
                 q, self.compute_knitting_matrix(q=q)
             )
 

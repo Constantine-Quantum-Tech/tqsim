@@ -100,11 +100,11 @@ class TestAnyonModel:
         assert hasattr(fibonacci_model, "N_symbols")
         assert hasattr(fibonacci_model, "F_matrix")
         assert hasattr(fibonacci_model, "R_matrix")
-        assert hasattr(fibonacci_model, "braiding_matrix")
+        assert hasattr(fibonacci_model, "B_matrix")
 
     def test_braiding_matrix_shape(self, fibonacci_model):
         """Test that braiding matrix has correct shape as observed in notebook."""
-        B = fibonacci_model.braiding_matrix
+        B = fibonacci_model.B_matrix
         expected_shape = (2, 2, 2, 2, 2, 2)
         assert (
             B.shape == expected_shape
@@ -188,7 +188,7 @@ class TestAnyonModel:
 
     def test_braiding_matrix_properties(self, fibonacci_model):
         """Test properties of the braiding matrix."""
-        B = fibonacci_model.braiding_matrix
+        B = fibonacci_model.B_matrix
 
         # Test that it's complex
         assert np.iscomplexobj(B)
@@ -229,7 +229,7 @@ class TestAnyonModel:
     def test_complex_calculations_dont_crash(self, fibonacci_model):
         """Test that complex matrix calculations don't crash."""
         # These should all complete without error
-        B = fibonacci_model.braiding_matrix
+        B = fibonacci_model.B_matrix
         L1 = fibonacci_model._compute_L_matrix(q=1)
         K1 = fibonacci_model.compute_knitting_matrix(q=1)
 

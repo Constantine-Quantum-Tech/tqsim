@@ -122,7 +122,7 @@ class AnyonicCircuit:
         return self.__nb_qudits
 
     @property
-    def nb_anyons_per_qudits(self):
+    def nb_anyons_per_qudit(self):
         """Returns the number of anyons for each qudit in the circuit.
 
         Returns

@@ -36,7 +36,7 @@ def test_F_matrix():
 def test_B_matrix():
     # iterate over all possible a, b, c, d in [0, 1]
     for a, b, c, d in itertools.product([0, 1], repeat=4):
-        expected = fib_model.braiding_matrix[a, b, c, d, :, :]
+        expected = fib_model.B_matrix[a, b, c, d, :, :]
         got = B_fib(a, b, c, d)
         assert np.isclose(got, expected, atol=1e-6).all()
 
@@ -44,7 +44,7 @@ def test_B_matrix():
 def test_ising_B_matrix():
     # iterate over all possible a, b, c, d in [0, 1]
     for a, b, c, d in itertools.product([0, 1], repeat=4):
-        expected = ising_model.braiding_matrix[a, b, c, d, :, :]
+        expected = ising_model.B_matrix[a, b, c, d, :, :]
         got = B_ising(a, b, c, d)
         assert np.isclose(got, expected, atol=1e-6).all()
 
