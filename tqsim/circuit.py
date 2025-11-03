@@ -36,6 +36,13 @@ class AnyonicCircuit:
         Number of qudits in the circuit. The default is 1.
     nb_anyons_per_qudit : int, optional
         Number of anyons in each qudit. The default is 3.
+    model : AnyonModel, optional
+        The anyon model to use for the circuit. The default is FIBONACCI_MODEL.
+    input_charge : int, optional
+        The input anyon charge for each anyon. The default is 1.
+    force_recache : bool, optional
+        If True, forces the regeneration of cached basis and braiding operators.
+        The default is False.
 
     Attributes
     ----------

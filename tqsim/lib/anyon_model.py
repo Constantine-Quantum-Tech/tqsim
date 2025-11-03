@@ -25,13 +25,67 @@ from tqsim.lib.anyon_state import (
 
 
 class AnyonModel:
+    """Class representing an anyon model.
 
-    def __init__(self, \
-                 N_symbols: np.ndarray, 
-                 F_matrix: np.ndarray, 
-                 R_matrix: np.ndarray, 
-                 name=None, 
-                 force_recache=False):
+    Parameters
+    ----------
+    N_symbols : np.ndarray
+        The fusion rules N symbols tensor.
+    F_matrix : np.ndarray
+        The F matrix tensor.
+    R_matrix : np.ndarray
+        The R matrix tensor.
+    name : str, optional
+        The name of the anyon model. If None, a random name is generated.
+    force_recache : bool, optional
+        If True, forces the regeneration of cached matrices. Default is False.
+
+    Attributes
+    ----------
+    N_symbols : np.ndarray
+        The fusion rules N symbols tensor.
+    F_matrix : np.ndarray
+        The F matrix tensor.
+    R_matrix : np.ndarray
+        The R matrix tensor.
+    name : str
+        The name of the anyon model.
+
+    Example 1:
+        >>> from tqsim.models.fibonacci import FIBONACCI_MODEL
+        >>> model = FIBONACCI_MODEL
+        >>> print(model.N_symbols)
+        >>> print(model.F_matrix)
+        >>> print(model.R_matrix)
+
+    Example 2: Z_N model (Abelian model)
+        >>> N = 5
+        >>> N_symbols = np.zeros((N, N, N), dtype=int)
+        >>> for i, j, k in itertools.product(range(N), repeat=3):
+        >>>     if (i + j) % N == k:
+        >>>         N_symbols[i, j, k] = 1
+
+        >>> F_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
+        >>> for i, j, k, l, m, n in itertools.product(range(N), repeat=6):
+        >>>     if (i + j + k) % N == l and (i + j) % N == m and (j + k) % N == n:
+        >>>         F_matrix[i, j, k, l, m, n] = 1
+
+        >>> R_matrix = np.zeros((N, N, N), dtype=complex)
+        >>> for i, j, k in itertools.product(range(N), repeat=3):
+        >>>     if (i + j) % N == k:
+        >>>         R_matrix[i, j, k] = np.exp(2j * np.pi * i * j / N)
+
+        >>> zn_model = AnyonModel(N_symbols, F_matrix, R_matrix, name="Z_N")
+    """
+
+    def __init__(
+        self,
+        N_symbols: np.ndarray,
+        F_matrix: np.ndarray,
+        R_matrix: np.ndarray,
+        name=None,
+        force_recache=False,
+    ):
         assert N_symbols.ndim == 3, "N_symbols must be a 3D tensor"
         assert F_matrix.ndim == 6, "F_matrix must be a 6D tensor"
         assert R_matrix.ndim == 3, "R_matrix must be a 5D tensor"
