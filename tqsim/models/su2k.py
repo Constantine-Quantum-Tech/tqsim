@@ -1,5 +1,6 @@
 import itertools
 import numpy as np
+
 from tqsim.lib.anyon_model import AnyonModel
 
 
