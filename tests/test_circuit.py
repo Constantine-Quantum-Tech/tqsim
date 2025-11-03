@@ -19,6 +19,14 @@ from tqsim.models.ising import ISING_MODEL
 from tqsim.models.fibonacci import FIBONACCI_MODEL
 
 
+# move stored files to a temporary location before tests
+config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+store_path = os.path.join(config_path, "store")
+temp_path = os.path.join(config_path, "temp_store")
+if os.path.exists(store_path):
+    os.rename(store_path, temp_path)
+
+
 def test_init_1():
     circuit = AnyonicCircuit()
 
@@ -51,7 +59,12 @@ def test_init_3():
 
 
 def test_init_model():
-    circuit = AnyonicCircuit(nb_qudits=1, nb_anyons_per_qudit=3, model=ISING_MODEL, input_charge=1)
+    circuit = AnyonicCircuit(
+        nb_qudits=1,
+        nb_anyons_per_qudit=3,
+        model=ISING_MODEL,
+        input_charge=1
+        )
     assert circuit
     assert circuit.nb_qudits == 1
     assert circuit.nb_anyons_per_qudits == 3
@@ -177,3 +190,10 @@ def test_measure_1():
         circuit.measure()
     except:
         assert False
+
+
+# remove temporary stored files after tests
+if os.path.exists(store_path):
+    os.rmdir(store_path)
+if os.path.exists(temp_path):
+    os.rename(temp_path, store_path)
