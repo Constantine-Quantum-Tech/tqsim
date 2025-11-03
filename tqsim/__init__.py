@@ -10,7 +10,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from .circuit import AnyonicCircuit, generate_basis, generate_braiding_operator
-from .lib.utils import cplot
+# from .circuit import AnyonicCircuit, generate_basis, generate_braiding_operator
+# from .lib.utils import cplot
 
-__version__ = "0.0.2"
+from tqsim.circuit import AnyonicCircuit
+
+__version__ = "1.0.0"
