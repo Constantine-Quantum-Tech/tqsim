@@ -15,8 +15,8 @@ keywords = ["topological quantum computing", "quantum", "quantum computing", "an
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.14"
-numpy = "^2.3"
+python = "^3.14.0"
+numpy = "^2.3.4"
 matplotlib = "^3.10"
 seaborn = "^0.13"
 
