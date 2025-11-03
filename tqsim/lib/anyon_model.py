@@ -588,7 +588,6 @@ class AnyonModel:
         initial_inputs[braid_index - 1] = deepcopy(temp)
         # Check if the permuted initial inputs match the final inputs
         if not np.array_equal(initial_inputs, final_inputs):
-            # print("(Standard) )inputs do not match")
             return 0.0 + 0.0j
 
         initial_outcomes = deepcopy(initial_state.outcomes)
@@ -599,12 +598,10 @@ class AnyonModel:
             )
 
         if not np.array_equal(initial_outcomes, final_outcomes):
-            # print("(Standard) outcomes do not match")
             return 0.0 + 0.0j
 
         if braid_index == 1:
             # Braiding the first two anyons
-            # print("braiding first two anyons")
             a = 0  # vacuum
         elif braid_index == 2:
             a = deepcopy(initial_state.inputs[0])
@@ -694,11 +691,6 @@ class AnyonModel:
                     final_state.get_qudit_state(qudit),
                 ):
                     if qudit != qudit_index:
-                        # print(initial_state.get_qudit_state(qudit).inputs,
-                        #       final_state.get_qudit_state(qudit).inputs)
-                        # print(initial_state.get_qudit_state(qudit).outcomes,
-                        #       final_state.get_qudit_state(qudit).outcomes)
-                        # print(f"qudit state {qudit} does not match its final counterpart.")
                         return 0.0 + 0.0j
 
             initial_outcomes = deepcopy(initial_state.get_outcomes())
@@ -715,29 +707,18 @@ class AnyonModel:
                 final_state.get_qudit_state(qudit_index)
             )
 
-            # final_outcomes = deepcopy(qubit_state_final.outcomes)
-            # initial_outcomes = deepcopy(qubit_state_initial.outcomes)
-            # final_outcomes[remainder - 1] = initial_outcomes[remainder - 1]
-
-            # if not np.array_equal(final_outcomes, initial_outcomes):
-            #     # print("some i charges do not match")
-            #     return 0.0 + 0.0j
-
             # create standard basis states for initial and final single qudit states
             amplitude = self.compute_standard_braid_component(
                 qubit_state_initial,
                 remainder,
                 qubit_state_final,
             )
-            # print(f"amplitude: {amplitude}")
             return amplitude
         else:
             # Braiding between two qudits
-            # print("braiding between two qudits")
             first_qudit_index = (braid_index // nb_anyons_per_qudit) - 1
             second_qudit_index = braid_index // nb_anyons_per_qudit
             m = first_qudit_index
-            # print(f"first_qudit_index: {first_qudit_index}")
 
             for qudit in range(nb_qudits):
                 if not np.array_equal(
@@ -745,11 +726,6 @@ class AnyonModel:
                     final_state.get_qudit_state(qudit),
                 ):
                     if qudit not in [first_qudit_index, second_qudit_index]:
-                        # print(initial_state.get_qudit_state(qudit).inputs,
-                        #       final_state.get_qudit_state(qudit).inputs)
-                        # print(initial_state.get_qudit_state(qudit).outcomes,
-                        #       final_state.get_qudit_state(qudit).outcomes)
-                        # print(f"qudit state {qudit} does not match its final counterpart.")
                         return 0.0 + 0.0j
 
             initial_outcomes = deepcopy(
@@ -769,7 +745,6 @@ class AnyonModel:
                 final_outcomes[m - 1] = initial_outcomes[m - 1]
 
             if not np.array_equal(initial_outcomes, final_outcomes):
-                # print("outcomes do not match")
                 return 0.0 + 0.0j
 
             unmodified_i_initial = initial_state.charges[
@@ -793,7 +768,6 @@ class AnyonModel:
             ]
 
             if not np.array_equal(unmodified_i_initial, unmodified_i_final):
-                # print("some i charges do not match")
                 return 0.0 + 0.0j
 
             """
@@ -1043,6 +1017,5 @@ class AnyonModel:
                         base_f.nb_anyons_per_qudit,
                     ),
                 )
-                # print(i, f, sigmas[f, i])
 
         return sigmas
