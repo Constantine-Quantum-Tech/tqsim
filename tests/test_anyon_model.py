@@ -12,7 +12,7 @@
 
 import numpy as np
 import pytest
-from lib.anyon_model import AnyonModel
+from tqsim.lib.anyon_model import AnyonModel
 
 
 class TestAnyonModel:
