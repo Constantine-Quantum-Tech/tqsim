@@ -58,6 +58,7 @@ class AnyonicCircuit:
         nb_anyons_per_qudit: int = 3,
         model=FIBONACCI_MODEL,
         input_charge=1,
+        force_recache: bool = False,
     ):
         """
         Parameters
@@ -85,6 +86,28 @@ class AnyonicCircuit:
         self.__nb_braids: int = 0
         self.__braids_history: List[Tuple[int, int]] = []
         self.__measured: bool = False
+
+        if force_recache:
+            config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+            store_path = os.path.join(config_path, "store")
+
+            # remove basis
+            basis_path = os.path.join(
+                store_path,
+                f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
+                "-basis.dat",
+            )
+            if os.path.exists(basis_path):
+                os.remove(basis_path)
+            
+            # remove sigmas
+            sigmas_path = os.path.join(
+                store_path,
+                f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
+                "-sigmas.dat",
+            )
+            if os.path.exists(sigmas_path):
+                os.remove(sigmas_path)
 
         # Preparing the basis and braiding operators
         print("Generating basis...")

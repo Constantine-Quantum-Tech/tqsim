@@ -26,10 +26,23 @@ from tqsim.lib.anyon_state import (
 
 class AnyonModel:
 
-    def __init__(self, N_symbols, F_matrix, R_matrix, name=None):
+    def __init__(self, \
+                 N_symbols: np.ndarray, 
+                 F_matrix: np.ndarray, 
+                 R_matrix: np.ndarray, 
+                 name=None, 
+                 force_recache=False):
         assert N_symbols.ndim == 3, "N_symbols must be a 3D tensor"
         assert F_matrix.ndim == 6, "F_matrix must be a 6D tensor"
         assert R_matrix.ndim == 3, "R_matrix must be a 5D tensor"
+
+        if force_recache:
+            folder_path = os.path.join(STORE_PATH, f"{name}-q-*")
+            if os.path.exists(folder_path):
+                for file in os.listdir(folder_path):
+                    file_path = os.path.join(folder_path, file)
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
 
         self._N_symbols = N_symbols
         self._F_matrix = F_matrix
