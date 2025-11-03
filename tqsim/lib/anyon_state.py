@@ -48,13 +48,15 @@ class StandardAnyonState(AnyonState):
         assert (
             len(outcomes) == len(inputs) - 1
         ), "Number of outcomes must be one less than number of inputs."
-    
+
     def __eq__(self, value):
-        return np.array_equal(self.inputs, value.inputs) and np.array_equal(self.outcomes, value.outcomes)
+        return np.array_equal(self.inputs, value.inputs) and np.array_equal(
+            self.outcomes, value.outcomes
+        )
 
     def is_valid(self, model):
         return model.check_state(self)
-    
+
     def __repr__(self):
         return (
             f"StandardAnyonState(inputs={self.inputs}, "
@@ -117,12 +119,12 @@ class SparseAnyonState(AnyonState):
         assert len(charges) == nb_qudits * (2 * nb_anyons_per_qudit - 1) + (
             nb_qudits - 1
         ), "Charges length does not match the number of qudits and anyons per qudit."
-    
+
     def __eq__(self, value):
         return (
-            np.array_equal(self.charges, value.charges) and 
-            self.nb_qudits == value.nb_qudits and 
-            self.nb_anyons_per_qudit == value.nb_anyons_per_qudit
+            np.array_equal(self.charges, value.charges)
+            and self.nb_qudits == value.nb_qudits
+            and self.nb_anyons_per_qudit == value.nb_anyons_per_qudit
         )
 
     def is_valid(self, model):
@@ -254,13 +256,13 @@ class ComputationalSparseAnyonState(AnyonState):
         assert len(charges) == nb_qudits * (nb_anyons_per_qudit - 1) + (
             nb_qudits - 1
         ), "Charges length does not match the number of qudits and anyons per qudit."
-    
+
     def __eq__(self, value):
         return (
-            np.array_equal(self.charges, value.charges) and 
-            self.nb_qudits == value.nb_qudits and 
-            self.nb_anyons_per_qudit == value.nb_anyons_per_qudit and
-            self.input_charge == value.input_charge
+            np.array_equal(self.charges, value.charges)
+            and self.nb_qudits == value.nb_qudits
+            and self.nb_anyons_per_qudit == value.nb_anyons_per_qudit
+            and self.input_charge == value.input_charge
         )
 
     def is_valid(self, model):
@@ -286,7 +288,6 @@ class ComputationalSparseAnyonState(AnyonState):
             f"nb_anyons_per_qudit={self.nb_anyons_per_qudit}, "
             f"input_charge={self.input_charge})"
         )
-
 
     def inner_product(self, other):
         """Compute the inner product between two ComputationalSparseAnyonState instances.

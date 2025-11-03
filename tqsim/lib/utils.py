@@ -84,7 +84,8 @@ def matplotlib_close_if_inline(figure):
     """Close the given matplotlib figure if the backend in use draws figures inline.
     If the backend does not draw figures inline, this does nothing.  This function is to prevent
     duplicate images appearing; the inline backends will capture the figure in preparation and
-    display it as well, whereas the drawers want to return the figure to be displayed."""
+    display it as well, whereas the drawers want to return the figure to be displayed.
+    """
     # This can only called if figure has already been created, so matplotlib must exist.
     import matplotlib.pyplot
 
@@ -92,7 +93,7 @@ def matplotlib_close_if_inline(figure):
         matplotlib.pyplot.close(figure)
 
 
-def cplot(cmatrix, sigma=0.5, title=''):
+def cplot(cmatrix, sigma=0.5, title=""):
     """Plots a complex-valued matrix with color coding, and a color map.
     'Sigma' controls how much small values are colored. A lower value will
     emphasize small values more.
@@ -120,30 +121,35 @@ def cplot(cmatrix, sigma=0.5, title=''):
 
             if x == 0:
                 if y > 0:
-                    theta = pi/2
+                    theta = pi / 2
                 else:
-                    theta = -pi/2
+                    theta = -pi / 2
             else:
-                theta = atan(y/x)
+                theta = atan(y / x)
             if x < 0:
                 theta += pi
-            rad = 1- exp(-(x**2 + y**2)/sigma)
-            img[-1].append([cos(theta/2)**2,
-                            cos(theta/2 + 2*pi/3)**2,
-                            cos(theta/2 - 2*pi/3)**2,
-                            rad])
+            rad = 1 - exp(-(x**2 + y**2) / sigma)
+            img[-1].append(
+                [
+                    cos(theta / 2) ** 2,
+                    cos(theta / 2 + 2 * pi / 3) ** 2,
+                    cos(theta / 2 - 2 * pi / 3) ** 2,
+                    rad,
+                ]
+            )
 
-    mpl.rcParams['figure.figsize'] = (10, 10)
+    mpl.rcParams["figure.figsize"] = (10, 10)
     fig, (pl, sc) = plt.subplots(nrows=1, ncols=2, sharex=False)
-                                 #figsize=[8, 25])
+    # figsize=[8, 25])
     sc.imshow(img)
     pl.imshow(scale(sigma=sigma), extent=(-1, 1, -1, 1))
-    pl.set_xlabel('Re')
-    pl.set_ylabel('Img')
+    pl.set_xlabel("Re")
+    pl.set_ylabel("Img")
     pl.grid(True)
     plt.title(title)
     plt.show()
     return
+
 
 def scale(sigma=0.5):
     """
@@ -153,22 +159,26 @@ def scale(sigma=0.5):
     sc = 50
     for r in range(sc, -sc, -1):
         img.append([])
-        for c  in range(-sc, sc, 1):
-            y = (r/sc)
-            x = (c/sc)
+        for c in range(-sc, sc, 1):
+            y = r / sc
+            x = c / sc
             if x == 0:
                 if y > 0:
-                    theta = pi/2
+                    theta = pi / 2
                 else:
-                    theta = -pi/2
+                    theta = -pi / 2
             else:
-                theta = atan(y/x)
+                theta = atan(y / x)
             if x < 0:
                 theta += pi
-            rad = 1- exp(-(x**2 + y**2)/sigma)
-            img[-1].append([cos(theta/2)**2,
-                            cos(theta/2 + 2*pi/3)**2,
-                            cos(theta/2 - 2*pi/3)**2,
-                            rad])
+            rad = 1 - exp(-(x**2 + y**2) / sigma)
+            img[-1].append(
+                [
+                    cos(theta / 2) ** 2,
+                    cos(theta / 2 + 2 * pi / 3) ** 2,
+                    cos(theta / 2 - 2 * pi / 3) ** 2,
+                    rad,
+                ]
+            )
 
     return img

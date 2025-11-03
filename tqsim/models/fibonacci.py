@@ -1,3 +1,15 @@
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2025.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+
 import numpy as np
 from tqsim.lib.anyon_model import AnyonModel
 
@@ -77,4 +89,6 @@ for a1 in range(2):
     for a2 in range(2):
         R_matrix[a1, a2] = R(a1, a2).diagonal()
 
-FIBONACCI_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name='Fibonacci')
+FIBONACCI_MODEL = AnyonModel(
+    fusion_matrix, F_matrix, R_matrix, name="Fibonacci"
+)

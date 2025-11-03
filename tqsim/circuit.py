@@ -12,17 +12,13 @@
 
 import os
 import pickle
-from typing import List, Sequence, Tuple
-
 import numpy as np
+from typing import List, Sequence, Tuple
 
 from tqsim.config import STORE_PATH  # For caching the bases and sigmas.
 from tqsim.models.fibonacci import FIBONACCI_MODEL
 from tqsim.lib.basis_generator import ComputationalSparseBasisGenerator
-# from tqsim.lib.basis_generator import generate_basis
 from tqsim.lib.drawer import Drawer
-# from tqsim.lib.operator_generator import generate_braiding_operator
-
 
 
 class AnyonicCircuit:
@@ -57,10 +53,12 @@ class AnyonicCircuit:
     """
 
     def __init__(
-            self, nb_qudits: int = 1, 
-            nb_anyons_per_qudit: int = 3, 
-            model=FIBONACCI_MODEL, 
-            input_charge=1):
+        self,
+        nb_qudits: int = 1,
+        nb_anyons_per_qudit: int = 3,
+        model=FIBONACCI_MODEL,
+        input_charge=1,
+    ):
         """
         Parameters
         ----------
@@ -107,7 +105,7 @@ class AnyonicCircuit:
     @property
     def model(self):
         return self.__model
-    
+
     @property
     def input_charge(self):
         return self.__input_charge
@@ -184,7 +182,7 @@ class AnyonicCircuit:
     def basis(self):
         self.__basis = self.__get_basis()
         return self.__basis
-    
+
     @dim.getter
     def dim(self):
         self.__basis = self.__get_basis()
@@ -192,7 +190,8 @@ class AnyonicCircuit:
 
     def __get_basis(self) -> Tuple[np.ndarray, int]:
         folder_path = os.path.join(
-            STORE_PATH, f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}"
+            STORE_PATH,
+            f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
         )
         filename = os.path.join(folder_path, "-basis.dat")
         try:
@@ -203,11 +202,12 @@ class AnyonicCircuit:
             basis = generator.generate_basis(
                 self.__nb_qudits,
                 self.__nb_anyons_per_qudit,
-                self.__input_charge)
+                self.__input_charge,
+            )
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, "wb") as f:
                 pickle.dump(basis, f)
-        
+
         self.__dim = len(basis)
 
         return basis
@@ -225,7 +225,8 @@ class AnyonicCircuit:
             List of all the braiding operators.
         """
         folder_path = os.path.join(
-            STORE_PATH, f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}"
+            STORE_PATH,
+            f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
         )
         filename = os.path.join(folder_path, "-sigmas.dat")
         try:
@@ -277,7 +278,9 @@ class AnyonicCircuit:
 
         input_state = np.array(input_state)
         if not np.size(input_state) == self.__dim:
-            raise ValueError(f"The state has wrong dimension. Should be {self.__dim}")
+            raise ValueError(
+                f"The state has wrong dimension. Should be {self.__dim}"
+            )
 
         norm = np.sum(np.real(input_state * input_state.conjugate()))
         if not np.isclose(norm, 1):
@@ -315,7 +318,9 @@ class AnyonicCircuit:
 
         """
         if self.__measured:
-            raise Exception("System already measured! Cannot perform further braiding!")
+            raise Exception(
+                "System already measured! Cannot perform further braiding!"
+            )
 
         if not isinstance(m, int) or not isinstance(n, int):
             raise ValueError("n, m must be integers")
@@ -335,7 +340,9 @@ class AnyonicCircuit:
         if n < m:
             self.__unitary = self.__sigmas[n - 1] @ self.__unitary
         else:
-            self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
+            self.__unitary = (
+                self.__sigmas[m - 1].T.conjugate() @ self.__unitary
+            )
 
         self.__braids_history.append((n, m))
 
@@ -441,14 +448,16 @@ class AnyonicCircuit:
 
         """
         if not output in ["raw", "sigmas", "latex"]:
-            raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
+            raise ValueError(
+                'Output should be either: "raw", "sigmas" or "latex"'
+            )
 
         if output == "raw":
             return self.__braids_history
 
         elif output == "sigmas":
             ret = []
-            for (n, m) in self.__braids_history:
+            for n, m in self.__braids_history:
                 if m < n:
                     ret.append(f"is{m}")
                 else:
