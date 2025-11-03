@@ -11,11 +11,12 @@
 # that they have been altered from the originals.
 
 import os
-
-import numpy as np
 import pytest
+import numpy as np
 
 from tqsim import AnyonicCircuit
+from tqsim.models.ising import ISING_MODEL
+from tqsim.models.fibonacci import FIBONACCI_MODEL
 
 
 def test_init_1():
@@ -50,9 +51,6 @@ def test_init_3():
 
 
 def test_init_model():
-    from tqsim.models.ising import ISING_MODEL
-    from tqsim.models.fibonacci import FIBONACCI_MODEL
-
     circuit = AnyonicCircuit(nb_qudits=1, nb_anyons_per_qudit=3, model=ISING_MODEL, input_charge=1)
     assert circuit
     assert circuit.nb_qudits == 1
