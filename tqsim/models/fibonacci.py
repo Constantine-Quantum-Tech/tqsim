@@ -1,5 +1,5 @@
 import numpy as np
-from lib.anyon_model import AnyonModel
+from tqsim.lib.anyon_model import AnyonModel
 
 
 fusion_matrix = np.zeros((2, 2, 2))
@@ -77,4 +77,4 @@ for a1 in range(2):
     for a2 in range(2):
         R_matrix[a1, a2] = R(a1, a2).diagonal()
 
-FIBONACCI_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix)
+FIBONACCI_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name='Fibonacci')

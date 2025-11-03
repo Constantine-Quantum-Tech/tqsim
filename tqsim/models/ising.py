@@ -1,5 +1,5 @@
 import numpy as np
-from lib.anyon_model import AnyonModel
+from tqsim.lib.anyon_model import AnyonModel
 
 
 def check_rule(anyon_1, anyon_2, outcome):
@@ -108,4 +108,4 @@ for a1 in range(3):
     for a2 in range(3):
         R_matrix[a1, a2] = R(a1, a2).diagonal()
 
-ISING_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix)
+ISING_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name='Ising')
