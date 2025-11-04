@@ -12,14 +12,12 @@
 
 import os
 from copy import deepcopy
-from typing import List, Tuple
 
 import numpy as np
 
 from tqsim.config import STORE_PATH
 from tqsim.lib.anyon_state import (
     AnyonState,
-    ComputationalSparseAnyonState,
     SparseAnyonState,
     StandardAnyonState,
 )
@@ -992,7 +990,7 @@ class AnyonModel:
             ]
 
     def generate_computational_braiding_operator(
-        self, index: int, basis: List[AnyonState]
+        self, index: int, basis: list[AnyonState]
     ):
         """Generates the braiding operator of index 'index' for a system of
         a given number of qudits and anyons per qudit.

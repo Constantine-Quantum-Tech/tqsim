@@ -18,7 +18,6 @@ import numpy as np
 
 from tqsim.lib.anyon_model import AnyonModel
 from tqsim.lib.anyon_state import (
-    AnyonState,
     ComputationalSparseAnyonState,
     SparseAnyonState,
     StandardAnyonState,

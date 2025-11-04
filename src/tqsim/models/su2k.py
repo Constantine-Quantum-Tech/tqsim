@@ -14,8 +14,6 @@ import itertools
 
 import numpy as np
 
-from tqsim.lib.anyon_model import AnyonModel
-
 
 def get_fusion_matrix(k: int) -> np.ndarray:
     """

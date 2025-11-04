@@ -24,7 +24,6 @@
 # that they have been altered from the originals.
 
 from math import atan, cos, exp, pi
-from typing import Dict, List, Tuple
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -32,8 +31,8 @@ import numpy as np
 
 
 def einsum_with_names(
-    terms: List[Tuple[np.ndarray, Tuple[str, ...]]],
-    output_labels: Tuple[str, ...],
+    terms: list[tuple[np.ndarray, tuple[str, ...]]],
+    output_labels: tuple[str, ...],
 ) -> np.ndarray:
     """
     terms: list of (array, labels_tuple) where labels_tuple are composite label strings
@@ -42,7 +41,7 @@ def einsum_with_names(
     Returns: np.einsum result using the integer-index API so label names can be arbitrary strings.
     """
     # collect all unique labels and assign integer ids
-    label_to_int: Dict[str, int] = {}
+    label_to_int: dict[str, int] = {}
     next_int = 0
 
     def get_int(lbl):

@@ -12,8 +12,6 @@
 
 import itertools
 import os
-import shutil
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -25,7 +23,7 @@ from tqsim.models.ising import ISING_MODEL
 
 
 def clean_cache():
-    config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+    config_path = os.path.join(os.path.expanduser("~"), ".tqsim")
     store_path = os.path.join(config_path, "store")
     temp_path = os.path.join(config_path, "temp_store")
 
@@ -132,7 +130,7 @@ def test_init_model_2():
 
 def test_save():
     circuit = AnyonicCircuit()
-    config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+    config_path = os.path.join(os.path.expanduser("~"), ".tqsim")
     store_path = os.path.join(config_path, "store")
     data_path = os.path.join(store_path, "Fibonacci-1-3-1")
     basis_path = os.path.join(data_path, "-basis.dat")
@@ -245,7 +243,7 @@ def pytest_sessionfinish(session, exitstatus):
     """Called after the whole test run completes."""
     print("\nAll tests finished. Cleaning up...")
     # remove temporary stored files after tests
-    config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+    config_path = os.path.join(os.path.expanduser("~"), ".tqsim")
     store_path = os.path.join(config_path, "store")
     temp_path = os.path.join(config_path, "temp_store")
 

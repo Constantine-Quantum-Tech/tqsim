@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 r"""
 Created on Thu Aug 27 21:54:22 2020
 
@@ -30,7 +29,6 @@ This model is designed to:
     + calculates braiding generators (sigma_n).
 """
 from copy import deepcopy
-from typing import List
 
 import numpy as np
 
@@ -55,7 +53,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def check_state(outcomes: List):
+def check_state(outcomes: list):
     r"""checks if a state is valid in Fibonacci models. Ex:
         1 1 1 1
         \/ / /

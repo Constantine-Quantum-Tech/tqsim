@@ -12,7 +12,7 @@
 
 import os
 import pickle
-from typing import List, Sequence, Tuple
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -109,11 +109,11 @@ class AnyonicCircuit:
         self.__input_charge = input_charge
 
         self.__nb_braids: int = 0
-        self.__braids_history: List[Tuple[int, int]] = []
+        self.__braids_history: list[tuple[int, int]] = []
         self.__measured: bool = False
 
         if force_recache:
-            config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
+            config_path = os.path.join(os.path.expanduser("~"), ".tqsim")
             store_path = os.path.join(config_path, "store")
 
             # remove basis
@@ -236,7 +236,7 @@ class AnyonicCircuit:
         self.__basis = self.__get_basis()
         return self.__dim
 
-    def __get_basis(self) -> Tuple[np.ndarray, int]:
+    def __get_basis(self) -> tuple[np.ndarray, int]:
         folder_path = os.path.join(
             STORE_PATH,
             f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
@@ -265,7 +265,7 @@ class AnyonicCircuit:
         self.__braiding_operators = self.__get_sigmas()
         return self.__braiding_operators
 
-    def __get_sigmas(self) -> List[np.ndarray]:
+    def __get_sigmas(self) -> list[np.ndarray]:
         """Returns a list of all the braiding operators.
         Returns
         -------
@@ -489,7 +489,7 @@ class AnyonicCircuit:
             or a LaTeX string.
 
         """
-        if not output in ["raw", "sigmas", "latex"]:
+        if output not in ["raw", "sigmas", "latex"]:
             raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
 
         if output == "raw":
