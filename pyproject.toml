@@ -3,32 +3,29 @@
 name = "tqsim"
 version = "1.0.0"
 description = "TQSim is a Topological Quantum Computing simulator based on Anyon models"
-readme = "README.md"
-requires-python = ">=3.14,<4.0"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
 authors = [
     { name = "CQTech.org", email = "constantinequantumtech@gmail.com" },
-    { name = "Mohamed Messaoud Louamri", email = "mm.louamri@gmail.com" },
     { name = "Abdellah Tounsi", email = "abdellah.touni@umc.edu.dz" },
+    { name = "Mohamed Messaoud Louamri", email = "mm.louamri@gmail.com" },
     { name = "Nacer eddine Belaloui", email = "n.aityahia.belaloui@gmail.com" },
     { name = "Mohamed Taha Rouabah", email = "m.t.rouabah@gmail.com" },
 ]
+requires-python = ">=3.11"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 keywords = ["topological quantum computing", "quantum", "quantum computing", "anyons", "simulator"]
 urls = { repository = "https://github.com/Constantine-Quantum-Tech/tqsim" }
-
 dependencies = [
-    "numpy>=2.3,<3.0",
-    "matplotlib>=3.10,<4.0",
-    "seaborn>=0.13,<1.0",
+    "matplotlib>=3.10",
+    "numpy>=2.3.0",
+    "seaborn>=0.13",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pre-commit>=2.20.0,<3.0.0",
-    "pytest>=8.4.2,<9.0.0",
+    "pytest>=8.3.0",
 ]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.isort]
+profile = "black"
