@@ -67,9 +67,7 @@ class Drawer:
         anyon_under = self.__anyons[n_init]
         anyons_idle = map(
             lambda x: self.__anyons[x],
-            filter(
-                lambda x: x != m_init and x != n_init, self.__anyons.keys()
-            ),
+            filter(lambda x: x != m_init and x != n_init, self.__anyons.keys()),
         )
 
         distance = abs(anyon_over.get_last_y() - anyon_under.get_last_y())
@@ -88,9 +86,7 @@ class Drawer:
         anyon_under.x = anyon_under.get_last_x() + self._hi
         anyon_under.x = anyon_under.get_last_x() + self._id + self._hi
 
-        sigm = self._sigmoid(
-            np.append(self._hi, np.linspace(1 - self._hi[-1], 1, 25))
-        )
+        sigm = self._sigmoid(np.append(self._hi, np.linspace(1 - self._hi[-1], 1, 25)))
 
         start_y = anyon_under.get_last_y()
 
@@ -136,9 +132,7 @@ class Drawer:
                 # Idle anyons
                 for k in range(j + 2, self.__nb_anyons_per_qudit):
                     final_idx = (
-                        i * self.__nb_anyons_per_qudit
-                        + k
-                        + self.__STARTING_INDEX
+                        i * self.__nb_anyons_per_qudit + k + self.__STARTING_INDEX
                     )
                     idx = self.__idx_map[final_idx]
                     self.__anyons[idx].add_identity()
@@ -164,21 +158,15 @@ class Drawer:
                 # 2 -> None
                 # 3 -> 2
                 final_idx = (
-                    (k + 1) * self.__nb_anyons_per_qudit
-                    + self.__STARTING_INDEX
-                    - 1
+                    (k + 1) * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
                 )
                 idx = self.__idx_map[final_idx]
                 self.__anyons[idx].add_identity()
 
             # Fusing
-            final_bot_idx = (
-                i * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
-            )
+            final_bot_idx = i * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
             final_top_idx = (
-                (i + 1) * self.__nb_anyons_per_qudit
-                + self.__STARTING_INDEX
-                - 1
+                (i + 1) * self.__nb_anyons_per_qudit + self.__STARTING_INDEX - 1
             )
 
             idx_anyon_bot = self.__idx_map[final_bot_idx]

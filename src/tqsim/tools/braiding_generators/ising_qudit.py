@@ -22,9 +22,11 @@ This model is designed to:
     + calculates braiding generators (sigma_n).
 """
 
-import numpy as np
 from copy import deepcopy
-from tools.cplot import cplot
+
+import numpy as np
+
+from tqsim.tools.cplot import cplot
 
 
 def F(a1, a2, a3, outcome):
@@ -201,8 +203,7 @@ def B(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    return F(a0, a1, a2, outcome)\
-        @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
+    return F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
 
 
 def sigma(index, state_f, state_i):

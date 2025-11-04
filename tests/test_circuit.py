@@ -10,20 +10,19 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import os
-import pytest
 import itertools
+import os
+import shutil
+from pathlib import Path
+
 import numpy as np
+import pytest
 
 from tqsim import AnyonicCircuit
 from tqsim.lib.anyon_model import AnyonModel
-from tqsim.models.ising import ISING_MODEL
 from tqsim.models.fibonacci import FIBONACCI_MODEL
+from tqsim.models.ising import ISING_MODEL
 
-
-import pytest
-import shutil
-from pathlib import Path
 
 def clean_cache():
     config_path = os.path.join(os.path.expanduser("~"), f".tqsim")
@@ -32,6 +31,7 @@ def clean_cache():
 
     if os.path.exists(store_path):
         os.rename(store_path, temp_path)
+
 
 def pytest_sessionstart(session):
     """Run before any tests are collected or executed."""

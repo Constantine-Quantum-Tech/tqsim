@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 
@@ -58,10 +59,7 @@ class StandardAnyonState(AnyonState):
         return model.check_state(self)
 
     def __repr__(self):
-        return (
-            f"StandardAnyonState(inputs={self.inputs}, "
-            f"outcomes={self.outcomes})"
-        )
+        return f"StandardAnyonState(inputs={self.inputs}, " f"outcomes={self.outcomes})"
 
     def inner_product(self, other):
         """Compute the inner product between two StandardAnyonState instances.
@@ -110,9 +108,7 @@ class SparseAnyonState(AnyonState):
             nb_anyons_per_qudit = 3
     """
 
-    def __init__(
-        self, charges: np.ndarray, nb_qudits: int, nb_anyons_per_qudit: int
-    ):
+    def __init__(self, charges: np.ndarray, nb_qudits: int, nb_anyons_per_qudit: int):
         self.charges = charges
         self.nb_qudits = nb_qudits
         self.nb_anyons_per_qudit = nb_anyons_per_qudit

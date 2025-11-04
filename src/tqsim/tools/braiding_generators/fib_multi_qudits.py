@@ -32,10 +32,11 @@ TODO:
     - Translate to Cpp
 """
 
-import tools.braiding_generators.fib_qudit as fibo
-from tools.braiding_generators.fib_qudit import F, B
 from copy import deepcopy
-from tools.cplot import cplot
+
+import tqsim.tools.braiding_generators.fib_qudit as fibo
+from tqsim.tools.braiding_generators.fib_qudit import B, F
+from tqsim.tools.cplot import cplot
 
 
 def check_state(state):
@@ -79,8 +80,7 @@ def check_state(state):
 
     previous_outcome = state["qudits"][0][-1]
     for ii, outcome in enumerate(state["roots"]):
-        if fibo.check_rule(previous_outcome,
-                           state["qudits"][ii + 1][-1], outcome):
+        if fibo.check_rule(previous_outcome, state["qudits"][ii + 1][-1], outcome):
             previous_outcome = outcome
         else:
             check = False
@@ -103,20 +103,20 @@ def find_basis(n_qudits, qudit_len):
 
     n_roots = n_qudits - 1
     n_labels = n_qudits * qudit_len + n_roots
-    
+
     def fill_state(labels):
         state = {"qudits": [], "roots": []}
         for ii in range(n_qudits):
             state["qudits"].append([])
             for jj in range(qudit_len):
                 state["qudits"][-1].append(0)
-        
+
         ll = 0
         for ii in range(qudit_len):
             for jj in range(n_qudits):
                 state["qudits"][jj][ii] = labels[ll]
                 ll += 1
-        
+
         for ii in range(n_roots):
             state["roots"].append(labels[ll])
             ll += 1
@@ -129,7 +129,7 @@ def find_basis(n_qudits, qudit_len):
     for _ in range(n_labels):
         new_comb.append(0)
         final_comb.append(1)
-        
+
     new_state = fill_state(new_comb)
     states = []
     if check_state(new_state):
@@ -163,113 +163,110 @@ def find_basis_(n_qudits, qudit_len):
     """
 
     n_roots = n_qudits - 1
-    #n_labels = n_qudits * qudit_len + n_roots
+    # n_labels = n_qudits * qudit_len + n_roots
     n_anyons_per_qudit = qudit_len + 1
 
     # generate all combinations and verify if it is valid state
     one_qudit_basis = fibo.find_basis(n_anyons_per_qudit)
     qudit_basis_len = len(one_qudit_basis)
-    
+
     # iterate roots
     new_comb_roots = []
     final_comb_roots = []
     for _ in range(n_roots):
         new_comb_roots.append(0)
         final_comb_roots.append(1)
-    
+
     states = []
-    
+
     # iterate qudits
     new_comb_qudits = []
     final_comb_qudits = []
     for _ in range(n_qudits):
         new_comb_qudits.append(0)
-        final_comb_qudits.append(qudit_basis_len-1)
+        final_comb_qudits.append(qudit_basis_len - 1)
 
     qudits = []
     for i in new_comb_qudits:
         qudits.append(one_qudit_basis[i])
 
     new_state = {}
-    new_state['qudits'] = deepcopy(qudits)
-    new_state['roots']  = deepcopy(new_comb_roots)
+    new_state["qudits"] = deepcopy(qudits)
+    new_state["roots"] = deepcopy(new_comb_roots)
 
     if check_state(new_state):
         states.append(new_state)
 
     while not new_comb_qudits == final_comb_qudits:
 
-
         for ii, label in enumerate(new_comb_qudits):
-            if label < qudit_basis_len-1:
+            if label < qudit_basis_len - 1:
                 new_comb_qudits[ii] += 1
                 break
             else:
                 new_comb_qudits[ii] = 0
-        
+
         print(new_comb_qudits)
         qudits = []
         for i in new_comb_qudits:
             qudits.append(one_qudit_basis[i])
 
         new_state = {}
-        new_state['qudits'] = deepcopy(qudits)
-        new_state['roots']  = deepcopy(new_comb_roots)
-        #print(new_state)
+        new_state["qudits"] = deepcopy(qudits)
+        new_state["roots"] = deepcopy(new_comb_roots)
+        # print(new_state)
 
         if check_state(new_state):
             states.append(new_state)
-                
+
     while not new_comb_roots == final_comb_roots:
-        
+
         for ii, label in enumerate(new_comb_roots):
             if label == 0:
                 new_comb_roots[ii] = 1
                 break
             else:
                 new_comb_roots[ii] = 0
-        
+
         # iterate qudits
         new_comb_qudits = []
         final_comb_qudits = []
         for _ in range(n_qudits):
             new_comb_qudits.append(0)
-            final_comb_qudits.append(qudit_basis_len-1)
-        
+            final_comb_qudits.append(qudit_basis_len - 1)
+
         qudits = []
         for i in new_comb_qudits:
             qudits.append(one_qudit_basis[i])
 
         new_state = {}
-        new_state['qudits'] = deepcopy(qudits)
-        new_state['roots']  = deepcopy(new_comb_roots)
-        #print(new_state)
-        
+        new_state["qudits"] = deepcopy(qudits)
+        new_state["roots"] = deepcopy(new_comb_roots)
+        # print(new_state)
+
         if check_state(new_state):
             states.append(new_state)
-                
+
         while not new_comb_qudits == final_comb_qudits:
-       
+
             for ii, label in enumerate(new_comb_qudits):
-                if label < qudit_basis_len-1:
+                if label < qudit_basis_len - 1:
                     new_comb_qudits[ii] += 1
                     break
                 else:
                     new_comb_qudits[ii] = 0
-            
+
             qudits = []
             for i in new_comb_qudits:
                 qudits.append(one_qudit_basis[i])
 
             new_state = {}
-            new_state['qudits'] = deepcopy(qudits)
-            new_state['roots']  = deepcopy(new_comb_roots)
-            #print(new_state)
-            
+            new_state["qudits"] = deepcopy(qudits)
+            new_state["roots"] = deepcopy(new_comb_roots)
+            # print(new_state)
+
             if check_state(new_state):
                 states.append(new_state)
- 
-
 
     return states
 
@@ -306,8 +303,7 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1],
-                                                             pp[ii]]
+                * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
                 * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
@@ -425,7 +421,7 @@ def sigma(index_, state_f_, state_i_):
         if m + 1 > 2:
             new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
             if new_state_i != state_f_:
-            	return 0
+                return 0
 
             jj_ = deepcopy(new_state_i["qudits"][m + 1])
             jj = deepcopy(state_i_["qudits"][m + 1])
@@ -441,7 +437,7 @@ def sigma(index_, state_f_, state_i_):
         elif m + 1 == 2:
             new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
             if new_state_i != state_f_:
-            	return 0
+                return 0
 
             jj_ = deepcopy(new_state_i["qudits"][m + 1])
             jj = deepcopy(state_i_["qudits"][m + 1])

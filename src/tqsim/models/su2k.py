@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 import itertools
+
 import numpy as np
 
 from tqsim.lib.anyon_model import AnyonModel
@@ -121,12 +122,8 @@ def get_F_matrix(k: int):
             * delta(j1, j23, j)
         )
         vals = []
-        zmmin = int(
-            max(j1 + j2 + j12, j12 + j3 + j, j2 + j3 + j23, j1 + j23 + j)
-        )
-        zmmax = int(
-            min(j1 + j2 + j3 + j, j1 + j12 + j3 + j23, j2 + j12 + j + j23)
-        )
+        zmmin = int(max(j1 + j2 + j12, j12 + j3 + j, j2 + j3 + j23, j1 + j23 + j))
+        zmmax = int(min(j1 + j2 + j3 + j, j1 + j12 + j3 + j23, j2 + j12 + j + j23))
         for z in range(zmmin, zmmax + 1):
             exp = (-1) ** z
             up = crochet_factorial(z + 1)
@@ -146,9 +143,7 @@ def get_F_matrix(k: int):
         val = deltas * sum_
         return val
 
-    F_matrix = np.zeros(
-        (k + 1, k + 1, k + 1, k + 1, k + 1, k + 1), dtype=complex
-    )
+    F_matrix = np.zeros((k + 1, k + 1, k + 1, k + 1, k + 1, k + 1), dtype=complex)
 
     for a, b, c, d, e, f in itertools.product(range(k + 1), repeat=6):
         j1 = a / 2
@@ -196,9 +191,7 @@ def get_R_matrix(k: int) -> np.ndarray:
         j1 = a / 2
         j2 = b / 2
         j = c / 2
-        phase = q ** (
-            (0.5 + 0j) * (j * (j + 1) - j1 * (j1 + 1) - j2 * (j2 + 1))
-        )
+        phase = q ** ((0.5 + 0j) * (j * (j + 1) - j1 * (j1 + 1) - j2 * (j2 + 1)))
         N_symbols = get_fusion_matrix(k)
         if N_symbols[a, b, c] != 0:
             R_matrix[a, b, c] = ((-1 + 0j) ** (j - j1 - j2)) * phase

@@ -23,11 +23,12 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-import numpy as np
-import matplotlib.pyplot as plt
+from math import atan, cos, exp, pi
+from typing import Dict, List, Tuple
+
 import matplotlib as mpl
-from math import pi, cos, exp, atan
-from typing import List, Tuple, Dict
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def einsum_with_names(

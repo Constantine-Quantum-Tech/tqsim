@@ -11,3 +11,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+.coverage
+.tox
+.ruff_cache
+.mypy_cache
+.pytest_cache

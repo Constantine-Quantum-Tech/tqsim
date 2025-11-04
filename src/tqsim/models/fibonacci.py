@@ -11,8 +11,8 @@
 # that they have been altered from the originals.
 
 import numpy as np
-from tqsim.lib.anyon_model import AnyonModel
 
+from tqsim.lib.anyon_model import AnyonModel
 
 fusion_matrix = np.zeros((2, 2, 2))
 for a1 in range(2):
@@ -34,9 +34,7 @@ def F(a1, a2, a3, outcome):
 
     # a1 + a2 + a3 + outcome = 4
     if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array(
-            [[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]]
-        )
+        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
     # a1 + a2 + a3 + outcome = 3
     elif a1 + a2 + a3 + outcome == 3:
         f_matrix = np.array([[0, 0], [0, 1]])
@@ -89,6 +87,4 @@ for a1 in range(2):
     for a2 in range(2):
         R_matrix[a1, a2] = R(a1, a2).diagonal()
 
-FIBONACCI_MODEL = AnyonModel(
-    fusion_matrix, F_matrix, R_matrix, name="Fibonacci"
-)
+FIBONACCI_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name="Fibonacci")

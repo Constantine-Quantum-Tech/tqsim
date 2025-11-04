@@ -12,13 +12,14 @@
 
 import os
 import pickle
-import numpy as np
 from typing import List, Sequence, Tuple
 
+import numpy as np
+
 from tqsim.config import STORE_PATH  # For caching the bases and sigmas.
-from tqsim.models.fibonacci import FIBONACCI_MODEL
 from tqsim.lib.basis_generator import ComputationalSparseBasisGenerator
 from tqsim.lib.drawer import Drawer
+from tqsim.models.fibonacci import FIBONACCI_MODEL
 
 
 class AnyonicCircuit:
@@ -56,7 +57,7 @@ class AnyonicCircuit:
         The dimension of the fusion space for the quantum circuit.
     basis : List
         List of all the basis states.
-    
+
     Example usage
     -------------
     >>> circuit = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3)
@@ -123,7 +124,7 @@ class AnyonicCircuit:
             )
             if os.path.exists(basis_path):
                 os.remove(basis_path)
-            
+
             # remove sigmas
             sigmas_path = os.path.join(
                 store_path,
@@ -325,9 +326,7 @@ class AnyonicCircuit:
 
         input_state = np.array(input_state)
         if not np.size(input_state) == self.__dim:
-            raise ValueError(
-                f"The state has wrong dimension. Should be {self.__dim}"
-            )
+            raise ValueError(f"The state has wrong dimension. Should be {self.__dim}")
 
         norm = np.sum(np.real(input_state * input_state.conjugate()))
         if not np.isclose(norm, 1):
@@ -365,9 +364,7 @@ class AnyonicCircuit:
 
         """
         if self.__measured:
-            raise Exception(
-                "System already measured! Cannot perform further braiding!"
-            )
+            raise Exception("System already measured! Cannot perform further braiding!")
 
         if not isinstance(m, int) or not isinstance(n, int):
             raise ValueError("n, m must be integers")
@@ -387,9 +384,7 @@ class AnyonicCircuit:
         if n < m:
             self.__unitary = self.__sigmas[n - 1] @ self.__unitary
         else:
-            self.__unitary = (
-                self.__sigmas[m - 1].T.conjugate() @ self.__unitary
-            )
+            self.__unitary = self.__sigmas[m - 1].T.conjugate() @ self.__unitary
 
         self.__braids_history.append((n, m))
 
@@ -495,9 +490,7 @@ class AnyonicCircuit:
 
         """
         if not output in ["raw", "sigmas", "latex"]:
-            raise ValueError(
-                'Output should be either: "raw", "sigmas" or "latex"'
-            )
+            raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
 
         if output == "raw":
             return self.__braids_history

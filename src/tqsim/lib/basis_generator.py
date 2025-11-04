@@ -12,15 +12,17 @@
 # Module for generating basis states for anyonic systems.
 
 import itertools
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
+
+from tqsim.lib.anyon_model import AnyonModel
 from tqsim.lib.anyon_state import (
     AnyonState,
-    StandardAnyonState,
-    SparseAnyonState,
     ComputationalSparseAnyonState,
+    SparseAnyonState,
+    StandardAnyonState,
 )
-from tqsim.lib.anyon_model import AnyonModel
 
 
 class BasisGenerator:

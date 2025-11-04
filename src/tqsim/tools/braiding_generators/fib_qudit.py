@@ -29,10 +29,12 @@ This model is designed to:
     + generates B (braiding) matrices.
     + calculates braiding generators (sigma_n).
 """
-import numpy as np
-from typing import List
 from copy import deepcopy
-from tools.cplot import cplot
+from typing import List
+
+import numpy as np
+
+from tqsim.tools.cplot import cplot
 
 
 def check_rule(anyon_1, anyon_2, outcome):
@@ -97,7 +99,7 @@ def find_basis(n_anyons):
     for _ in range(n_labels):
         new_comb.append(0)
         final_comb.append(1)
-    
+
     states = []
     if check_state(new_comb):
         new_state = deepcopy(new_comb)
@@ -126,8 +128,7 @@ def F(a1, a2, a3, outcome):
 
     # a1 + a2 + a3 + outcome = 4
     if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)],
-                             [np.sqrt(inv_phi), -inv_phi]])
+        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
 
     # a1 + a2 + a3 + outcome = 3
     elif a1 + a2 + a3 + outcome == 3:
@@ -163,8 +164,9 @@ def R(a1, a2):
     R matrix
     """
     if a1 + a2 == 2:
-        r_matrix = np.array([[np.exp(-4 * np.pi * 1j / 5), 0],
-                             [0, np.exp(3 * np.pi * 1j / 5)]])
+        r_matrix = np.array(
+            [[np.exp(-4 * np.pi * 1j / 5), 0], [0, np.exp(3 * np.pi * 1j / 5)]]
+        )
     else:
         r_matrix = np.array([[1, 0], [0, 1]])
 
@@ -175,8 +177,7 @@ def B(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    b_matrix = F(a0, a1, a2, outcome)\
-        @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
+    b_matrix = F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
 
     return b_matrix
 

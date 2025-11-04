@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
+
 from tqsim.lib.anyon_model import AnyonModel
 
 

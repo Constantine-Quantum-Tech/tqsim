@@ -24,8 +24,56 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "black>=24.10.0",
+    "mypy>=1.10.0",
     "pytest>=8.3.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.0",
+    "tox-uv>=1.29.0",
 ]
 
-[tool.isort]
-profile = "black"
+[build-system]
+requires = ["hatchling>=1.25"]   # or "setuptools>=75"
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+xfail_strict = true
+
+[tool.coverage.run]
+source = ["tqsim"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+
+[tool.ruff]
+src = ["src"]
+line-length = 88
+target-version = "py311"
+fix = false  # fine: per-command flags (e.g. --fix) can still override this
+
+[tool.ruff.lint]
+# You can exclude or enable rulesets here
+select = ["E", "F", "W", "I", "N", "UP", "C90"]
+ignore = ["E501"]  # Let Black handle line length
+
+[tool.ruff.format]
+# Keep Ruff’s formatter disabled if you’re using Black
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = ["src"]
+plugins = []
+warn_unused_ignores = true
+warn_redundant_casts = true
+strict_optional = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true

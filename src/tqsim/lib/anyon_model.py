@@ -11,17 +11,19 @@
 # that they have been altered from the originals.
 
 import os
-import numpy as np
-from typing import Tuple, List
 from copy import deepcopy
+from typing import List, Tuple
+
+import numpy as np
+
 from tqsim.config import STORE_PATH
-from tqsim.lib.utils import einsum_with_names
 from tqsim.lib.anyon_state import (
     AnyonState,
-    StandardAnyonState,
-    SparseAnyonState,
     ComputationalSparseAnyonState,
+    SparseAnyonState,
+    StandardAnyonState,
 )
+from tqsim.lib.utils import einsum_with_names
 
 
 class AnyonModel:
@@ -260,8 +262,7 @@ class AnyonModel:
             The L matrix.
         """
         assert q > 0, (
-            "q must be strictly positive. "
-            "For q=1, L is just the braiding matrix."
+            "q must be strictly positive. " "For q=1, L is just the braiding matrix."
         )
         terms = []
 
@@ -396,8 +397,7 @@ class AnyonModel:
 
         # Compute K matrix
         assert q > 0, (
-            "q must be strictly positive. "
-            "For q=0, K is just the braiding matrix."
+            "q must be strictly positive. " "For q=0, K is just the braiding matrix."
         )
 
         terms = []
@@ -488,9 +488,7 @@ class AnyonModel:
                 state.charges, state.nb_qudits, state.nb_anyons_per_qudit
             )
         elif isinstance(state, StandardAnyonState):
-            return self.check_standard_basis_state(
-                state.inputs, state.outcomes
-            )
+            return self.check_standard_basis_state(state.inputs, state.outcomes)
         else:
             raise ValueError(
                 "State must be either SparseAnyonState or StandardAnyonState"
@@ -567,12 +565,8 @@ class AnyonModel:
             start = i * nb_anyons_per_qudit
             end = (i + 1) * nb_anyons_per_qudit
             inputs = charges[start:end]
-            start = nb_qudits * nb_anyons_per_qudit + i * (
-                nb_anyons_per_qudit - 1
-            )
-            end = nb_qudits * nb_anyons_per_qudit + (i + 1) * (
-                nb_anyons_per_qudit - 1
-            )
+            start = nb_qudits * nb_anyons_per_qudit + i * (nb_anyons_per_qudit - 1)
+            end = nb_qudits * nb_anyons_per_qudit + (i + 1) * (nb_anyons_per_qudit - 1)
             outcomes = charges[start:end]
             check = self.check_standard_basis_state(inputs, outcomes)
             if not check:
@@ -582,9 +576,7 @@ class AnyonModel:
             return True
 
         indices = [
-            nb_qudits * nb_anyons_per_qudit
-            + (i + 1) * (nb_anyons_per_qudit - 1)
-            - 1
+            nb_qudits * nb_anyons_per_qudit + (i + 1) * (nb_anyons_per_qudit - 1) - 1
             for i in range(nb_qudits)
         ]
         inputs = charges[indices]
@@ -723,8 +715,7 @@ class AnyonModel:
             initial_state.nb_qudits == final_state.nb_qudits
         ), "initial_state and final_state must have the same number of qudits"
         assert (
-            initial_state.nb_anyons_per_qudit
-            == final_state.nb_anyons_per_qudit
+            initial_state.nb_anyons_per_qudit == final_state.nb_anyons_per_qudit
         ), "initial_state and final_state must have the same number of anyons per qudit"
 
         nb_qudits = initial_state.nb_qudits
@@ -767,12 +758,8 @@ class AnyonModel:
                 return 0.0 + 0.0j
 
             # Check that constant nodes stay fixed
-            qubit_state_initial = deepcopy(
-                initial_state.get_qudit_state(qudit_index)
-            )
-            qubit_state_final = deepcopy(
-                final_state.get_qudit_state(qudit_index)
-            )
+            qubit_state_initial = deepcopy(initial_state.get_qudit_state(qudit_index))
+            qubit_state_final = deepcopy(final_state.get_qudit_state(qudit_index))
 
             # create standard basis states for initial and final single qudit states
             amplitude = self.compute_standard_braid_component(
@@ -816,9 +803,7 @@ class AnyonModel:
 
             unmodified_i_initial = initial_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + m
-                * (nb_anyons_per_qudit - 1) : nb_qudits
-                * nb_anyons_per_qudit
+                + m * (nb_anyons_per_qudit - 1) : nb_qudits * nb_anyons_per_qudit
                 + m * (nb_anyons_per_qudit - 1)
                 + nb_anyons_per_qudit
                 - 2
@@ -826,9 +811,7 @@ class AnyonModel:
 
             unmodified_i_final = final_state.charges[
                 nb_qudits * nb_anyons_per_qudit
-                + m
-                * (nb_anyons_per_qudit - 1) : nb_qudits
-                * nb_anyons_per_qudit
+                + m * (nb_anyons_per_qudit - 1) : nb_qudits * nb_anyons_per_qudit
                 + m * (nb_anyons_per_qudit - 1)
                 + nb_anyons_per_qudit
                 - 2
@@ -855,19 +838,11 @@ class AnyonModel:
             # a charges of the state a(m,q) a(m+1, 0), ..., a(m+1, q),
             a = []
             # a(m,q)
-            a.append(
-                deepcopy(
-                    initial_state.charges[(m + 1) * nb_anyons_per_qudit - 1]
-                )
-            )
+            a.append(deepcopy(initial_state.charges[(m + 1) * nb_anyons_per_qudit - 1]))
             # a(m+1,0) ... a(m+1,q)
             for r in range(0, q + 1):
                 a.append(
-                    deepcopy(
-                        initial_state.charges[
-                            (m + 1) * nb_anyons_per_qudit + r
-                        ]
-                    )
+                    deepcopy(initial_state.charges[(m + 1) * nb_anyons_per_qudit + r])
                 )
 
             # i charges of the state i(m,q-1), i(m,q)i(m+1,1) ... i(m+1,q)
@@ -893,10 +868,7 @@ class AnyonModel:
                 i.append(
                     deepcopy(
                         initial_state.charges[
-                            nb_qudits * nb_anyons_per_qudit
-                            + (m + 1) * q
-                            + r
-                            - 1
+                            nb_qudits * nb_anyons_per_qudit + (m + 1) * q + r - 1
                         ]
                     )
                 )
@@ -916,10 +888,7 @@ class AnyonModel:
                 i_prime.append(
                     deepcopy(
                         final_state.charges[
-                            nb_qudits * nb_anyons_per_qudit
-                            + (m + 1) * q
-                            + r
-                            - 1
+                            nb_qudits * nb_anyons_per_qudit + (m + 1) * q + r - 1
                         ]
                     )
                 )
@@ -932,9 +901,7 @@ class AnyonModel:
                 j.append(0)  # dummy value for j(m-2)
                 j.append(
                     deepcopy(
-                        initial_state.charges[
-                            nb_qudits * nb_anyons_per_qudit + q - 1
-                        ]
+                        initial_state.charges[nb_qudits * nb_anyons_per_qudit + q - 1]
                     )
                 )  # j(m - 1)
                 j.append(
@@ -947,9 +914,7 @@ class AnyonModel:
             elif m == 1:
                 j.append(
                     deepcopy(
-                        initial_state.charges[
-                            nb_qudits * nb_anyons_per_qudit + q - 1
-                        ]
+                        initial_state.charges[nb_qudits * nb_anyons_per_qudit + q - 1]
                     )
                 )  # j(m - 2)
                 j.append(
@@ -971,9 +936,7 @@ class AnyonModel:
                     j.append(
                         deepcopy(
                             initial_state.charges[
-                                nb_qudits * nb_anyons_per_qudit
-                                + nb_qudits * q
-                                + r
+                                nb_qudits * nb_anyons_per_qudit + nb_qudits * q + r
                             ]
                         )
                     )
@@ -984,18 +947,14 @@ class AnyonModel:
             if m == 0:
                 j_prime.append(
                     deepcopy(
-                        final_state.charges[
-                            nb_qudits * nb_anyons_per_qudit + q - 1
-                        ]
+                        final_state.charges[nb_qudits * nb_anyons_per_qudit + q - 1]
                     )
                 )
             else:
                 j_prime.append(
                     deepcopy(
                         final_state.charges[
-                            nb_qudits * nb_anyons_per_qudit
-                            + nb_qudits * q
-                            + (m - 1)
+                            nb_qudits * nb_anyons_per_qudit + nb_qudits * q + (m - 1)
                         ]
                     )
                 )
@@ -1011,9 +970,7 @@ class AnyonModel:
             j'(m-1), i'(m,q), i'(m+1,1) ... i'(m+1,q)
             }
             """
-            knitting_matrix = self._K_matrices.get(
-                q, self.compute_knitting_matrix(q=q)
-            )
+            knitting_matrix = self._K_matrices.get(q, self.compute_knitting_matrix(q=q))
 
             """
             f"a(m,{q})",
@@ -1063,8 +1020,7 @@ class AnyonModel:
                     SparseAnyonState(
                         np.concatenate(
                             (
-                                np.ones(nb_anyons, dtype=int)
-                                * base_i.input_charge,
+                                np.ones(nb_anyons, dtype=int) * base_i.input_charge,
                                 base_i.charges,
                             )
                         ),
@@ -1075,8 +1031,7 @@ class AnyonModel:
                     SparseAnyonState(
                         np.concatenate(
                             (
-                                np.ones(nb_anyons, dtype=int)
-                                * base_f.input_charge,
+                                np.ones(nb_anyons, dtype=int) * base_f.input_charge,
                                 base_f.charges,
                             )
                         ),

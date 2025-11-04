@@ -31,11 +31,13 @@ TODO:
     - raise ValueError's
     - Translate to Cpp
 """
-import numpy as np
-import tools.braiding_generators.ising_qudit as ising
-from tools.braiding_generators.ising_qudit import F, B
 from copy import deepcopy
-from tools.cplot import cplot
+
+import numpy as np
+
+import tqsim.tools.braiding_generators.ising_qudit as ising
+from tqsim.tools.braiding_generators.ising_qudit import B, F
+from tqsim.tools.cplot import cplot
 
 
 def check_state(state):
@@ -79,8 +81,7 @@ def check_state(state):
 
     previous_outcome = state["qudits"][0][-1]
     for ii, outcome in enumerate(state["roots"]):
-        if ising.check_rule(previous_outcome,
-                            state["qudits"][ii + 1][-1], outcome):
+        if ising.check_rule(previous_outcome, state["qudits"][ii + 1][-1], outcome):
             previous_outcome = outcome
         else:
             check = False
@@ -174,8 +175,7 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1],
-                                                             pp[ii]]
+                * F(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1], pp[ii]]
                 * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 

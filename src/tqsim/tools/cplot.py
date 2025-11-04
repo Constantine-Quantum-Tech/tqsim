@@ -8,11 +8,13 @@ Complex unitary matrix plotting
 
 
 """
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from math import pi, sqrt, cos, atan, exp
+
 from colorsys import hls_to_rgb
+from math import atan, cos, exp, pi, sqrt
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 
 def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
@@ -28,7 +30,7 @@ def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
         color_codes=True,
         rc=None,
     )
-    #sns.set_style("whitegrid", {"grid.linestyle": ":"})
+    # sns.set_style("whitegrid", {"grid.linestyle": ":"})
 
     dims = unitary.shape
     img = []
@@ -64,9 +66,7 @@ def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
         plt.yticks([dims[1] - 1 - i for i in range(dims[1])])
     else:
         plt.xticks([i for i in range(dims[0])], labels=ticks)
-        plt.yticks(
-            [dims[1] - 1 - i for i in range(dims[1])], labels=ticks[::-1]
-        )
+        plt.yticks([dims[1] - 1 - i for i in range(dims[1])], labels=ticks[::-1])
 
     plt.grid(linewidth=0.1)
     plt.imshow(img)  # , extent=(1, dims[0], 1, dims[1]))
@@ -94,22 +94,22 @@ def scale(sigma=0.5, title="scale", show=True):
     )
 
     # Create figure and axes
-    fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+    fig, ax = plt.subplots(subplot_kw=dict(projection="polar"))
 
     N = 100
     rad = np.tile(np.linspace(0, 1, N).reshape((N, 1)), N)
-    theta = np.tile(np.linspace(0, 2*pi, N), (N, 1))
+    theta = np.tile(np.linspace(0, 2 * pi, N), (N, 1))
 
     color = np.ones((N, N, 3))
-    #color[:, :, 0] = abs(np.sin(theta/2 + 2*pi/3))
-    #color[:, :, 1] = abs(np.sin(theta/2 ))
-    #color[:, :, 2] = abs(np.sin(theta/2 + pi/3))
-    #color[:, :, 3] = abs(rad)
+    # color[:, :, 0] = abs(np.sin(theta/2 + 2*pi/3))
+    # color[:, :, 1] = abs(np.sin(theta/2 ))
+    # color[:, :, 2] = abs(np.sin(theta/2 + pi/3))
+    # color[:, :, 3] = abs(rad)
 
     for t in range(N):
         for r in range(N):
-            hue = t/N
-            rdi = sqrt(r/N)
+            hue = t / N
+            rdi = sqrt(r / N)
             lum = 0.5 + 0.5 * exp(-rdi / sigma)
             if rdi > 2:
                 sat = 0
@@ -122,7 +122,18 @@ def scale(sigma=0.5, title="scale", show=True):
 
     # Remove labels and ticks
     ax.set_yticklabels([])
-    ax.set_xticklabels(['0', '\u03C0/4', '\u03C0/2', '3\u03C0/4', '\u03C0', '5\u03C0/4', '3\u03C0/2', '7\u03C0/4'])
+    ax.set_xticklabels(
+        [
+            "0",
+            "\u03c0/4",
+            "\u03c0/2",
+            "3\u03c0/4",
+            "\u03c0",
+            "5\u03c0/4",
+            "3\u03c0/2",
+            "7\u03c0/4",
+        ]
+    )
     plt.grid(linewidth=0.2)
     fig.tight_layout()
     plt.savefig(f"images/{title}.png", dpi=500, bbox_inches="tight")

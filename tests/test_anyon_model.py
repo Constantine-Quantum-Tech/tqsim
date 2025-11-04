@@ -12,6 +12,7 @@
 
 import numpy as np
 import pytest
+
 from tqsim.lib.anyon_model import AnyonModel
 
 
@@ -120,9 +121,7 @@ class TestAnyonModel:
 
     def test_L_matrix_computation_q0_raises_error(self, fibonacci_model):
         """Test that L matrix computation for q=0 raises AssertionError as observed in notebook."""
-        with pytest.raises(
-            AssertionError, match="q must be strictly positive"
-        ):
+        with pytest.raises(AssertionError, match="q must be strictly positive"):
             fibonacci_model._compute_L_matrix(q=0)
 
     def test_knitting_matrix_computation_q1(self, fibonacci_model):
@@ -133,13 +132,9 @@ class TestAnyonModel:
             K1.shape == expected_shape
         ), f"Expected shape {expected_shape}, got {K1.shape}"
 
-    def test_knitting_matrix_computation_q0_raises_error(
-        self, fibonacci_model
-    ):
+    def test_knitting_matrix_computation_q0_raises_error(self, fibonacci_model):
         """Test that knitting matrix computation for q=0 raises AssertionError as observed in notebook."""
-        with pytest.raises(
-            AssertionError, match="q must be strictly positive"
-        ):
+        with pytest.raises(AssertionError, match="q must be strictly positive"):
             fibonacci_model.compute_knitting_matrix(q=0)
 
     def test_fusion_matrix_properties(self, fibonacci_model):
@@ -199,21 +194,21 @@ class TestAnyonModel:
     def test_check_rule_method(self, fibonacci_model):
         """Test the check_rule method with various anyon combinations."""
         # Test valid fusion rules
-        assert fibonacci_model.check_rule(
-            np.array([0]), np.array([0]), np.array([0])
-        )[0]
-        assert fibonacci_model.check_rule(
-            np.array([0]), np.array([1]), np.array([1])
-        )[0]
-        assert fibonacci_model.check_rule(
-            np.array([1]), np.array([0]), np.array([1])
-        )[0]
-        assert fibonacci_model.check_rule(
-            np.array([1]), np.array([1]), np.array([0])
-        )[0]
-        assert fibonacci_model.check_rule(
-            np.array([1]), np.array([1]), np.array([1])
-        )[0]
+        assert fibonacci_model.check_rule(np.array([0]), np.array([0]), np.array([0]))[
+            0
+        ]
+        assert fibonacci_model.check_rule(np.array([0]), np.array([1]), np.array([1]))[
+            0
+        ]
+        assert fibonacci_model.check_rule(np.array([1]), np.array([0]), np.array([1]))[
+            0
+        ]
+        assert fibonacci_model.check_rule(np.array([1]), np.array([1]), np.array([0]))[
+            0
+        ]
+        assert fibonacci_model.check_rule(np.array([1]), np.array([1]), np.array([1]))[
+            0
+        ]
 
         # Test invalid fusion rules
         assert not fibonacci_model.check_rule(
