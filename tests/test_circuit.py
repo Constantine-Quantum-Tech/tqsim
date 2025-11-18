@@ -70,23 +70,23 @@ def test_init_3():
 
 def test_init_model_1():
     # Z_N model (Abelian model)
-    N = 5
-    N_symbols = np.zeros((N, N, N), dtype=int)
-    for i, j, k in itertools.product(range(N), repeat=3):
-        if (i + j) % N == k:
-            N_symbols[i, j, k] = 1
+    num_charges = 5
+    n_symbols = np.zeros((num_charges, num_charges, num_charges), dtype=int)
+    for i, j, k in itertools.product(range(num_charges), repeat=3):
+        if (i + j) % num_charges == k:
+            n_symbols[i, j, k] = 1
 
-    F_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
-    for i, j, k, total_charge, m, n in itertools.product(range(N), repeat=6):
-        if (i + j + k) % N == total_charge and (i + j) % N == m and (j + k) % N == n:
-            F_matrix[i, j, k, total_charge, m, n] = 1
+    f_matrix = np.zeros((num_charges, num_charges, num_charges, num_charges, num_charges, num_charges), dtype=complex)
+    for i, j, k, total_charge, m, n in itertools.product(range(num_charges), repeat=6):
+        if (i + j + k) % num_charges == total_charge and (i + j) % num_charges == m and (j + k) % num_charges == n:
+            f_matrix[i, j, k, total_charge, m, n] = 1
 
-    R_matrix = np.zeros((N, N, N), dtype=complex)
-    for i, j, k in itertools.product(range(N), repeat=3):
-        if (i + j) % N == k:
-            R_matrix[i, j, k] = np.exp(2j * np.pi * i * j / N)
+    r_matrix = np.zeros((num_charges, num_charges, num_charges), dtype=complex)
+    for i, j, k in itertools.product(range(num_charges), repeat=3):
+        if (i + j) % num_charges == k:
+            r_matrix[i, j, k] = np.exp(2j * np.pi * i * j / num_charges)
 
-    zn_model = AnyonModel(N_symbols, F_matrix, R_matrix, name="Z_N")
+    zn_model = AnyonModel(n_symbols, f_matrix, r_matrix, name="Z_N")
 
     circuit = AnyonicCircuit(
         nb_qudits=1, nb_anyons_per_qudit=4, model=zn_model, input_charge=1

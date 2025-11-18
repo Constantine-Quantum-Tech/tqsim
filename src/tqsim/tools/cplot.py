@@ -96,20 +96,20 @@ def scale(sigma=0.5, title="scale", show=True):
     # Create figure and axes
     fig, ax = plt.subplots(subplot_kw=dict(projection="polar"))
 
-    N = 100
-    rad = np.tile(np.linspace(0, 1, N).reshape((N, 1)), N)
-    theta = np.tile(np.linspace(0, 2 * pi, N), (N, 1))
+    num_points = 100
+    rad = np.tile(np.linspace(0, 1, num_points).reshape((num_points, 1)), num_points)
+    theta = np.tile(np.linspace(0, 2 * pi, num_points), (num_points, 1))
 
-    color = np.ones((N, N, 3))
+    color = np.ones((num_points, num_points, 3))
     # color[:, :, 0] = abs(np.sin(theta/2 + 2*pi/3))
     # color[:, :, 1] = abs(np.sin(theta/2 ))
     # color[:, :, 2] = abs(np.sin(theta/2 + pi/3))
     # color[:, :, 3] = abs(rad)
 
-    for t in range(N):
-        for r in range(N):
-            hue = t / N
-            rdi = sqrt(r / N)
+    for t in range(num_points):
+        for r in range(num_points):
+            hue = t / num_points
+            rdi = sqrt(r / num_points)
             lum = 0.5 + 0.5 * exp(-rdi / sigma)
             if rdi > 2:
                 sat = 0

@@ -54,41 +54,41 @@ class AnyonModel:
     Example 1:
         >>> from tqsim.models.fibonacci import FIBONACCI_MODEL
         >>> model = FIBONACCI_MODEL
-        >>> print(model.N_symbols)
-        >>> print(model.F_matrix)
-        >>> print(model.R_matrix)
+        >>> print(model.n_symbols)
+        >>> print(model.f_matrix)
+        >>> print(model.r_matrix)
 
     Example 2: Z_N model (Abelian model)
         >>> N = 5
-        >>> N_symbols = np.zeros((N, N, N), dtype=int)
+        >>> n_symbols = np.zeros((N, N, N), dtype=int)
         >>> for i, j, k in itertools.product(range(N), repeat=3):
         >>>     if (i + j) % N == k:
-        >>>         N_symbols[i, j, k] = 1
+        >>>         n_symbols[i, j, k] = 1
 
-        >>> F_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
-        >>> for i, j, k, l, m, n in itertools.product(range(N), repeat=6):
-        >>>     if (i + j + k) % N == l and (i + j) % N == m and (j + k) % N == n:
-        >>>         F_matrix[i, j, k, l, m, n] = 1
+        >>> f_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
+        >>> for i, j, k, fusion_result, m, n in itertools.product(range(N), repeat=6):
+        >>>     if (i + j + k) % N == fusion_result and (i + j) % N == m and (j + k) % N == n:
+        >>>         f_matrix[i, j, k, fusion_result, m, n] = 1
 
-        >>> R_matrix = np.zeros((N, N, N), dtype=complex)
+        >>> r_matrix = np.zeros((N, N, N), dtype=complex)
         >>> for i, j, k in itertools.product(range(N), repeat=3):
         >>>     if (i + j) % N == k:
-        >>>         R_matrix[i, j, k] = np.exp(2j * np.pi * i * j / N)
+        >>>         r_matrix[i, j, k] = np.exp(2j * np.pi * i * j / N)
 
-        >>> zn_model = AnyonModel(N_symbols, F_matrix, R_matrix, name="Z_N")
+        >>> zn_model = AnyonModel(n_symbols, f_matrix, r_matrix, name="Z_N")
     """
 
     def __init__(
         self,
-        N_symbols: np.ndarray,
-        F_matrix: np.ndarray,
-        R_matrix: np.ndarray,
+        n_symbols: np.ndarray,
+        f_matrix: np.ndarray,
+        r_matrix: np.ndarray,
         name=None,
         force_recache=False,
     ):
-        assert N_symbols.ndim == 3, "N_symbols must be a 3D tensor"
-        assert F_matrix.ndim == 6, "F_matrix must be a 6D tensor"
-        assert R_matrix.ndim == 3, "R_matrix must be a 5D tensor"
+        assert n_symbols.ndim == 3, "N_symbols must be a 3D tensor"
+        assert f_matrix.ndim == 6, "F_matrix must be a 6D tensor"
+        assert r_matrix.ndim == 3, "R_matrix must be a 5D tensor"
 
         if force_recache:
             folder_path = os.path.join(STORE_PATH, f"{name}-q-*")
@@ -98,12 +98,12 @@ class AnyonModel:
                     if os.path.isfile(file_path):
                         os.remove(file_path)
 
-        self._N_symbols = N_symbols
-        self._F_matrix = F_matrix
-        self._R_matrix = R_matrix
-        self._B_matrix = self._compute_braiding_matrix()
-        self._K_matrices = {}
-        self.nb_charges = self.N_symbols.shape[0]
+        self._n_symbols = n_symbols
+        self._f_matrix = f_matrix
+        self._r_matrix = r_matrix
+        self._b_matrix = self._compute_braiding_matrix()
+        self._k_matrices = {}
+        self.nb_charges = self.n_symbols.shape[0]
 
         if name is None:
             self._name = f"model-{np.random.randint(1000)}"
@@ -111,7 +111,7 @@ class AnyonModel:
             self._name = name
 
     @property
-    def N_symbols(self):
+    def n_symbols(self):
         """Returns the fusion rules N symbols tensor.
 
         Returns
@@ -120,10 +120,10 @@ class AnyonModel:
             The N symbols tensor.
 
         """
-        return self._N_symbols
+        return self._n_symbols
 
     @property
-    def F_matrix(self):
+    def f_matrix(self):
         """Returns the F matrix tensor.
 
         Returns
@@ -132,10 +132,10 @@ class AnyonModel:
             The F matrix tensor.
 
         """
-        return self._F_matrix
+        return self._f_matrix
 
     @property
-    def R_matrix(self):
+    def r_matrix(self):
         """Returns the R matrix tensor.
 
         Returns
@@ -144,10 +144,10 @@ class AnyonModel:
             The R matrix tensor.
 
         """
-        return self._R_matrix
+        return self._r_matrix
 
     @property
-    def B_matrix(self):
+    def b_matrix(self):
         """Returns the braiding matrix tensor.
 
         Returns
@@ -155,14 +155,14 @@ class AnyonModel:
         np.ndarray
             The braiding matrix tensor.
 
-        return self._B_matrix
+        return self._b_matrix
             The braiding matrix tensor.
 
         """
-        return self._B_matrix
+        return self._b_matrix
 
     @property
-    def K_matrices(self):
+    def k_matrices(self):
         """Returns the K matrices dictionary.
 
         Returns
@@ -171,7 +171,7 @@ class AnyonModel:
             The K matrices dictionary.
 
         """
-        return self._K_matrices
+        return self._k_matrices
 
     @property
     def name(self):
@@ -206,8 +206,8 @@ class AnyonModel:
             True if the Fibonacci fusion rules are obeyed, False otherwise.
 
         """
-        # check that N_symbols[anyon1[i], anyon2[i], outcome[i]] == 1 for all i
-        return self.N_symbols[anyon1, anyon2, outcome] == np.ones_like(anyon1)
+        # check that n_symbols[anyon1[i], anyon2[i], outcome[i]] == 1 for all i
+        return self.n_symbols[anyon1, anyon2, outcome] == np.ones_like(anyon1)
 
     def _compute_braiding_matrix(self):
         r"""Computes the braiding matrix for the anyon model.
@@ -223,13 +223,13 @@ class AnyonModel:
         """
         b_matrix = np.einsum(
             "abcjil, bcl, acbjml -> abcjim",
-            self.F_matrix,
-            self.R_matrix,
-            self.F_matrix.conjugate(),
+            self.f_matrix,
+            self.r_matrix,
+            self.f_matrix.conjugate(),
         )
         return b_matrix
 
-    def _compute_L_matrix(self, q: int):
+    def _compute_l_matrix(self, q: int):
         r"""
         [L_{ a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{p(q+1)}]^{
         i(m,q) i(m+1,1) ... i(m+1,q)
@@ -285,12 +285,12 @@ class AnyonModel:
                     f"p({q-r+1})",
                 )
             # conj + swap last two axes for dagger
-            F_dag = np.conjugate(self.F_matrix).swapaxes(-1, -2)
-            terms.append((F_dag, labels))
+            f_dag = np.conjugate(self.f_matrix).swapaxes(-1, -2)
+            terms.append((f_dag, labels))
             r += 1
 
         # --- B tensor
-        B_labels = (
+        b_labels = (
             f"i(m,{q-1})",
             f"a(m,{q})",
             "a(m+1,0)",
@@ -298,7 +298,7 @@ class AnyonModel:
             f"i(m,{q})",
             f"ip(m,{q})",
         )
-        terms.append((self.B_matrix, B_labels))
+        terms.append((self.b_matrix, b_labels))
 
         # --- Right product of q F factors
         r = 1
@@ -320,7 +320,7 @@ class AnyonModel:
                     f"p({q-r+1})",
                     f"ip(m+1,{q-r+1})",
                 )
-            terms.append((self.F_matrix, labels))
+            terms.append((self.f_matrix, labels))
             r += 1
 
         # --- Output indices
@@ -344,7 +344,7 @@ class AnyonModel:
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
 
-    def compute_knitting_matrix(self, q: int, return_L=False):
+    def compute_knitting_matrix(self, q: int, return_l=False):
         r"""
         See Appendix of https://arxiv.org/abs/2307.01892
 
@@ -402,7 +402,7 @@ class AnyonModel:
 
         # --- Left F factor ---
         # Example label order (must match how F is actually stored):
-        F_labels = (
+        f_labels = (
             "j(m-2)",
             f"i(m,{q})",
             f"i(m+1,{q})",
@@ -410,11 +410,11 @@ class AnyonModel:
             "j(m-1)",
             "k",
         )
-        terms.append((self.F_matrix, F_labels))
+        terms.append((self.f_matrix, f_labels))
 
         # --- L factor ---
         # L already carries many indices (a, i, i', ...).
-        # Here we assume L_labels is known / fixed.
+        # Here we assume l_labels is known / fixed.
         # Example layout (you must adapt to your actual storage order!):
         # out_labels = (
         #     [f"a(m,{q})"] + [f"a(m+1,{r})" for r in range(0, q+1)] +
@@ -422,7 +422,7 @@ class AnyonModel:
         #     [f"i(m,{q})"] + [f"i(m+1,{r})" for r in range(0, q+1)] +
         #     [f"ip(m,{q})"] + [f"ip(m+1,{r})" for r in range(0, q+1)]
         # )
-        L_labels = (
+        l_labels = (
             f"a(m,{q})",
             *[f"a(m+1,{r})" for r in range(0, q + 1)],
             f"i(m,{q-1})",
@@ -432,13 +432,13 @@ class AnyonModel:
             f"ip(m,{q})",
             *[f"ip(m+1,{r})" for r in range(1, q + 1)],
         )
-        L_matrix = self._compute_L_matrix(q)
-        terms.append((L_matrix, L_labels))
+        l_matrix = self._compute_l_matrix(q)
+        terms.append((l_matrix, l_labels))
 
         # --- Right F dagger factor ---
         # dagger = conjugate and swapaxes(5,4): swap 'k' and 'j(m-1)'
-        F_dag = np.conjugate(np.swapaxes(self.F_matrix, 5, 4))
-        F_labels_dag = (
+        f_dag = np.conjugate(np.swapaxes(self.f_matrix, 5, 4))
+        f_labels_dag = (
             "j(m-2)",
             f"ip(m,{q})",
             f"ip(m+1,{q})",
@@ -446,7 +446,7 @@ class AnyonModel:
             "k",
             "jp(m-1)",
         )
-        terms.append((F_dag, F_labels_dag))
+        terms.append((f_dag, f_labels_dag))
 
         # --- Output labels for K ---
         # [K_{a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{j(m-2), j(m)}]^{
@@ -469,16 +469,16 @@ class AnyonModel:
         )
 
         # Perform contraction
-        K = einsum_with_names(terms, out_labels)
-        self._K_matrices[q] = K
+        k = einsum_with_names(terms, out_labels)
+        self._k_matrices[q] = k
 
         # Store K matrix to file
         os.makedirs(folder_path, exist_ok=True)
-        np.save(filename, K)
+        np.save(filename, k)
 
-        if return_L:
-            return K, L_matrix
-        return K
+        if return_l:
+            return k, l_matrix
+        return k
 
     def check_state(self, state) -> bool:
         if isinstance(state, SparseAnyonState):
@@ -678,7 +678,7 @@ class AnyonModel:
 
         j = deepcopy(final_state.outcomes[braid_index - 1])
 
-        amplitude = self.B_matrix[a, b, c, j, i, m]
+        amplitude = self.b_matrix[a, b, c, j, i, m]
         return amplitude
 
     def compute_sparse_braid_inner_product(
