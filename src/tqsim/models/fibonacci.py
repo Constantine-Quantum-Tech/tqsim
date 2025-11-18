@@ -25,39 +25,45 @@ for a1 in range(2):
                     fusion_matrix[a1, a2, outcome] = 1
 
 
+def _get_f_matrix_sum_2(a1, a2, a3, outcome):
+    """Helper function for F matrix when a1 + a2 + a3 + outcome = 2."""
+    if a1 + a2 == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a2 + a3 == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a1 + a3 == 2:
+        return np.array([[0, 0], [0, 1]])
+    elif a3 + outcome == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a1 + outcome == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a2 + outcome == 2:
+        return np.array([[0, 0], [0, 1]])
+    return np.array([[0, 0], [0, 0]])
+
+
 def get_f_matrix(a1, a2, a3, outcome):  # noqa: N802
     """
     F matrix
     """
     inv_phi = (np.sqrt(5) - 1) / 2  # inverse of golden number
-    f_matrix = np.array([[0, 0], [0, 0]])
+    total = a1 + a2 + a3 + outcome
 
     # a1 + a2 + a3 + outcome = 4
-    if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+    if total == 4:
+        return np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
     # a1 + a2 + a3 + outcome = 3
-    elif a1 + a2 + a3 + outcome == 3:
-        f_matrix = np.array([[0, 0], [0, 1]])
+    elif total == 3:
+        return np.array([[0, 0], [0, 1]])
     # a1 + a2 + a3 + outcome = 2
-    elif a1 + a2 + a3 + outcome == 2:
-        if a1 + a2 == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a2 + a3 == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a1 + a3 == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-        elif a3 + outcome == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a1 + outcome == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a2 + outcome == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-    # a1 + a2 + a3 + outcome = 1
+    elif total == 2:
+        return _get_f_matrix_sum_2(a1, a2, a3, outcome)
     # a1 + a2 + a3 + outcome = 0
-    elif a1 + a2 + a3 + outcome == 0:
-        f_matrix = np.array([[1, 0], [0, 0]])
-
-    return f_matrix
+    elif total == 0:
+        return np.array([[1, 0], [0, 0]])
+    # Default case (including sum = 1)
+    else:
+        return np.array([[0, 0], [0, 0]])
 
 
 def get_r_matix(a1, a2):  # noqa: N802
