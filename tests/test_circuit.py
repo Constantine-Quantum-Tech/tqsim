@@ -76,9 +76,16 @@ def test_init_model_1():
         if (i + j) % num_charges == k:
             n_symbols[i, j, k] = 1
 
-    f_matrix = np.zeros((num_charges, num_charges, num_charges, num_charges, num_charges, num_charges), dtype=complex)
+    f_matrix = np.zeros(
+        (num_charges, num_charges, num_charges, num_charges, num_charges, num_charges),
+        dtype=complex,
+    )
     for i, j, k, total_charge, m, n in itertools.product(range(num_charges), repeat=6):
-        if (i + j + k) % num_charges == total_charge and (i + j) % num_charges == m and (j + k) % num_charges == n:
+        if (
+            (i + j + k) % num_charges == total_charge
+            and (i + j) % num_charges == m
+            and (j + k) % num_charges == n
+        ):
             f_matrix[i, j, k, total_charge, m, n] = 1
 
     r_matrix = np.zeros((num_charges, num_charges, num_charges), dtype=complex)

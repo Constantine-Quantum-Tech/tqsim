@@ -202,7 +202,11 @@ def braiding_matrix(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    return f_matrix(a0, a1, a2, outcome) @ r_matrix(a1, a2) @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    return (
+        f_matrix(a0, a1, a2, outcome)
+        @ r_matrix(a1, a2)
+        @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    )
 
 
 def sigma(index, state_f, state_i):

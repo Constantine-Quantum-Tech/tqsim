@@ -188,7 +188,11 @@ def braiding_matrix(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    b_matrix = f_matrix(a0, a1, a2, outcome) @ r_matrix(a1, a2) @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    b_matrix = (
+        f_matrix(a0, a1, a2, outcome)
+        @ r_matrix(a1, a2)
+        @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    )
 
     return b_matrix
 
