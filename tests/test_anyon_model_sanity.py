@@ -4,17 +4,17 @@ import numpy as np
 
 from tqsim.models.fibonacci import FIBONACCI_MODEL
 from tqsim.models.ising import ISING_MODEL
-from tqsim.tools.braiding_generators.fib_multi_qudits import B as B_fib
-from tqsim.tools.braiding_generators.fib_multi_qudits import L as L_fib
-from tqsim.tools.braiding_generators.fib_multi_qudits import S as K_fib
-from tqsim.tools.braiding_generators.fib_qudit import F as F_fib
+from tqsim.tools.braiding_generators.fib_multi_qudits import B as b_fib
+from tqsim.tools.braiding_generators.fib_multi_qudits import L as l_fib
+from tqsim.tools.braiding_generators.fib_multi_qudits import S as k_fib
+from tqsim.tools.braiding_generators.fib_qudit import F as f_fib
 from tqsim.tools.braiding_generators.ising_multi_qudits import (
-    B as B_ising,
+    B as b_ising,
 )
 from tqsim.tools.braiding_generators.ising_multi_qudits import (
-    L as L_ising,
+    L as l_ising,
 )
-from tqsim.tools.braiding_generators.ising_multi_qudits import S as K_ising
+from tqsim.tools.braiding_generators.ising_multi_qudits import S as k_ising
 
 fib_model = FIBONACCI_MODEL
 ising_model = ISING_MODEL
@@ -24,7 +24,7 @@ def test_f_matrix():
     # iterate over all possible a, b, c, d in [0, 1]
     for a, b, c, d in itertools.product([0, 1], repeat=4):
         expected = fib_model.f_matrix[a, b, c, d, :, :]
-        got = F_fib(a, b, c, d)
+        got = f_fib(a, b, c, d)
         assert np.isclose(got, expected, atol=1e-6).all()
 
 
@@ -32,7 +32,7 @@ def test_b_matrix():
     # iterate over all possible a, b, c, d in [0, 1]
     for a, b, c, d in itertools.product([0, 1], repeat=4):
         expected = fib_model.b_matrix[a, b, c, d, :, :]
-        got = B_fib(a, b, c, d)
+        got = b_fib(a, b, c, d)
         assert np.isclose(got, expected, atol=1e-6).all()
 
 
@@ -40,7 +40,7 @@ def test_ising_b_matrix():
     # iterate over all possible a, b, c, d in [0, 1]
     for a, b, c, d in itertools.product([0, 1], repeat=4):
         expected = ising_model.b_matrix[a, b, c, d, :, :]
-        got = B_ising(a, b, c, d)
+        got = b_ising(a, b, c, d)
         assert np.isclose(got, expected, atol=1e-6).all()
 
 
@@ -58,7 +58,7 @@ def test_l_matrix_fib_and_ising():
 
         idx = tuple(a + [h, k, i] + jj + [i_] + jj_)
         l1 = l_matrix[idx]
-        l2 = L_fib(k, h, i_, i, jj_, jj)
+        l2 = l_fib(k, h, i_, i, jj_, jj)
         assert np.isclose(l1, l2), f"Fibonacci L mismatch for params: {params}"
 
     # Ising
@@ -70,7 +70,7 @@ def test_l_matrix_fib_and_ising():
 
         idx = tuple(a + [h, k, i] + jj + [i_] + jj_)
         l1 = l_matrix[idx]
-        l2 = L_ising(k, h, i_, i, jj_, jj)
+        l2 = l_ising(k, h, i_, i, jj_, jj)
         assert np.isclose(l1, l2), f"Ising L mismatch for params: {params}"
 
 
@@ -93,7 +93,7 @@ def test_k_matrix_fib_and_ising():
         jj = list(params[7 + q : 7 + 2 * q])
 
         k1 = new_k(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
-        k2 = K_fib(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+        k2 = k_fib(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
         assert np.isclose(k1, k2), f"Fibonacci K mismatch for params: {params}"
 
     # Ising
@@ -109,5 +109,5 @@ def test_k_matrix_fib_and_ising():
         jj = list(params[7 + q : 7 + 2 * q])
 
         k1 = new_k(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
-        k2 = K_ising(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+        k2 = k_ising(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
         assert np.isclose(k1, k2), f"Ising K mismatch for params: {params}"
