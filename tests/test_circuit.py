@@ -77,9 +77,9 @@ def test_init_model_1():
             N_symbols[i, j, k] = 1
 
     F_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
-    for i, j, k, fusion_result, m, n in itertools.product(range(N), repeat=6):
-        if (i + j + k) % N == fusion_result and (i + j) % N == m and (j + k) % N == n:
-            F_matrix[i, j, k, fusion_result, m, n] = 1
+    for i, j, k, total_charge, m, n in itertools.product(range(N), repeat=6):
+        if (i + j + k) % N == total_charge and (i + j) % N == m and (j + k) % N == n:
+            F_matrix[i, j, k, total_charge, m, n] = 1
 
     R_matrix = np.zeros((N, N, N), dtype=complex)
     for i, j, k in itertools.product(range(N), repeat=3):
