@@ -117,44 +117,57 @@ def find_basis(n_anyons):
     return states
 
 
+def _get_f_matrix_sum_4(inv_phi):
+    """Get F matrix when sum = 4."""
+    return np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+
+
+def _get_f_matrix_sum_3():
+    """Get F matrix when sum = 3."""
+    return np.array([[0, 0], [0, 1]])
+
+
+def _get_f_matrix_sum_2(a1, a2, a3, outcome):
+    """Get F matrix when sum = 2."""
+    if a1 + a2 == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a2 + a3 == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a1 + a3 == 2:
+        return np.array([[0, 0], [0, 1]])
+    elif a3 + outcome == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a1 + outcome == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a2 + outcome == 2:
+        return np.array([[0, 0], [0, 1]])
+    return np.array([[0, 0], [0, 0]])
+
+
+def _get_f_matrix_sum_0():
+    """Get F matrix when sum = 0."""
+    return np.array([[1, 0], [0, 0]])
+
+
 def f_matrix(a1, a2, a3, outcome):
     """
     F matrix
     """
     inv_phi = (np.sqrt(5) - 1) / 2  # inverse of golden number
-    f_matrix = np.array([[0, 0], [0, 0]])
+    total = a1 + a2 + a3 + outcome
 
-    # a1 + a2 + a3 + outcome = 4
-    if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+    if total == 4:
+        result = _get_f_matrix_sum_4(inv_phi)
+    elif total == 3:
+        result = _get_f_matrix_sum_3()
+    elif total == 2:
+        result = _get_f_matrix_sum_2(a1, a2, a3, outcome)
+    elif total == 0:
+        result = _get_f_matrix_sum_0()
+    else:
+        result = np.array([[0, 0], [0, 0]])
 
-    # a1 + a2 + a3 + outcome = 3
-    elif a1 + a2 + a3 + outcome == 3:
-        f_matrix = np.array([[0, 0], [0, 1]])
-
-    # a1 + a2 + a3 + outcome = 2
-    elif a1 + a2 + a3 + outcome == 2:
-        if a1 + a2 == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a2 + a3 == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a1 + a3 == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-        elif a3 + outcome == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a1 + outcome == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a2 + outcome == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-
-    # a1 + a2 + a3 + outcome = 1
-    # a1 + a2 + a3 + outcome = 0
-    elif a1 + a2 + a3 + outcome == 0:
-        f_matrix = np.array([[1, 0], [0, 0]])
-
-    # return f_matrix
-    # return complex matrix
-    return f_matrix.astype(complex)
+    return result.astype(complex)
 
 
 def r_matrix(a1, a2):
