@@ -79,13 +79,69 @@ def check_state(state):
 
     previous_outcome = state["qudits"][0][-1]
     for ii, outcome in enumerate(state["roots"]):
-        if fibo.check_rule(previous_outcome, state["qudits"][ii + 1][-1], outcome):
+        if fibo.check_rule(
+            previous_outcome, state["qudits"][ii + 1][-1], outcome
+        ):
             previous_outcome = outcome
         else:
             check = False
             break
 
     return check
+
+
+def _fill_state(labels, n_qudits, qudit_len, n_roots):
+    """Helper function to fill a state from a label list."""
+    state = {"qudits": [], "roots": []}
+    for ii in range(n_qudits):
+        state["qudits"].append([])
+        for jj in range(qudit_len):
+            state["qudits"][-1].append(0)
+
+    ll = 0
+    for ii in range(qudit_len):
+        for jj in range(n_qudits):
+            state["qudits"][jj][ii] = labels[ll]
+            ll += 1
+
+    for ii in range(n_roots):
+        state["roots"].append(labels[ll])
+        ll += 1
+
+    return state
+
+
+def _initialize_combinations(n_labels):
+    """Initialize starting and ending combinations."""
+    new_comb = [0] * n_labels
+    final_comb = [1] * n_labels
+    return new_comb, final_comb
+
+
+def _increment_combination(comb):
+    """Increment a binary combination in place."""
+    for ii, label in enumerate(comb):
+        if label == 0:
+            comb[ii] = 1
+            break
+        else:
+            comb[ii] = 0
+
+
+def _generate_valid_states(new_comb, final_comb, n_qudits, qudit_len, n_roots):
+    """Generate all valid states from combinations."""
+    states = []
+    new_state = _fill_state(new_comb, n_qudits, qudit_len, n_roots)
+    if check_state(new_state):
+        states.append(new_state)
+
+    while new_comb != final_comb:
+        _increment_combination(new_comb)
+        new_state = _fill_state(new_comb, n_qudits, qudit_len, n_roots)
+        if check_state(new_state):
+            states.append(new_state)
+
+    return states
 
 
 def find_basis(n_qudits, qudit_len):
@@ -99,54 +155,13 @@ def find_basis(n_qudits, qudit_len):
         qudit_len: int:
             number of outcomes representing one qudit.
     """
-
     n_roots = n_qudits - 1
     n_labels = n_qudits * qudit_len + n_roots
 
-    def fill_state(labels):
-        state = {"qudits": [], "roots": []}
-        for ii in range(n_qudits):
-            state["qudits"].append([])
-            for jj in range(qudit_len):
-                state["qudits"][-1].append(0)
-
-        ll = 0
-        for ii in range(qudit_len):
-            for jj in range(n_qudits):
-                state["qudits"][jj][ii] = labels[ll]
-                ll += 1
-
-        for ii in range(n_roots):
-            state["roots"].append(labels[ll])
-            ll += 1
-
-        return state
-
-    # generate all combinations and verify if it is valid state
-    new_comb = []
-    final_comb = []
-    for _ in range(n_labels):
-        new_comb.append(0)
-        final_comb.append(1)
-
-    new_state = fill_state(new_comb)
-    states = []
-    if check_state(new_state):
-        states.append(new_state)
-
-    while not new_comb == final_comb:
-        for ii, label in enumerate(new_comb):
-            if label == 0:
-                new_comb[ii] = 1
-                break
-            else:
-                new_comb[ii] = 0
-
-        new_state = fill_state(new_comb)
-        if check_state(new_state):
-            states.append(new_state)
-
-    return states
+    new_comb, final_comb = _initialize_combinations(n_labels)
+    return _generate_valid_states(
+        new_comb, final_comb, n_qudits, qudit_len, n_roots
+    )
 
 
 def find_basis_(n_qudits, qudit_len):
@@ -302,7 +317,9 @@ def l_matrix(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+                * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[
+                    jjj[ii + 1], pp[ii]
+                ]
                 * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
@@ -323,7 +340,9 @@ def l_matrix(k, h, i_, i, jj_, jj):
     for ii in range(qudit_len):
         product = (
             product
-            * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+            * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[
+                jjj[ii + 1], pp[ii]
+            ]
             * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
         )
 
