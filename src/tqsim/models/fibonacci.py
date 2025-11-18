@@ -25,7 +25,7 @@ for a1 in range(2):
                     fusion_matrix[a1, a2, outcome] = 1
 
 
-def F(a1, a2, a3, outcome):
+def F(a1, a2, a3, outcome):  # noqa: N802
     """
     F matrix
     """
@@ -60,7 +60,7 @@ def F(a1, a2, a3, outcome):
     return f_matrix
 
 
-def R(a1, a2):
+def R(a1, a2):  # noqa: N802
     """
     R matrix
     """

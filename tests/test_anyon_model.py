@@ -80,20 +80,20 @@ class TestAnyonModel:
             return r_matrix
 
         # Build F and R matrices
-        F_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
-        R_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
+        f_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
+        r_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
 
         for a1 in range(2):
             for a2 in range(2):
                 for a3 in range(2):
                     for outcome in range(2):
-                        F_matrix[a1, a2, a3, outcome] = F(a1, a2, a3, outcome)
+                        f_matrix[a1, a2, a3, outcome] = F(a1, a2, a3, outcome)
 
         for a1 in range(2):
             for a2 in range(2):
-                R_matrix[a1, a2] = R(a1, a2).diagonal()
+                r_matrix[a1, a2] = R(a1, a2).diagonal()
 
-        return AnyonModel(fusion_matrix, F_matrix, R_matrix)
+        return AnyonModel(fusion_matrix, f_matrix, r_matrix)
 
     def test_model_initialization(self, fibonacci_model):
         """Test that the model initializes correctly."""
