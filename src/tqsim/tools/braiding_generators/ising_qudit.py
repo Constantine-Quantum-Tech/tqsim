@@ -28,7 +28,7 @@ import numpy as np
 from tqsim.tools.cplot import cplot
 
 
-def F(a1, a2, a3, outcome):
+def f_matrix(a1, a2, a3, outcome):
     """
     F matrix for Ising model
     """
@@ -59,7 +59,7 @@ def F(a1, a2, a3, outcome):
     return f_matrix
 
 
-def R(a1, a2):
+def r_matrix(a1, a2):
     """
     R matrix
     """
@@ -198,11 +198,11 @@ def iterate(n_labels):
         yield new_comb
 
 
-def B(a0, a1, a2, outcome):
+def braiding_matrix(a0, a1, a2, outcome):
     """
     Braiding matrix
     """
-    return F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
+    return f_matrix(a0, a1, a2, outcome) @ r_matrix(a1, a2) @ f_matrix(a0, a2, a1, outcome).conjugate().T
 
 
 def sigma(index, state_f, state_i):
@@ -236,7 +236,7 @@ def sigma(index, state_f, state_i):
     if ket != bra:
         return 0
 
-    return B(a0, 1, 1, outcome)[a, b]
+    return braiding_matrix(a0, 1, 1, outcome)[a, b]
 
 
 def braiding_generator(index, n_anyons, show=True):

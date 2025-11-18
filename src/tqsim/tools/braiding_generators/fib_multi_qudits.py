@@ -34,7 +34,7 @@ TODO:
 from copy import deepcopy
 
 import tqsim.tools.braiding_generators.fib_qudit as fibo
-from tqsim.tools.braiding_generators.fib_qudit import B, F
+from tqsim.tools.braiding_generators.fib_qudit import braiding_matrix, f_matrix
 from tqsim.tools.cplot import cplot
 
 
@@ -270,7 +270,7 @@ def find_basis_(n_qudits, qudit_len):
     return states
 
 
-def L(k, h, i_, i, jj_, jj):
+def l_matrix(k, h, i_, i, jj_, jj):
     r"""
     L matrix component that is used in calculation of braiding between
     two anyons separated in two qudits.
@@ -302,11 +302,11 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
-                * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+                * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+                * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
-        product = product * B(h, 1, 1, pp[0])[i, i_]
+        product = product * braiding_matrix(h, 1, 1, pp[0])[i, i_]
         component += product
         # iterate
         for ii, label in enumerate(new_p):
@@ -323,19 +323,19 @@ def L(k, h, i_, i, jj_, jj):
     for ii in range(qudit_len):
         product = (
             product
-            * F(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
-            * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+            * f_matrix(i, jjj[ii], 1, pp[ii + 1]).T.conjugate()[jjj[ii + 1], pp[ii]]
+            * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
         )
 
-    product = product * B(h, 1, 1, pp[0])[i, i_]
+    product = product * braiding_matrix(h, 1, 1, pp[0])[i, i_]
     component += product
 
     return component
 
 
-def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+def knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
     r"""
-    S matrix or sewing matrix is used in calculation of braiding operator
+    K matrix or sewing matrix is used in calculation of braiding operator
     between two anyons separated between two qudits not fused imedialtely.
 
     Inputs:
@@ -353,9 +353,9 @@ def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
 
     for kk in [0, 1]:
         component += (
-            F(jmoo, i, jj[-1], jm)[jmo, kk]
-            * L(kk, h, i_, i, jj_, jj)
-            * F(jmoo, i_, jj_[-1], jm).T.conjugate()[kk, jmo_]
+            f_matrix(jmoo, i, jj[-1], jm)[jmo, kk]
+            * l_matrix(kk, h, i_, i, jj_, jj)
+            * f_matrix(jmoo, i_, jj_[-1], jm).T.conjugate()[kk, jmo_]
         )
 
     return component
@@ -463,7 +463,7 @@ def sigma(index_, state_f_, state_i_):
             jmo = state_i_["qudits"][0][-1]
             jm = state_i_["roots"][m]
 
-        amplitude += S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+        amplitude += knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
     return amplitude
 
