@@ -465,6 +465,54 @@ class AnyonicCircuit:
         self.drawer.measure()
         return self
 
+    def get_raw_history(self):
+        return self.__braids_history
+
+    def get_sigmas_history(self):
+        ret = []
+        for n, m in self.__braids_history:
+            if m < n:
+                ret.append(f"is{m}")
+            else:
+                ret.append(f"s{n}")
+        return ret
+
+    def get_latex_history(self):
+        sigmas = self.history(output="sigmas")
+
+        # Converting to a sigma notation with powers
+        power_sigmas = []
+        last_sigma = sigmas[-1] if len(sigmas) else None
+        power = 0
+        for sigma in reversed(sigmas):
+            if sigma == last_sigma:
+                power += 1
+                continue
+            # Done counting the powers of the last sigma, adding it
+            power_sigmas.append((last_sigma, power))
+            # resetting
+            power = 1
+            last_sigma = sigma
+
+        # Handling the last sigma
+        if power != 0:
+            power_sigmas.append((last_sigma, power))
+
+        # Converting to LaTeX
+        latex = ""
+        for sigma, p in power_sigmas:
+            # Inverses of sigmas (negative powers)
+            if sigma[0] == "i":
+                latex += r"\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
+            # Sigmas (positive powers)
+            else:
+                latex += r"\sigma_{" f"{sigma[1:]}" "}"
+                if p > 1:  # Only add exponents != 1
+                    latex += "^{" f"{p}" "}"
+
+        latex = "$ " + latex + "$"
+        return latex
+
     def history(self, output: str = "raw"):
         """Returns the history of all braiding operations that were performed
         in the circuit.
@@ -493,52 +541,13 @@ class AnyonicCircuit:
             raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
 
         if output == "raw":
-            return self.__braids_history
+            return self.get_raw_history()
 
         elif output == "sigmas":
-            ret = []
-            for n, m in self.__braids_history:
-                if m < n:
-                    ret.append(f"is{m}")
-                else:
-                    ret.append(f"s{n}")
-            return ret
+            return self.get_sigmas_history()
 
         else:
-            sigmas = self.history(output="sigmas")
-
-            # Converting to a sigma notation with powers
-            power_sigmas = []
-            last_sigma = sigmas[-1] if len(sigmas) else None
-            power = 0
-            for sigma in reversed(sigmas):
-                if sigma == last_sigma:
-                    power += 1
-                    continue
-                # Done counting the powers of the last sigma, adding it
-                power_sigmas.append((last_sigma, power))
-                # resetting
-                power = 1
-                last_sigma = sigma
-
-            # Handling the last sigma
-            if power != 0:
-                power_sigmas.append((last_sigma, power))
-
-            # Converting to LaTeX
-            latex = ""
-            for sigma, p in power_sigmas:
-                # Inverses of sigmas (negative powers)
-                if sigma[0] == "i":
-                    latex += r"\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
-                # Sigmas (positive powers)
-                else:
-                    latex += r"\sigma_{" f"{sigma[1:]}" "}"
-                    if p > 1:  # Only add exponents != 1
-                        latex += "^{" f"{p}" "}"
-
-            latex = "$ " + latex + "$"
-            return latex
+            return self.get_latex_history()
 
     def draw(self):
         """Draws the topological quantum circuit.
