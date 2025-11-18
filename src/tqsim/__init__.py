@@ -10,7 +10,9 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tqsim.circuit import AnyonicCircuit
-from tqsim.config import clean_config_path as clean_cache
+from tqsim.circuit import AnyonicCircuit as AnyonicCircuit
+from tqsim.config import clean_config_path as clean_config_path
+
+clean_cache = clean_config_path
 
 __version__ = "1.0.0"

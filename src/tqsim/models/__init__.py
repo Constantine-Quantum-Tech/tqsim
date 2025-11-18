@@ -10,5 +10,5 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-from tqsim.models.fibonacci import FIBONACCI_MODEL
-from tqsim.models.ising import ISING_MODEL
+from tqsim.models.fibonacci import FIBONACCI_MODEL as FIBONACCI_MODEL
+from tqsim.models.ising import ISING_MODEL as ISING_MODEL

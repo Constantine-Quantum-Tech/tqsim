@@ -77,9 +77,9 @@ def test_init_model_1():
             N_symbols[i, j, k] = 1
 
     F_matrix = np.zeros((N, N, N, N, N, N), dtype=complex)
-    for i, j, k, l, m, n in itertools.product(range(N), repeat=6):
-        if (i + j + k) % N == l and (i + j) % N == m and (j + k) % N == n:
-            F_matrix[i, j, k, l, m, n] = 1
+    for i, j, k, fusion_result, m, n in itertools.product(range(N), repeat=6):
+        if (i + j + k) % N == fusion_result and (i + j) % N == m and (j + k) % N == n:
+            F_matrix[i, j, k, fusion_result, m, n] = 1
 
     R_matrix = np.zeros((N, N, N), dtype=complex)
     for i, j, k in itertools.product(range(N), repeat=3):
@@ -129,7 +129,7 @@ def test_init_model_2():
 
 
 def test_save():
-    circuit = AnyonicCircuit()
+    _ = AnyonicCircuit()
     config_path = os.path.join(os.path.expanduser("~"), ".tqsim")
     store_path = os.path.join(config_path, "store")
     data_path = os.path.join(store_path, "Fibonacci-1-3-1")
@@ -174,7 +174,7 @@ def test_braid_1():
     try:
         circuit.braid(1, 2)
         circuit.braid(2, 3)
-    except:
+    except Exception:
         assert False
 
 
@@ -184,7 +184,7 @@ def test_braid_2():
         circuit.initialize(np.ones(3) / np.sqrt(3))
         circuit.braid(1, 2)
         circuit.braid(2, 3)
-    except:
+    except Exception:
         assert False
 
 
@@ -235,7 +235,7 @@ def test_measure_1():
     circuit = AnyonicCircuit()
     try:
         circuit.measure()
-    except:
+    except Exception:
         assert False
 
 

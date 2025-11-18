@@ -82,9 +82,10 @@ def test_K_matrix_fib_and_ising():
 
     # Fibonacci
     K_matrix = fib_model.compute_knitting_matrix(q)
-    new_K = lambda jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj: K_matrix[
-        tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)
-    ]
+    
+    def new_K(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+        return K_matrix[tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)]
+    
     for params in itertools.product([0, 1], repeat=3 + 3 + 2 + 2 * q):
         jm, jmo, jmoo, jmo_ = params[0], params[1], params[2], params[3]
         h, i_, i = params[4], params[5], params[6]
@@ -97,9 +98,10 @@ def test_K_matrix_fib_and_ising():
 
     # Ising
     K_matrix = ising_model.compute_knitting_matrix(q)
-    new_K = lambda jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj: K_matrix[
-        tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)
-    ]
+    
+    def new_K(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+        return K_matrix[tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)]
+    
     for params in itertools.product([0, 1], repeat=3 + 3 + 2 + 2 * q):
         jm, jmo, jmoo, jmo_ = params[0], params[1], params[2], params[3]
         h, i_, i = params[4], params[5], params[6]

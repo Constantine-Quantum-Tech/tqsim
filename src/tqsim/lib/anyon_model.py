@@ -820,7 +820,7 @@ class AnyonModel:
 
             """
             [K_{
-            a(m,q) a(m+1, 0), ..., a(m+1, q), 
+            a(m,q) a(m+1, 0), ..., a(m+1, q),
             i(m,q-1)}^{j(m-2), j(m)
             }]^{
             j(m-1) i(m,q)i(m+1,1) ... i(m+1,q)
@@ -960,7 +960,7 @@ class AnyonModel:
             """
             Return
             [K_{
-            a(m,q) a(m+1, 0), ..., a(m+1, q), 
+            a(m,q) a(m+1, 0), ..., a(m+1, q),
             i(m,q-1)}^{j(m-2), j(m)
             }]^{
             j(m-1) i(m,q)i(m+1,1) ... i(m+1,q)

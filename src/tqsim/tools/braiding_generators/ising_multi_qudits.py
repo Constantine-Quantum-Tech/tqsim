@@ -248,7 +248,6 @@ def sigma(index_, state_f_, state_i_):
     qudit_len = len(state_i_["qudits"][0])
 
     amplitude = 0
-    braket = 1
 
     # n modulo q > 0
     if index_ % (qudit_len + 1) > 0:
