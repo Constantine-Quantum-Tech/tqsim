@@ -961,7 +961,7 @@ class AnyonModel:
                 )
             )
 
-        knitting_matrix = self._K_matrices.get(q, self.compute_knitting_matrix(q=q))
+        knitting_matrix = self._k_matrices.get(q, self.compute_knitting_matrix(q=q))
 
         return knitting_matrix[
             *a, i[0], j[0], j[2], j[1], *i[1::], j_prime[0], *i_prime
