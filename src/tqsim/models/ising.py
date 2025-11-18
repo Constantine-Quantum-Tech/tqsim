@@ -41,7 +41,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def f(a1, a2, a3, outcome):
+def get_f_matrix(a1, a2, a3, outcome):
     """
     F matrix for Ising model
     """
@@ -72,7 +72,7 @@ def f(a1, a2, a3, outcome):
     return f_matrix
 
 
-def r(a1, a2):
+def get_r_matrix(a1, a2):
     """
     R matrix
     """
@@ -115,10 +115,10 @@ for a1 in range(3):
     for a2 in range(3):
         for a3 in range(3):
             for outcome in range(3):
-                f_matrix[a1, a2, a3, outcome] = f(a1, a2, a3, outcome)
+                f_matrix[a1, a2, a3, outcome] = get_f_matrix(a1, a2, a3, outcome)
 
 for a1 in range(3):
     for a2 in range(3):
-        r_matrix[a1, a2] = r(a1, a2).diagonal()
+        r_matrix[a1, a2] = get_r_matrix(a1, a2).diagonal()
 
 ISING_MODEL = AnyonModel(fusion_matrix, f_matrix, r_matrix, name="Ising")

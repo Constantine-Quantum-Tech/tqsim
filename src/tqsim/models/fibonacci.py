@@ -25,7 +25,7 @@ for a1 in range(2):
                     fusion_matrix[a1, a2, outcome] = 1
 
 
-def F(a1, a2, a3, outcome):  # noqa: N802
+def get_f_matrix(a1, a2, a3, outcome):  # noqa: N802
     """
     F matrix
     """
@@ -60,7 +60,7 @@ def F(a1, a2, a3, outcome):  # noqa: N802
     return f_matrix
 
 
-def R(a1, a2):  # noqa: N802
+def get_r_matix(a1, a2):  # noqa: N802
     """
     R matrix
     """
@@ -74,17 +74,17 @@ def R(a1, a2):  # noqa: N802
     return r_matrix
 
 
-F_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
-R_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
+f_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
+r_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
 
 for a1 in range(2):
     for a2 in range(2):
         for a3 in range(2):
             for outcome in range(2):
-                F_matrix[a1, a2, a3, outcome] = F(a1, a2, a3, outcome)
+                f_matrix[a1, a2, a3, outcome] = get_f_matrix(a1, a2, a3, outcome)
 
 for a1 in range(2):
     for a2 in range(2):
-        R_matrix[a1, a2] = R(a1, a2).diagonal()
+        r_matrix[a1, a2] = get_r_matix(a1, a2).diagonal()
 
-FIBONACCI_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name="Fibonacci")
+FIBONACCI_MODEL = AnyonModel(fusion_matrix, f_matrix, r_matrix, name="Fibonacci")
