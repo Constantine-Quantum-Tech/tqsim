@@ -23,6 +23,14 @@ class TestAnyonModel:
     def fibonacci_model(self):
         """Create a Fibonacci anyon model as tested in the notebook."""
         # Fusion matrix setup from notebook
+        fusion_matrix = self._build_fusion_matrix()
+        f_matrix = self._build_f_matrix()
+        r_matrix = self._build_r_matrix()
+
+        return AnyonModel(fusion_matrix, f_matrix, r_matrix)
+
+    def _build_fusion_matrix(self):
+        """Build the fusion matrix."""
         fusion_matrix = np.zeros((2, 2, 2))
         for a1 in range(2):
             for a2 in range(2):
@@ -32,68 +40,83 @@ class TestAnyonModel:
                     else:
                         if (a1 + a2) == outcome:
                             fusion_matrix[a1, a2, outcome] = 1
+        return fusion_matrix
 
-        def get_f_matrix(a1, a2, a3, outcome):
-            """F matrix helper function from notebook."""
-            inv_phi = (np.sqrt(5) - 1) / 2  # inverse of golden number
-            matrix = np.array([[0, 0], [0, 0]])
-
-            # a1 + a2 + a3 + outcome = 4
-            if a1 + a2 + a3 + outcome == 4:
-                matrix = np.array(
-                    [[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]]
-                )
-            # a1 + a2 + a3 + outcome = 3
-            elif a1 + a2 + a3 + outcome == 3:
-                matrix = np.array([[0, 0], [0, 1]])
-            # a1 + a2 + a3 + outcome = 2
-            elif a1 + a2 + a3 + outcome == 2:
-                if a1 + a2 == 2:
-                    matrix = np.array([[0, 1], [0, 0]])
-                elif a2 + a3 == 2:
-                    matrix = np.array([[0, 0], [1, 0]])
-                elif a1 + a3 == 2:
-                    matrix = np.array([[0, 0], [0, 1]])
-                elif a3 + outcome == 2:
-                    matrix = np.array([[0, 1], [0, 0]])
-                elif a1 + outcome == 2:
-                    matrix = np.array([[0, 0], [1, 0]])
-                elif a2 + outcome == 2:
-                    matrix = np.array([[0, 0], [0, 1]])
-            # a1 + a2 + a3 + outcome = 0
-            elif a1 + a2 + a3 + outcome == 0:
-                matrix = np.array([[1, 0], [0, 0]])
-
-            return matrix
-
-        def get_r_matrix(a1, a2):
-            """R matrix helper function from notebook."""
-            if a1 + a2 == 2:
-                matrix = np.array(
-                    [
-                        [np.exp(-4 * np.pi * 1j / 5), 0],
-                        [0, np.exp(3 * np.pi * 1j / 5)],
-                    ]
-                )
-            else:
-                matrix = np.array([[1, 0], [0, 1]])
-            return matrix
-
-        # Build F and R matrices
+    def _build_f_matrix(self):
+        """Build the F matrix."""
         f_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
-        r_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
-
         for a1 in range(2):
             for a2 in range(2):
                 for a3 in range(2):
                     for outcome in range(2):
-                        f_matrix[a1, a2, a3, outcome] = get_f_matrix(a1, a2, a3, outcome)
+                        f_matrix[a1, a2, a3, outcome] = self._get_f_matrix(
+                            a1, a2, a3, outcome
+                        )
+        return f_matrix
 
+    def _build_r_matrix(self):
+        """Build the R matrix."""
+        r_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
         for a1 in range(2):
             for a2 in range(2):
-                r_matrix[a1, a2] = get_r_matrix(a1, a2).diagonal()
+                r_matrix[a1, a2] = self._get_r_matrix(a1, a2).diagonal()
+        return r_matrix
 
-        return AnyonModel(fusion_matrix, f_matrix, r_matrix)
+    def _get_f_matrix_sum_4(self):
+        """Get F matrix when sum = 4."""
+        inv_phi = (np.sqrt(5) - 1) / 2
+        return np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+
+    def _get_f_matrix_sum_3(self):
+        """Get F matrix when sum = 3."""
+        return np.array([[0, 0], [0, 1]])
+
+    def _get_f_matrix_sum_2(self, a1, a2, a3, outcome):
+        """Get F matrix when sum = 2."""
+        if a1 + a2 == 2:
+            return np.array([[0, 1], [0, 0]])
+        elif a2 + a3 == 2:
+            return np.array([[0, 0], [1, 0]])
+        elif a1 + a3 == 2:
+            return np.array([[0, 0], [0, 1]])
+        elif a3 + outcome == 2:
+            return np.array([[0, 1], [0, 0]])
+        elif a1 + outcome == 2:
+            return np.array([[0, 0], [1, 0]])
+        elif a2 + outcome == 2:
+            return np.array([[0, 0], [0, 1]])
+        return np.array([[0, 0], [0, 0]])
+
+    def _get_f_matrix_sum_0(self):
+        """Get F matrix when sum = 0."""
+        return np.array([[1, 0], [0, 0]])
+
+    def _get_f_matrix(self, a1, a2, a3, outcome):
+        """F matrix helper function from notebook."""
+        total = a1 + a2 + a3 + outcome
+
+        if total == 4:
+            return self._get_f_matrix_sum_4()
+        elif total == 3:
+            return self._get_f_matrix_sum_3()
+        elif total == 2:
+            return self._get_f_matrix_sum_2(a1, a2, a3, outcome)
+        elif total == 0:
+            return self._get_f_matrix_sum_0()
+        return np.array([[0, 0], [0, 0]])
+
+    def _get_r_matrix(self, a1, a2):
+        """R matrix helper function from notebook."""
+        if a1 + a2 == 2:
+            matrix = np.array(
+                [
+                    [np.exp(-4 * np.pi * 1j / 5), 0],
+                    [0, np.exp(3 * np.pi * 1j / 5)],
+                ]
+            )
+        else:
+            matrix = np.array([[1, 0], [0, 1]])
+        return matrix
 
     def test_model_initialization(self, fibonacci_model):
         """Test that the model initializes correctly."""

@@ -233,6 +233,131 @@ def knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
     return component
 
 
+def _validate_sigma_states(state_f_, state_i_):
+    """Validate states for sigma computation."""
+    if not (check_state(state_f_) or check_state(state_i_)):
+        raise ValueError("States are not valid!")
+
+
+def _check_unchanged_qudits(state_i_, state_f_, m):
+    """Check if all qudits except m are unchanged."""
+    for ii, qudit in enumerate(state_i_["qudits"]):
+        if ii == m:
+            continue
+        elif qudit != state_f_["qudits"][ii]:
+            return False
+    return True
+
+
+def _check_unchanged_roots(state_i_, state_f_):
+    """Check if all roots are unchanged."""
+    for ii, root in enumerate(state_i_["roots"]):
+        if root != state_f_["roots"][ii]:
+            return False
+    return True
+
+
+def _compute_within_qudit_sigma(index_, state_f_, state_i_, m):
+    """Compute sigma amplitude for braiding within a qudit."""
+    amplitude = ising.sigma(
+        index=index_,
+        state_f=state_f_["qudits"][m],
+        state_i=state_i_["qudits"][m],
+    )
+
+    if not _check_unchanged_qudits(state_i_, state_f_, m):
+        return 0
+
+    if not _check_unchanged_roots(state_i_, state_f_):
+        return 0
+
+    return amplitude
+
+
+def _prepare_new_state(state_i_, state_f_, m):
+    """Prepare the new state for between-qudit braiding."""
+    new_state_i = deepcopy(state_i_)
+    new_state_i["qudits"][m][-1] = deepcopy(state_f_["qudits"][m][-1])
+    new_state_i["qudits"][m + 1] = deepcopy(state_f_["qudits"][m + 1])
+    return new_state_i
+
+
+def _extract_knitting_params_case1(new_state_i, state_i_, state_f_, m):
+    """Extract parameters for knitting matrix when m + 1 > 2."""
+    new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["roots"][m - 1]
+    jmoo = state_i_["roots"][m - 2]
+    jmo = state_i_["roots"][m - 1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _extract_knitting_params_case2(new_state_i, state_i_, state_f_, m):
+    """Extract parameters for knitting matrix when m + 1 == 2."""
+    new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["roots"][m - 1]
+    jmoo = state_i_["qudits"][0][-1]
+    jmo = state_i_["roots"][m - 1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _extract_knitting_params_case3(new_state_i, state_i_, state_f_, m):
+    """Extract parameters for knitting matrix when m + 1 == 1."""
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["qudits"][0][-1]
+    jmoo = 0
+    jmo = state_i_["qudits"][0][-1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _compute_between_qudits_sigma(state_i_, state_f_, m):
+    """Compute sigma amplitude for braiding between qudits."""
+    new_state_i = _prepare_new_state(state_i_, state_f_, m)
+
+    if m + 1 > 2:
+        params = _extract_knitting_params_case1(new_state_i, state_i_, state_f_, m)
+    elif m + 1 == 2:
+        params = _extract_knitting_params_case2(new_state_i, state_i_, state_f_, m)
+    else:  # m + 1 == 1
+        params = _extract_knitting_params_case3(new_state_i, state_i_, state_f_, m)
+
+    if params is None:
+        return 0
+
+    return knitting_matrix(*params)
+
+
 def sigma(index_, state_f_, state_i_):
     """
     Amplitude of getting state_f by applying the braiding operator
@@ -241,102 +366,20 @@ def sigma(index_, state_f_, state_i_):
     Returns:
         the component (state_f, state_i) of the sigma_{index} matrix
     """
-    if not (check_state(state_f_) or check_state(state_i_)):
-        raise ValueError("States are not valid!")
+    _validate_sigma_states(state_f_, state_i_)
 
-    # n_qudits = len(state_i_['qudits'])
     qudit_len = len(state_i_["qudits"][0])
 
-    amplitude = 0
-
-    # n modulo q > 0
+    # n modulo q > 0: braiding within a qudit
     if index_ % (qudit_len + 1) > 0:
-        # (qudit_len + 1) is number of anyons/qudit
-
         m = index_ // (qudit_len + 1)
-        amplitude = ising.sigma(
-            index=index_ % (qudit_len + 1),
-            state_f=state_f_["qudits"][m],
-            state_i=state_i_["qudits"][m],
+        return _compute_within_qudit_sigma(
+            index_ % (qudit_len + 1), state_f_, state_i_, m
         )
 
-        for ii, qudit in enumerate(state_i_["qudits"]):
-            if ii == m:
-                continue
-            elif qudit != state_f_["qudits"][ii]:
-                return 0
-
-        for ii, root in enumerate(state_i_["roots"]):
-            if root != state_f_["roots"][ii]:
-                return 0
-    # n modulo q = 0
-    else:
-        m = (index_ // (qudit_len + 1)) - 1
-
-        new_state_i = deepcopy(state_i_)
-        new_state_i["qudits"][m][-1] = deepcopy(state_f_["qudits"][m][-1])
-        new_state_i["qudits"][m + 1] = deepcopy(state_f_["qudits"][m + 1])
-        r"""
-            jm: int: j_m
-            jmo: int: j_{m-1}
-            jmoo: int: j_{m-2}
-            jmo_: int: j'_{m-1}
-            h: int: i_{m(q-1)}
-            i_: int: i'_{mq}
-            i: int: i_{mq}
-            jj_: list: [i'_{(m+1)1},....i'_{(m+1)q}]
-            jj: list: [i_{(m+1)1},....i_{(m+1)q}]
-        """
-        if m + 1 > 2:
-            new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["roots"][m - 1]
-            jmoo = state_i_["roots"][m - 2]
-            jmo = state_i_["roots"][m - 1]
-            jm = state_i_["roots"][m]
-
-        elif m + 1 == 2:
-            new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["roots"][m - 1]
-            jmoo = state_i_["qudits"][0][-1]
-            jmo = state_i_["roots"][m - 1]
-            jm = state_i_["roots"][m]
-
-        elif m + 1 == 1:
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["qudits"][0][-1]
-            jmoo = 0
-            jmo = state_i_["qudits"][0][-1]
-            jm = state_i_["roots"][m]
-
-        amplitude += knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
-
-    return amplitude
+    # n modulo q = 0: braiding between qudits
+    m = (index_ // (qudit_len + 1)) - 1
+    return _compute_between_qudits_sigma(state_i_, state_f_, m)
 
 
 def braiding_generator(index, n_qudits, qudit_len, show=True):
