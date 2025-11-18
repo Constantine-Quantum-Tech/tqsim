@@ -28,8 +28,10 @@ This model is designed to:
     + generates B (braiding) matrices.
     + calculates braiding generators (sigma_n).
 """
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
+
 from tqsim.tools.cplot import cplot
 
 
