@@ -44,15 +44,15 @@ def einsum_with_names(
     label_to_int: dict[str, int] = {}
     next_int = 0
 
-    def get_int(lbl):
+    def get_int(lbl: str) -> int:
         nonlocal next_int
         if lbl not in label_to_int:
             label_to_int[lbl] = next_int
             next_int += 1
         return label_to_int[lbl]
 
-    arrays = []
-    index_lists = []
+    arrays: list[np.ndarray] = []
+    index_lists: list[list[int]] = []
 
     # convert each term's label tuple into a list of integers
     for arr, labels in terms:
@@ -64,7 +64,7 @@ def einsum_with_names(
     out_idxs = [get_int(lbl) for lbl in output_labels]
 
     # build the einsum call: np.einsum(arr0, idx0, arr1, idx1, ..., out_idx_list)
-    einsum_args = []
+    einsum_args: list[np.ndarray | list[int]] = []
     for arr, idxs in zip(arrays, index_lists):
         einsum_args.append(arr)
         einsum_args.append(idxs)
@@ -80,7 +80,7 @@ MATPLOTLIB_INLINE_BACKENDS = {
 }
 
 
-def matplotlib_close_if_inline(figure):
+def matplotlib_close_if_inline(figure: mpl.figure.Figure) -> None:
     """Close the given matplotlib figure if the backend in use draws figures inline.
     If the backend does not draw figures inline, this does nothing.  This function is to prevent
     duplicate images appearing; the inline backends will capture the figure in preparation and
@@ -93,7 +93,7 @@ def matplotlib_close_if_inline(figure):
         matplotlib.pyplot.close(figure)
 
 
-def cplot(cmatrix, sigma=0.5, title=""):
+def cplot(cmatrix: np.ndarray, sigma: float = 0.5, title: str = "") -> None:
     """Plots a complex-valued matrix with color coding, and a color map.
     'Sigma' controls how much small values are colored. A lower value will
     emphasize small values more.
@@ -112,7 +112,7 @@ def cplot(cmatrix, sigma=0.5, title=""):
     None.
 
     """
-    img = []
+    img: list[list[list[float]]] = []
     for r, row in enumerate(cmatrix):
         img.append([])
         for c in row:
@@ -151,11 +151,11 @@ def cplot(cmatrix, sigma=0.5, title=""):
     return
 
 
-def scale(sigma=0.5):
+def scale(sigma: float = 0.5) -> list[list[list[float]]]:
     """
     Plot the scaling spectrum of the complex plane [-1, 1, -i, i]
     """
-    img = []
+    img: list[list[list[float]]] = []
     sc = 50
     for r in range(sc, -sc, -1):
         img.append([])
