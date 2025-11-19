@@ -18,6 +18,7 @@ import numpy as np
 from tqsim.config import STORE_PATH
 from tqsim.lib.anyon_state import (
     AnyonState,
+    ComputationalSparseAnyonState,
     SparseAnyonState,
     StandardAnyonState,
 )
@@ -83,9 +84,9 @@ class AnyonModel:
         n_symbols: np.ndarray,
         f_matrix: np.ndarray,
         r_matrix: np.ndarray,
-        name=None,
-        force_recache=False,
-    ):
+        name: str | None = None,
+        force_recache: bool = False,
+    ) -> None:
         assert n_symbols.ndim == 3, "N_symbols must be a 3D tensor"
         assert f_matrix.ndim == 6, "F_matrix must be a 6D tensor"
         assert r_matrix.ndim == 3, "R_matrix must be a 5D tensor"
@@ -102,7 +103,7 @@ class AnyonModel:
         self._f_matrix = f_matrix
         self._r_matrix = r_matrix
         self._b_matrix = self._compute_braiding_matrix()
-        self._k_matrices = {}
+        self._k_matrices: dict[int, np.ndarray] = {}
         self.nb_charges = self.n_symbols.shape[0]
 
         if name is None:
@@ -111,7 +112,7 @@ class AnyonModel:
             self._name = name
 
     @property
-    def n_symbols(self):
+    def n_symbols(self) -> np.ndarray:
         """Returns the fusion rules N symbols tensor.
 
         Returns
@@ -123,7 +124,7 @@ class AnyonModel:
         return self._n_symbols
 
     @property
-    def f_matrix(self):
+    def f_matrix(self) -> np.ndarray:
         """Returns the F matrix tensor.
 
         Returns
@@ -135,7 +136,7 @@ class AnyonModel:
         return self._f_matrix
 
     @property
-    def r_matrix(self):
+    def r_matrix(self) -> np.ndarray:
         """Returns the R matrix tensor.
 
         Returns
@@ -147,7 +148,7 @@ class AnyonModel:
         return self._r_matrix
 
     @property
-    def b_matrix(self):
+    def b_matrix(self) -> np.ndarray:
         """Returns the braiding matrix tensor.
 
         Returns
@@ -162,7 +163,7 @@ class AnyonModel:
         return self._b_matrix
 
     @property
-    def k_matrices(self):
+    def k_matrices(self) -> dict[int, np.ndarray]:
         """Returns the K matrices dictionary.
 
         Returns
@@ -174,7 +175,7 @@ class AnyonModel:
         return self._k_matrices
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Returns the name of the anyon model.
 
         Returns
@@ -209,7 +210,7 @@ class AnyonModel:
         # check that n_symbols[anyon1[i], anyon2[i], outcome[i]] == 1 for all i
         return self.n_symbols[anyon1, anyon2, outcome] == np.ones_like(anyon1)
 
-    def _compute_braiding_matrix(self):
+    def _compute_braiding_matrix(self) -> np.ndarray:
         r"""Computes the braiding matrix for the anyon model.
 
         [ B_{abc}^j ]_{im} = sum_l [ F_{abc}^j ]_{il} R_{bc}^l
@@ -229,7 +230,7 @@ class AnyonModel:
         )
         return b_matrix
 
-    def _compute_l_matrix(self, q: int):
+    def _compute_l_matrix(self, q: int) -> np.ndarray:
         r"""
         [L_{ a(m,q) a(m+1, 0), ..., a(m+1, q), i(m,q-1)}^{p(q+1)}]^{
         i(m,q) i(m+1,1) ... i(m+1,q)
@@ -262,7 +263,7 @@ class AnyonModel:
         assert q > 0, (
             "q must be strictly positive. " "For q=1, L is just the braiding matrix."
         )
-        terms = []
+        terms: list[tuple[np.ndarray, tuple[str, ...]]] = []
 
         # --- Left product of q dagger-F factors
         r = 1
@@ -329,7 +330,7 @@ class AnyonModel:
         # }_{
         # i'(m,q), i'(m+1,0) ... i'(m+1,q)
         # }
-        out_labels = (
+        out_labels = tuple(
             [f"a(m,{q})"]
             + ["a(m+1,0)"]
             + [f"a(m+1,{q-r+1})" for r in range(1, q + 1)]
@@ -344,7 +345,7 @@ class AnyonModel:
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
 
-    def compute_knitting_matrix(self, q: int, return_l=False):
+    def compute_knitting_matrix(self, q: int, return_l: bool = False) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
         r"""
         See Appendix of https://arxiv.org/abs/2307.01892
 
@@ -398,7 +399,7 @@ class AnyonModel:
             "q must be strictly positive. " "For q=0, K is just the braiding matrix."
         )
 
-        terms = []
+        terms: list[tuple[np.ndarray, tuple[str, ...]]] = []
 
         # --- Left F factor ---
         # Example label order (must match how F is actually stored):
@@ -480,7 +481,7 @@ class AnyonModel:
             return k, l_matrix
         return k
 
-    def check_state(self, state) -> bool:
+    def check_state(self, state: AnyonState) -> bool:
         if isinstance(state, SparseAnyonState):
             return self.check_sparse_state(
                 state.charges, state.nb_qudits, state.nb_anyons_per_qudit
@@ -524,7 +525,7 @@ class AnyonModel:
         anyon_2[0] = inputs[0]
         anyon_2[1::] = outcomes[0:-1]
         rules = self.check_rule(anyon_1, anyon_2, outcomes)
-        return np.all(rules)
+        return bool(np.all(rules))
 
     def check_sparse_state(
         self, charges: np.ndarray, nb_qudits: int, nb_anyons_per_qudit: int
@@ -602,14 +603,14 @@ class AnyonModel:
             ]
             fusion_tree = []
         """
-        pass
+        raise NotImplementedError("check_general_state is not yet implemented")
 
     def compute_standard_braid_component(
         self,
         initial_state: StandardAnyonState,
         braid_index: int,
         final_state: StandardAnyonState,
-    ):
+    ) -> complex:
         """
         Computes the probability amplitudes of getting a final anyon state
         from braiding two anyons (of indices i and i+1) in the initial anyon state.
@@ -686,7 +687,7 @@ class AnyonModel:
         initial_state: SparseAnyonState,
         braid_index: int,
         final_state: SparseAnyonState,
-    ):
+    ) -> None:
         """Validate inputs for sparse braid inner product computation."""
         assert braid_index > 0, "braid_index must be greater than 0"
         assert braid_index < (
@@ -709,7 +710,7 @@ class AnyonModel:
         initial_state: SparseAnyonState,
         final_state: SparseAnyonState,
         braid_index: int,
-    ):
+    ) -> bool:
         """Check if permuted initial inputs match final inputs."""
         initial_inputs = deepcopy(initial_state.get_inputs())
         final_inputs = deepcopy(final_state.get_inputs())
@@ -728,13 +729,10 @@ class AnyonModel:
         qudit_index: int,
         remainder: int,
         nb_qudits: int,
-    ):
+    ) -> complex:
         """Compute braiding within a single qudit."""
         for qudit in range(nb_qudits):
-            if not np.array_equal(
-                initial_state.get_qudit_state(qudit),
-                final_state.get_qudit_state(qudit),
-            ):
+            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(qudit):
                 if qudit != qudit_index:
                     return 0.0 + 0.0j
 
@@ -761,13 +759,10 @@ class AnyonModel:
         first_qudit_index: int,
         second_qudit_index: int,
         nb_qudits: int,
-    ):
+    ) -> bool:
         """Validate that only the two braided qudits can differ."""
         for qudit in range(nb_qudits):
-            if not np.array_equal(
-                initial_state.get_qudit_state(qudit),
-                final_state.get_qudit_state(qudit),
-            ):
+            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(qudit):
                 if qudit not in [first_qudit_index, second_qudit_index]:
                     return False
         return True
@@ -779,7 +774,7 @@ class AnyonModel:
         m: int,
         nb_qudits: int,
         nb_anyons_per_qudit: int,
-    ):
+    ) -> bool:
         """Validate outcomes for braiding between qudits."""
         initial_outcomes = deepcopy(
             initial_state.charges[
@@ -825,7 +820,7 @@ class AnyonModel:
         q: int,
         nb_qudits: int,
         nb_anyons_per_qudit: int,
-    ):
+    ) -> list[int]:
         """Extract j charges for knitting matrix computation."""
         j = []
         if m == 0:
@@ -877,7 +872,7 @@ class AnyonModel:
         second_qudit_index: int,
         nb_qudits: int,
         nb_anyons_per_qudit: int,
-    ):
+    ) -> complex:
         """Compute braiding between two qudits."""
         m = first_qudit_index
 
@@ -963,16 +958,15 @@ class AnyonModel:
 
         knitting_matrix = self._k_matrices.get(q, self.compute_knitting_matrix(q=q))
 
-        return knitting_matrix[
-            *a, i[0], j[0], j[2], j[1], *i[1::], j_prime[0], *i_prime
-        ]
+        index = tuple([*a, i[0], j[0], j[2], j[1], *i[1::], j_prime[0], *i_prime])
+        return complex(knitting_matrix[index])  # type: ignore[call-overload]
 
     def compute_sparse_braid_inner_product(
         self,
         initial_state: SparseAnyonState,
         braid_index: int,
         final_state: SparseAnyonState,
-    ):
+    ) -> complex:
         """
         Computes the probability amplitudes of getting a final anyon state
         from braiding two anyons (of indices i and i+1) in the initial anyon state.
@@ -1018,8 +1012,8 @@ class AnyonModel:
             )
 
     def generate_computational_braiding_operator(
-        self, index: int, basis: list[AnyonState]
-    ):
+        self, index: int, basis: list[ComputationalSparseAnyonState]
+    ) -> np.ndarray:
         """Generates the braiding operator of index 'index' for a system of
         a given number of qudits and anyons per qudit.
         This operator braids anyons at positions 'index' and 'index'+1.
