@@ -1,7 +1,18 @@
 """
-Created on Thu Aug 27 21:54:22 2020
 
-@author: abduhu
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2025.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+Created on Thu Aug 27 21:54:22 2020
 
 Complex unitary matrix plotting
 ********
@@ -17,7 +28,7 @@ import numpy as np
 import seaborn as sns
 
 
-def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
+def cplot(unitary: "np.ndarray", title: str = "", sigma: float = 0.5, show: bool = True, ticks: list[str] | None = None) -> None:
     """
     Plots complex matrix using chromatic values.
     """
@@ -33,7 +44,7 @@ def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
     # sns.set_style("whitegrid", {"grid.linestyle": ":"})
 
     dims = unitary.shape
-    img = []
+    img: list[list[tuple[float, float, float]]] = []
     for r, row in enumerate(unitary):
         img.append([])
         for c in row:
@@ -54,7 +65,7 @@ def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
             rad = sqrt(x**2 + y**2)
             lum = 0.5 + 0.5 * exp(-rad / sigma)
             if rad > 2:
-                sat = 0
+                sat = 0.0
             else:
                 sat = cos(pi * rad / 2) * 0.5 + 0.5
             img[-1].append(hls_to_rgb(hue, lum, sat))
@@ -79,7 +90,7 @@ def cplot(unitary: "np.ndarray", title="", sigma=0.5, show=True, ticks=None):
         plt.close()
 
 
-def scale(sigma=0.5, title="scale", show=True):
+def scale(sigma: float = 0.5, title: str = "scale", show: bool = True) -> None:
     """
     Plot the scaling spectrum of the complex plane [-1, 1, -i, i]
     """
@@ -100,11 +111,7 @@ def scale(sigma=0.5, title="scale", show=True):
     rad = np.tile(np.linspace(0, 1, num_points).reshape((num_points, 1)), num_points)
     theta = np.tile(np.linspace(0, 2 * pi, num_points), (num_points, 1))
 
-    color = np.ones((num_points, num_points, 3))
-    # color[:, :, 0] = abs(np.sin(theta/2 + 2*pi/3))
-    # color[:, :, 1] = abs(np.sin(theta/2 ))
-    # color[:, :, 2] = abs(np.sin(theta/2 + pi/3))
-    # color[:, :, 3] = abs(rad)
+    color = np.ones((num_points, num_points, 3), dtype=float)
 
     for t in range(num_points):
         for r in range(num_points):
