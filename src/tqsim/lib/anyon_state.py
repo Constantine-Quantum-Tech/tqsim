@@ -10,16 +10,22 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from tqsim.lib.anyon_model import AnyonModel
 
 
 class AnyonState(ABC):
     """Abstract base class for anyonic states."""
 
     @abstractmethod
-    def is_valid(self, model):
+    def is_valid(self, model: AnyonModel) -> bool:
         pass
 
 
@@ -50,18 +56,20 @@ class StandardAnyonState(AnyonState):
             len(outcomes) == len(inputs) - 1
         ), "Number of outcomes must be one less than number of inputs."
 
-    def __eq__(self, value):
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, StandardAnyonState):
+            return False
         return np.array_equal(self.inputs, value.inputs) and np.array_equal(
             self.outcomes, value.outcomes
         )
 
-    def is_valid(self, model):
+    def is_valid(self, model: AnyonModel) -> bool:
         return model.check_state(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"StandardAnyonState(inputs={self.inputs}, " f"outcomes={self.outcomes})"
 
-    def inner_product(self, other):
+    def inner_product(self, other: "StandardAnyonState") -> float:
         """Compute the inner product between two StandardAnyonState instances.
 
         Parameters
@@ -116,17 +124,19 @@ class SparseAnyonState(AnyonState):
             nb_qudits - 1
         ), "Charges length does not match the number of qudits and anyons per qudit."
 
-    def __eq__(self, value):
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, SparseAnyonState):
+            return False
         return (
             np.array_equal(self.charges, value.charges)
             and self.nb_qudits == value.nb_qudits
             and self.nb_anyons_per_qudit == value.nb_anyons_per_qudit
         )
 
-    def is_valid(self, model):
+    def is_valid(self, model: AnyonModel) -> bool:
         return model.check_state(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         # Create a string representation of the SparseAnyonState
         return (
             f"SparseAnyonState(charges={self.charges}, "
@@ -134,10 +144,10 @@ class SparseAnyonState(AnyonState):
             f"nb_anyons_per_qudit={self.nb_anyons_per_qudit})"
         )
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> np.ndarray:
         return self.charges[index]
 
-    def get_qudit_state(self, qudit_index):
+    def get_qudit_state(self, qudit_index: int) -> StandardAnyonState:
         """Retrieve the charges corresponding to a specific qudit
         as StandardAnyonState.
 
@@ -166,7 +176,7 @@ class SparseAnyonState(AnyonState):
             outcomes=self.charges[outcomes_start:outcomes_end],
         )
 
-    def get_inputs(self):
+    def get_inputs(self) -> np.ndarray:
         """Retrieve the inputs of the SparseAnyonState.
 
         Returns
@@ -177,7 +187,7 @@ class SparseAnyonState(AnyonState):
         total_inputs = self.nb_qudits * self.nb_anyons_per_qudit
         return self.charges[:total_inputs]
 
-    def get_outcomes(self):
+    def get_outcomes(self) -> np.ndarray:
         """Retrieve the outcomes of the SparseAnyonState.
 
         Returns
@@ -188,7 +198,7 @@ class SparseAnyonState(AnyonState):
         total_outcomes = self.nb_qudits - 1
         return self.charges[-total_outcomes:]
 
-    def inner_product(self, other):
+    def inner_product(self, other: "SparseAnyonState") -> float:
         """Compute the inner product between two SparseAnyonState instances.
 
         Parameters
@@ -253,7 +263,9 @@ class ComputationalSparseAnyonState(AnyonState):
             nb_qudits - 1
         ), "Charges length does not match the number of qudits and anyons per qudit."
 
-    def __eq__(self, value):
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, ComputationalSparseAnyonState):
+            return False
         return (
             np.array_equal(self.charges, value.charges)
             and self.nb_qudits == value.nb_qudits
@@ -261,7 +273,7 @@ class ComputationalSparseAnyonState(AnyonState):
             and self.input_charge == value.input_charge
         )
 
-    def is_valid(self, model):
+    def is_valid(self, model: AnyonModel) -> bool:
         sparse_state = SparseAnyonState(
             charges=np.concatenate(
                 (
@@ -277,7 +289,7 @@ class ComputationalSparseAnyonState(AnyonState):
         )
         return model.check_state(sparse_state)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"ComputationalSparseAnyonState(charges={self.charges}, "
             f"nb_qudits={self.nb_qudits}, "
@@ -285,7 +297,7 @@ class ComputationalSparseAnyonState(AnyonState):
             f"input_charge={self.input_charge})"
         )
 
-    def inner_product(self, other):
+    def inner_product(self, other: object) -> float:
         """Compute the inner product between two ComputationalSparseAnyonState instances.
 
         Parameters

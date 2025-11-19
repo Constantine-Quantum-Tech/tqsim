@@ -44,7 +44,7 @@ def get_fusion_matrix(k: int) -> np.ndarray:
     return fusion_matrix
 
 
-def get_f_matrix(k: int):
+def get_f_matrix(k: int) -> np.ndarray:
     """
     Placeholder for the F matrix function for SU(2)_k.
     The actual implementation would depend on the specific details of the SU(2)_k model.
@@ -56,28 +56,28 @@ def get_f_matrix(k: int):
 
     Returns
     -------
-    function
-        A function that computes the F matrix for given inputs.
+    np.ndarray
+        A 6D numpy array representing the F matrix.
     """
     q = np.exp(2j * np.pi / (k + 2))
 
-    def crochet(n):
+    def crochet(n: int | float | np.ndarray) -> complex | np.ndarray:
         """
         crochet = [n]_q
                 = (q**(n/2) - q**(-n/2)) / (q**(1/2) - q**(-1/2))
         """
         return (q ** (n / 2) - q ** (-n / 2)) / (q ** (1 / 2) - q ** (-1 / 2))
 
-    def crochet_factorial(n):
+    def crochet_factorial(n: int | float | np.ndarray) -> complex | int | np.complexfloating:
         """
         [n]_q! = [n]_q [n-1]_q ... [1]_q
         """
-        val = np.prod(crochet(np.arange(1, n + 1))) if n > 0 else 1
+        val: complex | int | np.complexfloating = np.prod(crochet(np.arange(1, n + 1))) if n > 0 else 1
         # print(f"crochet_factorial({n}) = {val}")
         return val
 
     # delta = lambda j1, j2, j3: np.sqrt(
-    def delta(j1, j2, j3):
+    def delta(j1: int | float, j2: int | float, j3: int | float) -> complex | np.complexfloating:
         """
         Delta(j1, j2, j3) = sqrt(
             [-j1 + j2 + j3]_q! *
@@ -94,7 +94,14 @@ def get_f_matrix(k: int):
         )
         return val
 
-    def braceq(j1, j2, j3, j, j12, j23):
+    def braceq(
+        j1: int | float,
+        j2: int | float,
+        j3: int | float,
+        j: int | float,
+        j12: int | float,
+        j23: int | float,
+    ) -> complex | np.complexfloating:
         """
         { j1 j2 j12 }
         { j3  j  j23 } =
@@ -178,7 +185,7 @@ def get_r_matrix(k: int) -> np.ndarray:
     r_matrix = np.zeros((dim, dim, dim), dtype=complex)
     q = np.exp(2j * np.pi / (k + 2))
 
-    def crochet(n):
+    def crochet(n: int | float | np.ndarray) -> complex | np.ndarray:
         """
         crochet = [n]_q
                 = (q**(n/2) - q**(-n/2)) / (q**(1/2) - q**(-1/2))

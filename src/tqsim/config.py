@@ -17,7 +17,7 @@ CONFIG_PATH = os.path.join(os.path.expanduser("~"), f".{PROGRAM_NAME}")
 STORE_PATH = os.path.join(CONFIG_PATH, "store")
 
 
-def clean_config_path():
+def clean_config_path() -> None:
     """Cleans up the configuration directory by removing all files and subdirectories."""
     if os.path.exists(CONFIG_PATH):
         for root, dirs, files in os.walk(CONFIG_PATH, topdown=False):
