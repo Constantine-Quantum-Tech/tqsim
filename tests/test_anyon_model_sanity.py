@@ -85,7 +85,15 @@ def test_k_matrix_fib_and_ising() -> None:
     k_matrix = fib_model.compute_knitting_matrix(q)
 
     def new_k(
-        jm: int, jmo: int, jmoo: int, jmo_: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]
+        jm: int,
+        jmo: int,
+        jmoo: int,
+        jmo_: int,
+        h: int,
+        i_: int,
+        i: int,
+        jj_: list[int],
+        jj: list[int],
     ) -> Any:
         return k_matrix[tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)]  # type: ignore[call-overload]
 
@@ -103,7 +111,15 @@ def test_k_matrix_fib_and_ising() -> None:
     k_matrix = ising_model.compute_knitting_matrix(q)
 
     def new_k_ising(
-        jm: int, jmo: int, jmoo: int, jmo_: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]
+        jm: int,
+        jmo: int,
+        jmoo: int,
+        jmo_: int,
+        h: int,
+        i_: int,
+        i: int,
+        jj_: list[int],
+        jj: list[int],
     ) -> Any:
         return k_matrix[tuple(a + [h, jmoo, jm, jmo, i] + jj + [jmo_, i_] + jj_)]  # type: ignore[call-overload]
 

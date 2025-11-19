@@ -68,16 +68,22 @@ def get_f_matrix(k: int) -> np.ndarray:
         """
         return (q ** (n / 2) - q ** (-n / 2)) / (q ** (1 / 2) - q ** (-1 / 2))
 
-    def crochet_factorial(n: int | float | np.ndarray) -> complex | int | np.complexfloating:
+    def crochet_factorial(
+        n: int | float | np.ndarray,
+    ) -> complex | int | np.complexfloating:
         """
         [n]_q! = [n]_q [n-1]_q ... [1]_q
         """
-        val: complex | int | np.complexfloating = np.prod(crochet(np.arange(1, n + 1))) if n > 0 else 1
+        val: complex | int | np.complexfloating = (
+            np.prod(crochet(np.arange(1, n + 1))) if n > 0 else 1
+        )
         # print(f"crochet_factorial({n}) = {val}")
         return val
 
     # delta = lambda j1, j2, j3: np.sqrt(
-    def delta(j1: int | float, j2: int | float, j3: int | float) -> complex | np.complexfloating:
+    def delta(
+        j1: int | float, j2: int | float, j3: int | float
+    ) -> complex | np.complexfloating:
         """
         Delta(j1, j2, j3) = sqrt(
             [-j1 + j2 + j3]_q! *

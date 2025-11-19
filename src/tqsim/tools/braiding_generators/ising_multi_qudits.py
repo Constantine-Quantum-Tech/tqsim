@@ -218,7 +218,17 @@ def l_matrix(k: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]) -> 
     return component
 
 
-def knitting_matrix(jm: int, jmo: int, jmoo: int, jmo_: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]) -> complex:
+def knitting_matrix(
+    jm: int,
+    jmo: int,
+    jmoo: int,
+    jmo_: int,
+    h: int,
+    i_: int,
+    i: int,
+    jj_: list[int],
+    jj: list[int],
+) -> complex:
     r"""
     S matrix or sewing matrix is used in calculation of braiding operator
     between two anyons separated between two qudits not fused imedialtely.
@@ -270,7 +280,9 @@ def _check_unchanged_roots(state_i_: dict, state_f_: dict) -> bool:
     return True
 
 
-def _compute_within_qudit_sigma(index_: int, state_f_: dict, state_i_: dict, m: int) -> complex:
+def _compute_within_qudit_sigma(
+    index_: int, state_f_: dict, state_i_: dict, m: int
+) -> complex:
     """Compute sigma amplitude for braiding within a qudit."""
     amplitude = ising.sigma(
         index=index_,
@@ -295,7 +307,9 @@ def _prepare_new_state(state_i_: dict, state_f_: dict, m: int) -> dict:
     return new_state_i
 
 
-def _extract_knitting_params_case1(new_state_i: dict, state_i_: dict, state_f_: dict, m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+def _extract_knitting_params_case1(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 > 2."""
     new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
     if new_state_i != state_f_:
@@ -315,7 +329,9 @@ def _extract_knitting_params_case1(new_state_i: dict, state_i_: dict, state_f_: 
     return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
 
-def _extract_knitting_params_case2(new_state_i: dict, state_i_: dict, state_f_: dict, m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+def _extract_knitting_params_case2(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 == 2."""
     new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
     if new_state_i != state_f_:
@@ -335,7 +351,9 @@ def _extract_knitting_params_case2(new_state_i: dict, state_i_: dict, state_f_: 
     return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
 
-def _extract_knitting_params_case3(new_state_i: dict, state_i_: dict, state_f_: dict, m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+def _extract_knitting_params_case3(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 == 1."""
     if new_state_i != state_f_:
         return None
@@ -395,7 +413,9 @@ def sigma(index_: int, state_f_: dict, state_i_: dict) -> complex:
     return _compute_between_qudits_sigma(state_i_, state_f_, m)
 
 
-def braiding_generator(index: int, n_qudits: int, qudit_len: int, show: bool = True) -> tuple[list[list[complex]], list[dict]]:
+def braiding_generator(
+    index: int, n_qudits: int, qudit_len: int, show: bool = True
+) -> tuple[list[list[complex]], list[dict]]:
     r"""
     calculates matrix representation of the braiding generator -in the basis
     of multi-qudit fusion space- which exchanges

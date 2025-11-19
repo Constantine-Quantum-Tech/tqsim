@@ -345,7 +345,9 @@ class AnyonModel:
         # Call the helper from earlier
         return einsum_with_names(terms, out_labels)
 
-    def compute_knitting_matrix(self, q: int, return_l: bool = False) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
+    def compute_knitting_matrix(
+        self, q: int, return_l: bool = False
+    ) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
         r"""
         See Appendix of https://arxiv.org/abs/2307.01892
 
@@ -732,7 +734,9 @@ class AnyonModel:
     ) -> complex:
         """Compute braiding within a single qudit."""
         for qudit in range(nb_qudits):
-            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(qudit):
+            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(
+                qudit
+            ):
                 if qudit != qudit_index:
                     return 0.0 + 0.0j
 
@@ -762,7 +766,9 @@ class AnyonModel:
     ) -> bool:
         """Validate that only the two braided qudits can differ."""
         for qudit in range(nb_qudits):
-            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(qudit):
+            if initial_state.get_qudit_state(qudit) != final_state.get_qudit_state(
+                qudit
+            ):
                 if qudit not in [first_qudit_index, second_qudit_index]:
                     return False
         return True

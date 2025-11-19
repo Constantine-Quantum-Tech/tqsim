@@ -141,7 +141,9 @@ def _get_f_matrix_sum_3() -> npt.NDArray[np.int64]:
     return np.array([[0, 0], [0, 1]])
 
 
-def _get_f_matrix_sum_2(a1: int, a2: int, a3: int, outcome: int) -> npt.NDArray[np.int64]:
+def _get_f_matrix_sum_2(
+    a1: int, a2: int, a3: int, outcome: int
+) -> npt.NDArray[np.int64]:
     """Get F matrix when sum = 2."""
     if a1 + a2 == 2:
         return np.array([[0, 1], [0, 0]])
@@ -199,7 +201,9 @@ def r_matrix(a1: int, a2: int) -> npt.NDArray[np.complex128]:
     return r_matrix.astype(complex)
 
 
-def braiding_matrix(a0: int, a1: int, a2: int, outcome: int) -> npt.NDArray[np.complex128]:
+def braiding_matrix(
+    a0: int, a1: int, a2: int, outcome: int
+) -> npt.NDArray[np.complex128]:
     """
     Braiding matrix
     """
@@ -265,7 +269,7 @@ def braiding_generator(
     basis = find_basis(n_anyons)
 
     # compute components of the braiding matrix
-    sig : list[list[complex]] = []
+    sig: list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):

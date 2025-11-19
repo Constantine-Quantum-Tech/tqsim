@@ -28,7 +28,13 @@ import numpy as np
 import seaborn as sns  # type: ignore[import-untyped]
 
 
-def cplot(unitary: "np.ndarray", title: str = "", sigma: float = 0.5, show: bool = True, ticks: list[str] | None = None) -> None:
+def cplot(
+    unitary: "np.ndarray",
+    title: str = "",
+    sigma: float = 0.5,
+    show: bool = True,
+    ticks: list[str] | None = None,
+) -> None:
     """
     Plots complex matrix using chromatic values.
     """

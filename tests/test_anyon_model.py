@@ -71,7 +71,9 @@ class TestAnyonModel:
         """Get F matrix when sum = 3."""
         return np.array([[0, 0], [0, 1]])
 
-    def _get_f_matrix_sum_2(self, a1: int, a2: int, a3: int, outcome: int) -> np.ndarray:
+    def _get_f_matrix_sum_2(
+        self, a1: int, a2: int, a3: int, outcome: int
+    ) -> np.ndarray:
         """Get F matrix when sum = 2."""
         if a1 + a2 == 2:
             return np.array([[0, 1], [0, 0]])
@@ -142,7 +144,9 @@ class TestAnyonModel:
             l1.shape == expected_shape
         ), f"Expected shape {expected_shape}, got {l1.shape}"
 
-    def test_l_matrix_computation_q0_raises_error(self, fibonacci_model: AnyonModel) -> None:
+    def test_l_matrix_computation_q0_raises_error(
+        self, fibonacci_model: AnyonModel
+    ) -> None:
         """Test that L matrix computation for q=0 raises AssertionError as observed in notebook."""
         with pytest.raises(AssertionError, match="q must be strictly positive"):
             fibonacci_model._compute_l_matrix(q=0)
@@ -152,9 +156,13 @@ class TestAnyonModel:
         k1 = fibonacci_model.compute_knitting_matrix(q=1, return_l=False)
         assert isinstance(k1, np.ndarray)
         expected_shape = (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
-        assert k1.shape == expected_shape, f"Expected shape {expected_shape}, got {k1.shape}"
+        assert (
+            k1.shape == expected_shape
+        ), f"Expected shape {expected_shape}, got {k1.shape}"
 
-    def test_knitting_matrix_computation_q0_raises_error(self, fibonacci_model: AnyonModel) -> None:
+    def test_knitting_matrix_computation_q0_raises_error(
+        self, fibonacci_model: AnyonModel
+    ) -> None:
         """Test that knitting matrix computation for q=0 raises AssertionError as observed in notebook."""
         with pytest.raises(AssertionError, match="q must be strictly positive"):
             fibonacci_model.compute_knitting_matrix(q=0)

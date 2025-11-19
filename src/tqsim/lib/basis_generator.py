@@ -89,7 +89,9 @@ class SparseBasisGenerator(BasisGenerator):
     def __init__(self, model: AnyonModel):
         self.model = model
 
-    def generate_basis(self, nb_qudits: int, nb_anyons_per_qudit: int) -> list[SparseAnyonState]:
+    def generate_basis(
+        self, nb_qudits: int, nb_anyons_per_qudit: int
+    ) -> list[SparseAnyonState]:
         """Generates all the basis states for a system of a given number of
         qudits, and a given number of anyons per qudit.
 
