@@ -42,13 +42,15 @@ illustrated by the following example:
 """
 
 from copy import deepcopy
+from typing import Any
 
+import numpy as np
 import tqsim.tools.braiding_generators.fib_qudit as fibo
 from tqsim.tools.braiding_generators.fib_qudit import braiding_matrix, f_matrix
 from tqsim.tools.cplot import cplot
 
 
-def check_state(state):
+def check_state(state: dict[str, Any]) -> bool:
     r"""
     Verifies if a state of 'n_qudits' qudit of 'qudit_len' number
     of anyons represented in the tonsorial form is acceptable in
@@ -98,9 +100,9 @@ def check_state(state):
     return check
 
 
-def _fill_state(labels, n_qudits, qudit_len, n_roots):
+def _fill_state(labels: list[int], n_qudits: int, qudit_len: int, n_roots: int) -> dict[str, Any]:
     """Helper function to fill a state from a label list."""
-    state = {"qudits": [], "roots": []}
+    state: dict[str, Any] = {"qudits": [], "roots": []}
     for ii in range(n_qudits):
         state["qudits"].append([])
         for jj in range(qudit_len):
@@ -119,14 +121,14 @@ def _fill_state(labels, n_qudits, qudit_len, n_roots):
     return state
 
 
-def _initialize_combinations(n_labels):
+def _initialize_combinations(n_labels: int) -> tuple[list[int], list[int]]:
     """Initialize starting and ending combinations."""
     new_comb = [0] * n_labels
     final_comb = [1] * n_labels
     return new_comb, final_comb
 
 
-def _increment_combination(comb):
+def _increment_combination(comb: list[int]) -> None:
     """Increment a binary combination in place."""
     for ii, label in enumerate(comb):
         if label == 0:
@@ -136,7 +138,7 @@ def _increment_combination(comb):
             comb[ii] = 0
 
 
-def _generate_valid_states(new_comb, final_comb, n_qudits, qudit_len, n_roots):
+def _generate_valid_states(new_comb: list[int], final_comb: list[int], n_qudits: int, qudit_len: int, n_roots: int) -> list[dict[str, Any]]:
     """Generate all valid states from combinations."""
     states = []
     new_state = _fill_state(new_comb, n_qudits, qudit_len, n_roots)
@@ -152,7 +154,7 @@ def _generate_valid_states(new_comb, final_comb, n_qudits, qudit_len, n_roots):
     return states
 
 
-def find_basis(n_qudits, qudit_len):
+def find_basis(n_qudits: int, qudit_len: int) -> list[dict[str, Any]]:
     """
     generates all states that form the basis of Hilbert space
     of anyons grouped by qudits and fused qudit by qudit.
@@ -170,7 +172,7 @@ def find_basis(n_qudits, qudit_len):
     return _generate_valid_states(new_comb, final_comb, n_qudits, qudit_len, n_roots)
 
 
-def l_matrix(k, h, i_, i, jj_, jj):
+def l_matrix(k: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]) -> complex:
     r"""
     L matrix component that is used in calculation of braiding between
     two anyons separated in two qudits.
@@ -233,7 +235,7 @@ def l_matrix(k, h, i_, i, jj_, jj):
     return component
 
 
-def knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+def knitting_matrix(jm: int, jmo: int, jmoo: int, jmo_: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]) -> complex:
     r"""
     K matrix or sewing matrix is used in calculation of braiding operator
     between two anyons separated between two qudits not fused imedialtely.
@@ -261,13 +263,13 @@ def knitting_matrix(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
     return component
 
 
-def _validate_sigma_states(state_f_, state_i_):
+def _validate_sigma_states(state_f_: dict[str, Any], state_i_: dict[str, Any]) -> None:
     """Validate states for sigma computation."""
     if not (check_state(state_f_) or check_state(state_i_)):
         raise ValueError("States are not valid!")
 
 
-def _check_unchanged_qudits(state_i_, state_f_, m):
+def _check_unchanged_qudits(state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> bool:
     """Check if all qudits except m are unchanged."""
     for ii, qudit in enumerate(state_i_["qudits"]):
         if ii == m:
@@ -277,7 +279,7 @@ def _check_unchanged_qudits(state_i_, state_f_, m):
     return True
 
 
-def _check_unchanged_roots(state_i_, state_f_):
+def _check_unchanged_roots(state_i_: dict[str, Any], state_f_: dict[str, Any]) -> bool:
     """Check if all roots are unchanged."""
     for ii, root in enumerate(state_i_["roots"]):
         if root != state_f_["roots"][ii]:
@@ -285,7 +287,7 @@ def _check_unchanged_roots(state_i_, state_f_):
     return True
 
 
-def _compute_within_qudit_sigma(index_, state_f_, state_i_, m):
+def _compute_within_qudit_sigma(index_: int, state_f_: dict[str, Any], state_i_: dict[str, Any], m: int) -> complex:
     """Compute sigma amplitude for braiding within a qudit."""
     amplitude = fibo.sigma(
         index=index_,
@@ -302,7 +304,7 @@ def _compute_within_qudit_sigma(index_, state_f_, state_i_, m):
     return amplitude
 
 
-def _prepare_new_state(state_i_, state_f_, m):
+def _prepare_new_state(state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> dict[str, Any]:
     """Prepare the new state for between-qudit braiding."""
     new_state_i = deepcopy(state_i_)
     new_state_i["qudits"][m][-1] = deepcopy(state_f_["qudits"][m][-1])
@@ -310,7 +312,7 @@ def _prepare_new_state(state_i_, state_f_, m):
     return new_state_i
 
 
-def _extract_knitting_params_case1(new_state_i, state_i_, state_f_, m):
+def _extract_knitting_params_case1(new_state_i: dict[str, Any], state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 > 2."""
     new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
     if new_state_i != state_f_:
@@ -330,7 +332,7 @@ def _extract_knitting_params_case1(new_state_i, state_i_, state_f_, m):
     return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
 
-def _extract_knitting_params_case2(new_state_i, state_i_, state_f_, m):
+def _extract_knitting_params_case2(new_state_i: dict[str, Any], state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 == 2."""
     new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
     if new_state_i != state_f_:
@@ -350,7 +352,7 @@ def _extract_knitting_params_case2(new_state_i, state_i_, state_f_, m):
     return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
 
-def _extract_knitting_params_case3(new_state_i, state_i_, state_f_, m):
+def _extract_knitting_params_case3(new_state_i: dict[str, Any], state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
     """Extract parameters for knitting matrix when m + 1 == 1."""
     if new_state_i != state_f_:
         return None
@@ -369,7 +371,7 @@ def _extract_knitting_params_case3(new_state_i, state_i_, state_f_, m):
     return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
 
 
-def _compute_between_qudits_sigma(state_i_, state_f_, m):
+def _compute_between_qudits_sigma(state_i_: dict[str, Any], state_f_: dict[str, Any], m: int) -> complex:
     """Compute sigma amplitude for braiding between qudits."""
     new_state_i = _prepare_new_state(state_i_, state_f_, m)
 
@@ -386,7 +388,7 @@ def _compute_between_qudits_sigma(state_i_, state_f_, m):
     return knitting_matrix(*params)
 
 
-def sigma(index_, state_f_, state_i_):
+def sigma(index_: int, state_f_: dict[str, Any], state_i_: dict[str, Any]) -> complex:
     """
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -410,7 +412,7 @@ def sigma(index_, state_f_, state_i_):
     return _compute_between_qudits_sigma(state_i_, state_f_, m)
 
 
-def braiding_generator(index, n_qudits, qudit_len, show=True):
+def braiding_generator(index: int, n_qudits: int, qudit_len: int, show: bool = True) -> tuple[list[list[complex]], list[dict[str, Any]]]:
     """
     calculates matrix representation of the braiding generator -in the basis
     of multi-qudit fusion space- which exchanges
@@ -432,12 +434,12 @@ def braiding_generator(index, n_qudits, qudit_len, show=True):
     basis = find_basis(n_qudits, qudit_len)
 
     # compute components of the braiding matrix
-    sig = []
+    sig : list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):
             sig[f].append(sigma(index, state_f, state_i))
     if show:
-        cplot(sig)
+        cplot(np.array(sig))
 
     return sig, basis
