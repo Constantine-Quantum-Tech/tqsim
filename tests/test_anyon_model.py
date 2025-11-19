@@ -11,7 +11,7 @@
 # that they have been altered from the originals.
 
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from tqsim.lib.anyon_model import AnyonModel
 
@@ -152,9 +152,7 @@ class TestAnyonModel:
         k1 = fibonacci_model.compute_knitting_matrix(q=1, return_l=False)
         assert isinstance(k1, np.ndarray)
         expected_shape = (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
-        assert (
-            k1.shape == expected_shape
-        ), f"Expected shape {expected_shape}, got {k1.shape}"
+        assert k1.shape == expected_shape, f"Expected shape {expected_shape}, got {k1.shape}"
 
     def test_knitting_matrix_computation_q0_raises_error(self, fibonacci_model: AnyonModel) -> None:
         """Test that knitting matrix computation for q=0 raises AssertionError as observed in notebook."""

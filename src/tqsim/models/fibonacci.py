@@ -25,7 +25,7 @@ for a1 in range(2):
                     fusion_matrix[a1, a2, outcome] = 1
 
 
-def _get_f_matrix_sum_2(a1, a2, a3, outcome):
+def _get_f_matrix_sum_2(a1: int, a2: int, a3: int, outcome: int) -> np.ndarray:
     """Helper function for F matrix when a1 + a2 + a3 + outcome = 2."""
     if a1 + a2 == 2:
         return np.array([[0, 1], [0, 0]])
@@ -42,7 +42,7 @@ def _get_f_matrix_sum_2(a1, a2, a3, outcome):
     return np.array([[0, 0], [0, 0]])
 
 
-def get_f_matrix(a1, a2, a3, outcome):  # noqa: N802
+def get_f_matrix(a1: int, a2: int, a3: int, outcome: int) -> np.ndarray:
     """
     F matrix
     """
@@ -66,7 +66,7 @@ def get_f_matrix(a1, a2, a3, outcome):  # noqa: N802
         return np.array([[0, 0], [0, 0]])
 
 
-def get_r_matix(a1, a2):  # noqa: N802
+def get_r_matix(a1: int, a2: int) -> np.ndarray:
     """
     R matrix
     """
@@ -80,8 +80,8 @@ def get_r_matix(a1, a2):  # noqa: N802
     return r_matrix
 
 
-f_matrix = np.zeros((2, 2, 2, 2, 2, 2)) * (1 + 0j)
-r_matrix = np.zeros((2, 2, 2)) * (1 + 0j)
+f_matrix = np.zeros((2, 2, 2, 2, 2, 2), dtype=complex)
+r_matrix = np.zeros((2, 2, 2), dtype=complex)
 
 for a1 in range(2):
     for a2 in range(2):
