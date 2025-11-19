@@ -25,7 +25,7 @@ from math import atan, cos, exp, pi, sqrt
 
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+import seaborn as sns  # type: ignore[import-untyped]
 
 
 def cplot(unitary: "np.ndarray", title: str = "", sigma: float = 0.5, show: bool = True, ticks: list[str] | None = None) -> None:
@@ -119,7 +119,7 @@ def scale(sigma: float = 0.5, title: str = "scale", show: bool = True) -> None:
             rdi = sqrt(r / num_points)
             lum = 0.5 + 0.5 * exp(-rdi / sigma)
             if rdi > 2:
-                sat = 0
+                sat = 0.0
             else:
                 sat = cos(pi * rdi / 2) * 0.5 + 0.5
             color[r, t] = np.array(hls_to_rgb(hue, lum, sat))
