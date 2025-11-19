@@ -45,6 +45,7 @@ from copy import deepcopy
 from typing import Any
 
 import numpy as np
+
 import tqsim.tools.braiding_generators.fib_qudit as fibo
 from tqsim.tools.braiding_generators.fib_qudit import braiding_matrix, f_matrix
 from tqsim.tools.cplot import cplot

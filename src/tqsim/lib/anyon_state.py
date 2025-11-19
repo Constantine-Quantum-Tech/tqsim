@@ -69,7 +69,7 @@ class StandardAnyonState(AnyonState):
     def __repr__(self) -> str:
         return f"StandardAnyonState(inputs={self.inputs}, " f"outcomes={self.outcomes})"
 
-    def inner_product(self, other: "StandardAnyonState") -> float:
+    def inner_product(self, other: StandardAnyonState) -> float:
         """Compute the inner product between two StandardAnyonState instances.
 
         Parameters
@@ -198,7 +198,7 @@ class SparseAnyonState(AnyonState):
         total_outcomes = self.nb_qudits - 1
         return self.charges[-total_outcomes:]
 
-    def inner_product(self, other: "SparseAnyonState") -> float:
+    def inner_product(self, other: SparseAnyonState) -> float:
         """Compute the inner product between two SparseAnyonState instances.
 
         Parameters

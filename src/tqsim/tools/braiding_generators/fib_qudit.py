@@ -41,7 +41,6 @@ This model is designed to:
     + calculates braiding generators (sigma_n).
 """
 from copy import deepcopy
-from typing import Any
 
 import numpy as np
 import numpy.typing as npt

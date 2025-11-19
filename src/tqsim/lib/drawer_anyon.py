@@ -11,6 +11,7 @@
 # that they have been altered from the originals.
 
 from typing import Any
+
 import numpy as np
 import numpy.typing as npt
 
