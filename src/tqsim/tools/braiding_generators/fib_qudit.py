@@ -41,13 +41,15 @@ This model is designed to:
     + calculates braiding generators (sigma_n).
 """
 from copy import deepcopy
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 
 from tqsim.tools.cplot import cplot
 
 
-def check_rule(anyon_1, anyon_2, outcome):
+def check_rule(anyon_1: int, anyon_2: int, outcome: int) -> bool:
     """
     anyons can be either 0 or 1.
     """
@@ -65,7 +67,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def check_state(outcomes: list):
+def check_state(outcomes: list[int]) -> bool:
     r"""checks if a state is valid in Fibonacci models. Ex:
         1 1 1 1
         \/ / /
@@ -89,7 +91,7 @@ def check_state(outcomes: list):
     return check
 
 
-def find_basis(n_anyons):
+def find_basis(n_anyons: int) -> list[list[int]]:
     """
     generates all states that form the basis of Hilbert space of n_anyons.
     Inputs:
@@ -129,17 +131,17 @@ def find_basis(n_anyons):
     return states
 
 
-def _get_f_matrix_sum_4(inv_phi):
+def _get_f_matrix_sum_4(inv_phi: float) -> npt.NDArray[np.float64]:
     """Get F matrix when sum = 4."""
     return np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
 
 
-def _get_f_matrix_sum_3():
+def _get_f_matrix_sum_3() -> npt.NDArray[np.int64]:
     """Get F matrix when sum = 3."""
     return np.array([[0, 0], [0, 1]])
 
 
-def _get_f_matrix_sum_2(a1, a2, a3, outcome):
+def _get_f_matrix_sum_2(a1: int, a2: int, a3: int, outcome: int) -> npt.NDArray[np.int64]:
     """Get F matrix when sum = 2."""
     if a1 + a2 == 2:
         return np.array([[0, 1], [0, 0]])
@@ -156,33 +158,34 @@ def _get_f_matrix_sum_2(a1, a2, a3, outcome):
     return np.array([[0, 0], [0, 0]])
 
 
-def _get_f_matrix_sum_0():
+def _get_f_matrix_sum_0() -> npt.NDArray[np.int64]:
     """Get F matrix when sum = 0."""
     return np.array([[1, 0], [0, 0]])
 
 
-def f_matrix(a1, a2, a3, outcome):
+def f_matrix(a1: int, a2: int, a3: int, outcome: int) -> npt.NDArray[np.complex128]:
     """
     F matrix
     """
     inv_phi = (np.sqrt(5) - 1) / 2  # inverse of golden number
     total = a1 + a2 + a3 + outcome
 
+    result: npt.NDArray[np.complex128]
     if total == 4:
-        result = _get_f_matrix_sum_4(inv_phi)
+        result = _get_f_matrix_sum_4(inv_phi).astype(complex)
     elif total == 3:
-        result = _get_f_matrix_sum_3()
+        result = _get_f_matrix_sum_3().astype(complex)
     elif total == 2:
-        result = _get_f_matrix_sum_2(a1, a2, a3, outcome)
+        result = _get_f_matrix_sum_2(a1, a2, a3, outcome).astype(complex)
     elif total == 0:
-        result = _get_f_matrix_sum_0()
+        result = _get_f_matrix_sum_0().astype(complex)
     else:
-        result = np.array([[0, 0], [0, 0]])
+        result = np.array([[0, 0], [0, 0]], dtype=complex)
 
-    return result.astype(complex)
+    return result
 
 
-def r_matrix(a1, a2):
+def r_matrix(a1: int, a2: int) -> npt.NDArray[np.complex128]:
     """
     R matrix
     """
@@ -196,7 +199,7 @@ def r_matrix(a1, a2):
     return r_matrix.astype(complex)
 
 
-def braiding_matrix(a0, a1, a2, outcome):
+def braiding_matrix(a0: int, a1: int, a2: int, outcome: int) -> npt.NDArray[np.complex128]:
     """
     Braiding matrix
     """
@@ -209,7 +212,7 @@ def braiding_matrix(a0, a1, a2, outcome):
     return b_matrix
 
 
-def sigma(index, state_f, state_i):
+def sigma(index: int, state_f: list[int], state_i: list[int]) -> complex:
     """
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -243,7 +246,9 @@ def sigma(index, state_f, state_i):
     return braiding_matrix(a0, 1, 1, outcome)[a, b]
 
 
-def braiding_generator(index, n_anyons, show=True):
+def braiding_generator(
+    index: int, n_anyons: int, show: bool = True
+) -> tuple[list[list[complex]], list[list[int]]]:
     """
     calculates the matrix of the braiding generator that exchange
     index'th anyon with the (index + 1)'th anyon.
@@ -260,12 +265,12 @@ def braiding_generator(index, n_anyons, show=True):
     basis = find_basis(n_anyons)
 
     # compute components of the braiding matrix
-    sig = []
+    sig : list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):
             sig[f].append(sigma(index, state_f, state_i))
     if show:
-        cplot(sig)
+        cplot(np.array(sig))
 
     return sig, basis
