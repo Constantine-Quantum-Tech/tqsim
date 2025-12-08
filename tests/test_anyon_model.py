@@ -267,7 +267,3 @@ class TestAnyonModel:
         assert not np.any(np.isinf(b_matrix))
         assert not np.any(np.isinf(l1))
         assert not np.any(np.isinf(k1))
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

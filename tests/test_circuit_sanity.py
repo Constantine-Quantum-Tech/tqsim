@@ -454,4 +454,3 @@ def test_cnot_gate_sanity() -> None:
     assert np.allclose(
         identity_check, np.eye(len(basis)), atol=1e-10
     ), "CNOT matrix is not unitary"
-                 
