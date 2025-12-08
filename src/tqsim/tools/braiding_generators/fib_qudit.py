@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 r"""
-Created on Thu Aug 27 21:54:22 2020
 
-@author: Abdellah Tounsi
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2025.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+
+Created on Thu Aug 27 21:54:22 2020
 
 Fibonacci
 ********
@@ -31,11 +43,12 @@ This model is designed to:
 from copy import deepcopy
 
 import numpy as np
+import numpy.typing as npt
 
 from tqsim.tools.cplot import cplot
 
 
-def check_rule(anyon_1, anyon_2, outcome):
+def check_rule(anyon_1: int, anyon_2: int, outcome: int) -> bool:
     """
     anyons can be either 0 or 1.
     """
@@ -53,7 +66,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def check_state(outcomes: list):
+def check_state(outcomes: list[int]) -> bool:
     r"""checks if a state is valid in Fibonacci models. Ex:
         1 1 1 1
         \/ / /
@@ -77,7 +90,7 @@ def check_state(outcomes: list):
     return check
 
 
-def find_basis(n_anyons):
+def find_basis(n_anyons: int) -> list[list[int]]:
     """
     generates all states that form the basis of Hilbert space of n_anyons.
     Inputs:
@@ -117,47 +130,63 @@ def find_basis(n_anyons):
     return states
 
 
-def F(a1, a2, a3, outcome):
+def _get_f_matrix_sum_4(inv_phi: float) -> npt.NDArray[np.float64]:
+    """Get F matrix when sum = 4."""
+    return np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+
+
+def _get_f_matrix_sum_3() -> npt.NDArray[np.int64]:
+    """Get F matrix when sum = 3."""
+    return np.array([[0, 0], [0, 1]])
+
+
+def _get_f_matrix_sum_2(
+    a1: int, a2: int, a3: int, outcome: int
+) -> npt.NDArray[np.int64]:
+    """Get F matrix when sum = 2."""
+    if a1 + a2 == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a2 + a3 == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a1 + a3 == 2:
+        return np.array([[0, 0], [0, 1]])
+    elif a3 + outcome == 2:
+        return np.array([[0, 1], [0, 0]])
+    elif a1 + outcome == 2:
+        return np.array([[0, 0], [1, 0]])
+    elif a2 + outcome == 2:
+        return np.array([[0, 0], [0, 1]])
+    return np.array([[0, 0], [0, 0]])
+
+
+def _get_f_matrix_sum_0() -> npt.NDArray[np.int64]:
+    """Get F matrix when sum = 0."""
+    return np.array([[1, 0], [0, 0]])
+
+
+def f_matrix(a1: int, a2: int, a3: int, outcome: int) -> npt.NDArray[np.complex128]:
     """
     F matrix
     """
     inv_phi = (np.sqrt(5) - 1) / 2  # inverse of golden number
-    f_matrix = np.array([[0, 0], [0, 0]])
+    total = a1 + a2 + a3 + outcome
 
-    # a1 + a2 + a3 + outcome = 4
-    if a1 + a2 + a3 + outcome == 4:
-        f_matrix = np.array([[inv_phi, np.sqrt(inv_phi)], [np.sqrt(inv_phi), -inv_phi]])
+    result: npt.NDArray[np.complex128]
+    if total == 4:
+        result = _get_f_matrix_sum_4(inv_phi).astype(complex)
+    elif total == 3:
+        result = _get_f_matrix_sum_3().astype(complex)
+    elif total == 2:
+        result = _get_f_matrix_sum_2(a1, a2, a3, outcome).astype(complex)
+    elif total == 0:
+        result = _get_f_matrix_sum_0().astype(complex)
+    else:
+        result = np.array([[0, 0], [0, 0]], dtype=complex)
 
-    # a1 + a2 + a3 + outcome = 3
-    elif a1 + a2 + a3 + outcome == 3:
-        f_matrix = np.array([[0, 0], [0, 1]])
-
-    # a1 + a2 + a3 + outcome = 2
-    elif a1 + a2 + a3 + outcome == 2:
-        if a1 + a2 == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a2 + a3 == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a1 + a3 == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-        elif a3 + outcome == 2:
-            f_matrix = np.array([[0, 1], [0, 0]])
-        elif a1 + outcome == 2:
-            f_matrix = np.array([[0, 0], [1, 0]])
-        elif a2 + outcome == 2:
-            f_matrix = np.array([[0, 0], [0, 1]])
-
-    # a1 + a2 + a3 + outcome = 1
-    # a1 + a2 + a3 + outcome = 0
-    elif a1 + a2 + a3 + outcome == 0:
-        f_matrix = np.array([[1, 0], [0, 0]])
-
-    # return f_matrix
-    # return complex matrix
-    return f_matrix.astype(complex)
+    return result
 
 
-def R(a1, a2):
+def r_matrix(a1: int, a2: int) -> npt.NDArray[np.complex128]:
     """
     R matrix
     """
@@ -171,16 +200,22 @@ def R(a1, a2):
     return r_matrix.astype(complex)
 
 
-def B(a0, a1, a2, outcome):
+def braiding_matrix(
+    a0: int, a1: int, a2: int, outcome: int
+) -> npt.NDArray[np.complex128]:
     """
     Braiding matrix
     """
-    b_matrix = F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
+    b_matrix = (
+        f_matrix(a0, a1, a2, outcome)
+        @ r_matrix(a1, a2)
+        @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    )
 
     return b_matrix
 
 
-def sigma(index, state_f, state_i):
+def sigma(index: int, state_f: list[int], state_i: list[int]) -> complex:
     """
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -211,10 +246,12 @@ def sigma(index, state_f, state_i):
     if ket != bra:
         return 0
 
-    return B(a0, 1, 1, outcome)[a, b]
+    return braiding_matrix(a0, 1, 1, outcome)[a, b]
 
 
-def braiding_generator(index, n_anyons, show=True):
+def braiding_generator(
+    index: int, n_anyons: int, show: bool = True
+) -> tuple[list[list[complex]], list[list[int]]]:
     """
     calculates the matrix of the braiding generator that exchange
     index'th anyon with the (index + 1)'th anyon.
@@ -231,12 +268,12 @@ def braiding_generator(index, n_anyons, show=True):
     basis = find_basis(n_anyons)
 
     # compute components of the braiding matrix
-    sig = []
+    sig: list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):
             sig[f].append(sigma(index, state_f, state_i))
     if show:
-        cplot(sig)
+        cplot(np.array(sig))
 
     return sig, basis

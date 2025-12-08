@@ -47,10 +47,10 @@ class Drawer:
                 )
 
     @property
-    def anyons(self):
+    def anyons(self) -> dict[int, DrawerAnyon]:
         return self.__anyons
 
-    def _sigmoid(self, x):
+    def _sigmoid(self, x: np.ndarray) -> np.ndarray:
         expr = 1 / (1 + np.exp(-(x - 0.5) * 12))
         expr -= expr[0]
         expr /= expr[-1]
@@ -99,7 +99,7 @@ class Drawer:
             self.__idx_map[n],
         )
 
-    def __fuse(self, idx_anyon_top, idx_anyon_bot):
+    def __fuse(self, idx_anyon_top: int, idx_anyon_bot: int) -> None:
         self.__anyons[idx_anyon_bot].x = (
             self.__anyons[idx_anyon_bot].get_last_x() + self._i
         )
@@ -121,7 +121,7 @@ class Drawer:
             idx_anyon_top
         ].get_last_y() - distance * self._sigmoid(self._i)
 
-    def measure(self):
+    def measure(self) -> None:
         for curr_anyon in self.__anyons.values():
             curr_anyon.add_identity()
 
@@ -173,7 +173,7 @@ class Drawer:
 
             self.__fuse(idx_anyon_top, idx_anyon_bot)
 
-    def draw(self):
+    def draw(self) -> plt.Figure:
         width = self.__anyons[1].get_last_x() * 0.5
         height = self.__nb_anyons * 0.3
         fig, ax = plt.subplots(1, 1, figsize=(width, height))
@@ -187,7 +187,7 @@ class Drawer:
                     ax.plot(x, y, curr_anyon.color)
                 ax.text(
                     -0.2,
-                    curr_anyon.get_first_y(),
+                    float(curr_anyon.get_first_y()),
                     curr_anyon.label,
                     horizontalalignment="right",
                 )

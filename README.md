@@ -13,7 +13,9 @@
 [![License](https://img.shields.io/github/license/Constantine-Quantum-Tech/tqsim?style=flat-square)](LICENSE)
 
 
-TQSim stands for Topological Quantum Simulator. It is an open-source library developed by [CQTech](https://cqtech.org) for simulating topological quantum computers based on Fibonacci anyons. 
+TQSim stands for Topological Quantum Simulator. It is an open-source library developed by [CQTech](https://cqtech.org) for simulating topological quantum computers based on anyonic systems. 
+
+By default, TQSim uses the **Fibonacci anyon model**, but it also supports other anyon models including **Ising** and **SU(2)k** models (available in `tqsim.models`). Additionally, users can define **custom anyon models** using the `AnyonModel` class for advanced simulations.
 
 Documentation for the latest stable version of TQSim is available [here](https://tqsim.readthedocs.io/en/latest/index.html).
 
@@ -91,6 +93,30 @@ print(result['counts'])  # Show the counts only.
 Output:
 ```bash
 {'1': 493, '2': 507}
+```
+
+### 3. Using Different Anyon Models
+TQSim supports multiple anyon models. The **Fibonacci model** is used by default, but you can also use **Ising** or **SU(2)k** models from `tqsim.models`:
+
+```python
+from tqsim import AnyonicCircuit
+from tqsim.models import ISINGMODEL
+
+# Using the Ising model
+circuit_ising = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3, model=ISINGMODEL)
+```
+
+For advanced use cases, you can define **custom anyon models** using the `AnyonModel` class:
+
+```python
+from tqsim.lib import AnyonModel
+
+# Define your custom anyon model
+custom_model = AnyonModel(
+    # Specify fusion rules, R-matrices, F-matrices
+)
+
+circuit_custom = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3, model=custom_model)
 ```
 
 ## Authors and Citation

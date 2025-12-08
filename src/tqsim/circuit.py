@@ -13,10 +13,12 @@
 import os
 import pickle
 from collections.abc import Sequence
+from typing import cast
 
 import numpy as np
 
 from tqsim.config import STORE_PATH  # For caching the bases and sigmas.
+from tqsim.lib.anyon_model import AnyonModel
 from tqsim.lib.basis_generator import ComputationalSparseBasisGenerator
 from tqsim.lib.drawer import Drawer
 from tqsim.models.fibonacci import FIBONACCI_MODEL
@@ -81,10 +83,10 @@ class AnyonicCircuit:
         self,
         nb_qudits: int = 1,
         nb_anyons_per_qudit: int = 3,
-        model=FIBONACCI_MODEL,
-        input_charge=1,
+        model: AnyonModel = FIBONACCI_MODEL,
+        input_charge: int = 1,
         force_recache: bool = False,
-    ):
+    ) -> None:
         """
         Parameters
         ----------
@@ -151,15 +153,15 @@ class AnyonicCircuit:
         self.__drawer = Drawer(nb_qudits, nb_anyons_per_qudit)
 
     @property
-    def model(self):
+    def model(self):  # type: ignore[no-untyped-def]
         return self.__model
 
     @property
-    def input_charge(self):
+    def input_charge(self) -> int:
         return self.__input_charge
 
     @property
-    def nb_qudits(self):
+    def nb_qudits(self) -> int:
         """Returns the number of qudits in the circuit.
 
         Returns
@@ -170,7 +172,7 @@ class AnyonicCircuit:
         return self.__nb_qudits
 
     @property
-    def nb_anyons_per_qudit(self):
+    def nb_anyons_per_qudit(self) -> int:
         """Returns the number of anyons for each qudit in the circuit.
 
         Returns
@@ -181,7 +183,7 @@ class AnyonicCircuit:
         return self.__nb_anyons_per_qudit
 
     @property
-    def drawer(self):
+    def drawer(self) -> Drawer:
         """Returns the drawer object for the circuit.
 
         Returns
@@ -192,7 +194,7 @@ class AnyonicCircuit:
         return self.__drawer
 
     @property
-    def dim(self):
+    def dim(self) -> int:
         """Returns the dimension of the fusion space.
 
         Returns
@@ -203,7 +205,7 @@ class AnyonicCircuit:
         return self.__dim
 
     @property
-    def basis(self):
+    def basis(self) -> np.ndarray:
         """Returns a list of all the basis states for the circuit.
 
         Returns
@@ -215,7 +217,7 @@ class AnyonicCircuit:
         return self.__basis
 
     @property
-    def braiding_operators(self):
+    def braiding_operators(self) -> list[np.ndarray]:
         """Returns a list of all the braiding operators.
 
         Returns
@@ -226,17 +228,7 @@ class AnyonicCircuit:
         """
         return self.__sigmas
 
-    @basis.getter
-    def basis(self):
-        self.__basis = self.__get_basis()
-        return self.__basis
-
-    @dim.getter
-    def dim(self):
-        self.__basis = self.__get_basis()
-        return self.__dim
-
-    def __get_basis(self) -> tuple[np.ndarray, int]:
+    def __get_basis(self) -> np.ndarray:
         folder_path = os.path.join(
             STORE_PATH,
             f"{self.model.name}-{self.__nb_qudits}-{self.__nb_anyons_per_qudit}-{self.__input_charge}",
@@ -259,11 +251,6 @@ class AnyonicCircuit:
         self.__dim = len(basis)
 
         return basis
-
-    @braiding_operators.getter
-    def braiding_operators(self):
-        self.__braiding_operators = self.__get_sigmas()
-        return self.__braiding_operators
 
     def __get_sigmas(self) -> list[np.ndarray]:
         """Returns a list of all the braiding operators.
@@ -294,7 +281,7 @@ class AnyonicCircuit:
 
         return sigmas
 
-    def initialize(self, input_state: np.ndarray):
+    def initialize(self, input_state: np.ndarray) -> "AnyonicCircuit":
         """Initializes the circuit in the state input_state.
 
         Parameters
@@ -336,7 +323,7 @@ class AnyonicCircuit:
 
         return self
 
-    def braid(self, n: int, m: int):
+    def braid(self, n: int, m: int) -> "AnyonicCircuit":
         """Braids the two anyons at positions 'n' and 'm'.
         If n < m, they are braided in a clockwise direction,
         if n > m, they are braided in a counterclockwise direction.
@@ -394,7 +381,7 @@ class AnyonicCircuit:
 
         return self
 
-    def braid_sequence(self, braid: Sequence[Sequence[int]]):
+    def braid_sequence(self, braid: Sequence[Sequence[int]]) -> "AnyonicCircuit":
         """Takes a sequence of [sigma operator, power], and applies the
         successive operators to the 'power'.
         The first operator in the sequence is the first to be applied.
@@ -445,7 +432,7 @@ class AnyonicCircuit:
 
         return self
 
-    def measure(self):
+    def measure(self) -> "AnyonicCircuit":
         """Performs a measurement on the whole circuit.
 
         Raises
@@ -465,7 +452,56 @@ class AnyonicCircuit:
         self.drawer.measure()
         return self
 
-    def history(self, output: str = "raw"):
+    def get_raw_history(self) -> list[tuple[int, int]]:
+        return self.__braids_history
+
+    def get_sigmas_history(self) -> list[str]:
+        ret = []
+        for n, m in self.__braids_history:
+            if m < n:
+                ret.append(f"is{m}")
+            else:
+                ret.append(f"s{n}")
+        return ret
+
+    def get_latex_history(self) -> str:
+        sigmas = cast(list[str], self.history(output="sigmas"))
+
+        # Converting to a sigma notation with powers
+        power_sigmas: list[tuple[str, int]] = []
+        last_sigma: str | None = sigmas[-1] if len(sigmas) else None
+        power = 0
+        for sigma in reversed(sigmas):
+            if sigma == last_sigma:
+                power += 1
+                continue
+            # Done counting the powers of the last sigma, adding it
+            if last_sigma is not None:
+                power_sigmas.append((last_sigma, power))
+            # resetting
+            power = 1
+            last_sigma = sigma
+
+        # Handling the last sigma
+        if power != 0 and last_sigma is not None:
+            power_sigmas.append((last_sigma, power))
+
+        # Converting to LaTeX
+        latex = ""
+        for sigma, p in power_sigmas:
+            # Inverses of sigmas (negative powers)
+            if sigma[0] == "i":
+                latex += r"\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
+            # Sigmas (positive powers)
+            else:
+                latex += r"\sigma_{" f"{sigma[1:]}" "}"
+                if p > 1:  # Only add exponents != 1
+                    latex += "^{" f"{p}" "}"
+
+        latex = "$ " + latex + "$"
+        return latex
+
+    def history(self, output: str = "raw") -> list[tuple[int, int]] | list[str] | str:
         """Returns the history of all braiding operations that were performed
         in the circuit.
         Its output can either be the raw braiding operations (n, m), a list of
@@ -493,54 +529,15 @@ class AnyonicCircuit:
             raise ValueError('Output should be either: "raw", "sigmas" or "latex"')
 
         if output == "raw":
-            return self.__braids_history
+            return self.get_raw_history()
 
         elif output == "sigmas":
-            ret = []
-            for n, m in self.__braids_history:
-                if m < n:
-                    ret.append(f"is{m}")
-                else:
-                    ret.append(f"s{n}")
-            return ret
+            return self.get_sigmas_history()
 
         else:
-            sigmas = self.history(output="sigmas")
+            return self.get_latex_history()
 
-            # Converting to a sigma notation with powers
-            power_sigmas = []
-            last_sigma = sigmas[-1] if len(sigmas) else None
-            power = 0
-            for sigma in reversed(sigmas):
-                if sigma == last_sigma:
-                    power += 1
-                    continue
-                # Done counting the powers of the last sigma, adding it
-                power_sigmas.append((last_sigma, power))
-                # resetting
-                power = 1
-                last_sigma = sigma
-
-            # Handling the last sigma
-            if power != 0:
-                power_sigmas.append((last_sigma, power))
-
-            # Converting to LaTeX
-            latex = ""
-            for sigma, p in power_sigmas:
-                # Inverses of sigmas (negative powers)
-                if sigma[0] == "i":
-                    latex += r"\sigma_{" f"{sigma[2:]}" "}^{" f"{-p}" "}"
-                # Sigmas (positive powers)
-                else:
-                    latex += r"\sigma_{" f"{sigma[1:]}" "}"
-                    if p > 1:  # Only add exponents != 1
-                        latex += "^{" f"{p}" "}"
-
-            latex = "$ " + latex + "$"
-            return latex
-
-    def draw(self):
+    def draw(self):  # type: ignore[no-untyped-def]
         """Draws the topological quantum circuit.
 
         Returns
@@ -571,7 +568,7 @@ class AnyonicCircuit:
         """
         return self.__unitary
 
-    def run(self, shots: int = 1000):
+    def run(self, shots: int = 1000) -> dict[str, dict[str, int] | np.ndarray]:
         """Simulates the quantum circuit for 'shots' number of times and
         returns the measurement results.
 

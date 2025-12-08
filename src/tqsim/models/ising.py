@@ -15,7 +15,7 @@ import numpy as np
 from tqsim.lib.anyon_model import AnyonModel
 
 
-def check_rule(anyon_1, anyon_2, outcome):
+def check_rule(anyon_1: int, anyon_2: int, outcome: int) -> bool:
     r"""
     anyons can be either 0 or 1 or 2
         0 : vacuum
@@ -41,7 +41,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def F(a1, a2, a3, outcome):
+def get_f_matrix(a1: int, a2: int, a3: int, outcome: int) -> np.ndarray:
     """
     F matrix for Ising model
     """
@@ -72,7 +72,7 @@ def F(a1, a2, a3, outcome):
     return f_matrix
 
 
-def R(a1, a2):
+def get_r_matrix(a1: int, a2: int) -> np.ndarray:
     """
     R matrix
     """
@@ -108,17 +108,17 @@ for a1 in range(3):
             if check_rule(a1, a2, outcome):
                 fusion_matrix[a1, a2, outcome] = 1
 
-F_matrix = np.zeros((3, 3, 3, 3, 3, 3)) * (1 + 0j)
-R_matrix = np.zeros((3, 3, 3)) * (1 + 0j)
+f_matrix = np.zeros((3, 3, 3, 3, 3, 3), dtype=complex)
+r_matrix = np.zeros((3, 3, 3), dtype=complex)
 
 for a1 in range(3):
     for a2 in range(3):
         for a3 in range(3):
             for outcome in range(3):
-                F_matrix[a1, a2, a3, outcome] = F(a1, a2, a3, outcome)
+                f_matrix[a1, a2, a3, outcome] = get_f_matrix(a1, a2, a3, outcome)
 
 for a1 in range(3):
     for a2 in range(3):
-        R_matrix[a1, a2] = R(a1, a2).diagonal()
+        r_matrix[a1, a2] = get_r_matrix(a1, a2).diagonal()
 
-ISING_MODEL = AnyonModel(fusion_matrix, F_matrix, R_matrix, name="Ising")
+ISING_MODEL = AnyonModel(fusion_matrix, f_matrix, r_matrix, name="Ising")

@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 r"""
-Created on Sun Mar  6 12:34:34 2022
 
-@author: appo
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2025.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+
+Created on Sun Mar  6 12:34:34 2022
 
 Ising Model
 -----------
@@ -21,14 +33,16 @@ This model is designed to:
     + calculates braiding generators (sigma_n).
 """
 
+from collections.abc import Iterator
 from copy import deepcopy
 
 import numpy as np
+import numpy.typing as npt
 
 from tqsim.tools.cplot import cplot
 
 
-def F(a1, a2, a3, outcome):
+def f_matrix(a1: int, a2: int, a3: int, outcome: int) -> npt.NDArray[np.complex128]:
     """
     F matrix for Ising model
     """
@@ -59,7 +73,7 @@ def F(a1, a2, a3, outcome):
     return f_matrix
 
 
-def R(a1, a2):
+def r_matrix(a1: int, a2: int) -> npt.NDArray[np.complex128]:
     """
     R matrix
     """
@@ -88,7 +102,7 @@ def R(a1, a2):
         return np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
 
-def check_rule(anyon_1, anyon_2, outcome):
+def check_rule(anyon_1: int, anyon_2: int, outcome: int) -> bool:
     r"""
     anyons can be either 0 or 1 or 2
         0 : vacuum
@@ -114,7 +128,7 @@ def check_rule(anyon_1, anyon_2, outcome):
     return check
 
 
-def check_state(outcomes):
+def check_state(outcomes: list[int]) -> bool:
     r"""
     checks if a state is valid in Ising models. Ex:
 
@@ -140,7 +154,7 @@ def check_state(outcomes):
     return check
 
 
-def find_basis(n_anyons):
+def find_basis(n_anyons: int) -> list[list[int]]:
     r"""
     generates all states that form the basis of Hilbert space of n_anyons.
     Inputs:
@@ -179,7 +193,7 @@ def find_basis(n_anyons):
     return states
 
 
-def iterate(n_labels):
+def iterate(n_labels: int) -> Iterator[list[int]]:
     """ """
 
     init_comb = [0] * n_labels
@@ -198,14 +212,20 @@ def iterate(n_labels):
         yield new_comb
 
 
-def B(a0, a1, a2, outcome):
+def braiding_matrix(
+    a0: int, a1: int, a2: int, outcome: int
+) -> npt.NDArray[np.complex128]:
     """
     Braiding matrix
     """
-    return F(a0, a1, a2, outcome) @ R(a1, a2) @ F(a0, a2, a1, outcome).conjugate().T
+    return (
+        f_matrix(a0, a1, a2, outcome)
+        @ r_matrix(a1, a2)
+        @ f_matrix(a0, a2, a1, outcome).conjugate().T
+    )
 
 
-def sigma(index, state_f, state_i):
+def sigma(index: int, state_f: list[int], state_i: list[int]) -> complex:
     r"""
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -236,10 +256,12 @@ def sigma(index, state_f, state_i):
     if ket != bra:
         return 0
 
-    return B(a0, 1, 1, outcome)[a, b]
+    return braiding_matrix(a0, 1, 1, outcome)[a, b]
 
 
-def braiding_generator(index, n_anyons, show=True):
+def braiding_generator(
+    index: int, n_anyons: int, show: bool = True
+) -> tuple[list[list[complex]], list[list[int]]]:
     r"""
     calculates the matrix of the braiding generator that exchange
     index'th anyon with the (index + 1)'th anyon.
@@ -256,7 +278,7 @@ def braiding_generator(index, n_anyons, show=True):
     basis = find_basis(n_anyons)
 
     # compute components of the braiding matrix
-    sig = []
+    sig: list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):

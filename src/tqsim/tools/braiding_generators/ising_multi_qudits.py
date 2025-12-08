@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 r"""
+
+# This code is part of TQSim.
+#
+# (C) Copyright Constantine Quantum Technologies, 2025.
+#
+# This code is licensed under the Apache License, Version 2.0. You may
+# obtain a copy of this license in the LICENSE.txt file in the root directory
+# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+#
+# Any modifications or derivative works of this code must retain this
+# copyright notice, and modified files need to carry a notice indicating
+# that they have been altered from the originals.
+#
+
 Created on Mon Sep 14 02:55:34 2020
 
-@author: Abdellah Tounsi
 ******
 
 'fib_multi_qudits' module computes elementary braiding generators of Ising
@@ -35,11 +48,11 @@ from copy import deepcopy
 import numpy as np
 
 import tqsim.tools.braiding_generators.ising_qudit as ising
-from tqsim.tools.braiding_generators.ising_qudit import B, F
+from tqsim.tools.braiding_generators.ising_qudit import braiding_matrix, f_matrix
 from tqsim.tools.cplot import cplot
 
 
-def check_state(state):
+def check_state(state: dict) -> bool:
     r"""
     Verifies if a state of 'n_qudits' qudit of 'qudit_len' number
     of anyons represented in the tonsorial form is acceptable in
@@ -89,7 +102,7 @@ def check_state(state):
     return check
 
 
-def find_basis(n_qudits, qudit_len):
+def find_basis(n_qudits: int, qudit_len: int) -> list[dict]:
     """
     generates all states that form the basis of Hilbert space
     of anyons grouped by qudits and fused qudit by qudit.
@@ -104,8 +117,8 @@ def find_basis(n_qudits, qudit_len):
     n_roots = n_qudits - 1
     n_labels = n_qudits * qudit_len + n_roots
 
-    def fill_state(labels):
-        state = {"qudits": [], "roots": []}
+    def fill_state(labels: list[int]) -> dict:
+        state: dict[str, list] = {"qudits": [], "roots": []}
         for ii, label in enumerate(labels):
             if ii < n_qudits * qudit_len:
                 if (ii) % qudit_len == 0:
@@ -142,7 +155,7 @@ def find_basis(n_qudits, qudit_len):
     return states
 
 
-def L(k, h, i_, i, jj_, jj):
+def l_matrix(k: int, h: int, i_: int, i: int, jj_: list[int], jj: list[int]) -> complex:
     r"""
     L matrix component that is used in calculation of braiding between
     two anyons separated in two qudits.
@@ -174,11 +187,11 @@ def L(k, h, i_, i, jj_, jj):
         for ii in range(qudit_len):
             product = (
                 product
-                * F(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1], pp[ii]]
-                * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+                * f_matrix(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1], pp[ii]]
+                * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
             )
 
-        product = product * B(h, 1, 1, pp[0])[i, i_]
+        product = product * braiding_matrix(h, 1, 1, pp[0])[i, i_]
         component += product
         # iterate
         for ii, label in enumerate(new_p):
@@ -195,17 +208,27 @@ def L(k, h, i_, i, jj_, jj):
     for ii in range(qudit_len):
         product = (
             product
-            * F(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1], pp[ii]]
-            * F(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
+            * f_matrix(i, jjj[ii], 1, pp[ii + 1]).conjugate().T[jjj[ii + 1], pp[ii]]
+            * f_matrix(i_, jjj_[ii], 1, pp[ii + 1])[pp[ii], jjj_[ii + 1]]
         )
 
-    product = product * B(h, 1, 1, pp[0])[i, i_]
+    product = product * braiding_matrix(h, 1, 1, pp[0])[i, i_]
     component += product
 
     return component
 
 
-def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
+def knitting_matrix(
+    jm: int,
+    jmo: int,
+    jmoo: int,
+    jmo_: int,
+    h: int,
+    i_: int,
+    i: int,
+    jj_: list[int],
+    jj: list[int],
+) -> complex:
     r"""
     S matrix or sewing matrix is used in calculation of braiding operator
     between two anyons separated between two qudits not fused imedialtely.
@@ -225,15 +248,148 @@ def S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj):
 
     for kk in [0, 1, 2]:
         component += (
-            F(jmoo, i, jj[-1], jm)[jmo, kk]
-            * L(kk, h, i_, i, jj_, jj)
-            * F(jmoo, i_, jj_[-1], jm).conjugate().T[kk, jmo_]
+            f_matrix(jmoo, i, jj[-1], jm)[jmo, kk]
+            * l_matrix(kk, h, i_, i, jj_, jj)
+            * f_matrix(jmoo, i_, jj_[-1], jm).conjugate().T[kk, jmo_]
         )
 
     return component
 
 
-def sigma(index_, state_f_, state_i_):
+def _validate_sigma_states(state_f_: dict, state_i_: dict) -> None:
+    """Validate states for sigma computation."""
+    if not (check_state(state_f_) or check_state(state_i_)):
+        raise ValueError("States are not valid!")
+
+
+def _check_unchanged_qudits(state_i_: dict, state_f_: dict, m: int) -> bool:
+    """Check if all qudits except m are unchanged."""
+    for ii, qudit in enumerate(state_i_["qudits"]):
+        if ii == m:
+            continue
+        elif qudit != state_f_["qudits"][ii]:
+            return False
+    return True
+
+
+def _check_unchanged_roots(state_i_: dict, state_f_: dict) -> bool:
+    """Check if all roots are unchanged."""
+    for ii, root in enumerate(state_i_["roots"]):
+        if root != state_f_["roots"][ii]:
+            return False
+    return True
+
+
+def _compute_within_qudit_sigma(
+    index_: int, state_f_: dict, state_i_: dict, m: int
+) -> complex:
+    """Compute sigma amplitude for braiding within a qudit."""
+    amplitude = ising.sigma(
+        index=index_,
+        state_f=state_f_["qudits"][m],
+        state_i=state_i_["qudits"][m],
+    )
+
+    if not _check_unchanged_qudits(state_i_, state_f_, m):
+        return 0
+
+    if not _check_unchanged_roots(state_i_, state_f_):
+        return 0
+
+    return amplitude
+
+
+def _prepare_new_state(state_i_: dict, state_f_: dict, m: int) -> dict:
+    """Prepare the new state for between-qudit braiding."""
+    new_state_i = deepcopy(state_i_)
+    new_state_i["qudits"][m][-1] = deepcopy(state_f_["qudits"][m][-1])
+    new_state_i["qudits"][m + 1] = deepcopy(state_f_["qudits"][m + 1])
+    return new_state_i
+
+
+def _extract_knitting_params_case1(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+    """Extract parameters for knitting matrix when m + 1 > 2."""
+    new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["roots"][m - 1]
+    jmoo = state_i_["roots"][m - 2]
+    jmo = state_i_["roots"][m - 1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _extract_knitting_params_case2(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+    """Extract parameters for knitting matrix when m + 1 == 2."""
+    new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["roots"][m - 1]
+    jmoo = state_i_["qudits"][0][-1]
+    jmo = state_i_["roots"][m - 1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _extract_knitting_params_case3(
+    new_state_i: dict, state_i_: dict, state_f_: dict, m: int
+) -> tuple[int, int, int, int, int, int, int, list[int], list[int]] | None:
+    """Extract parameters for knitting matrix when m + 1 == 1."""
+    if new_state_i != state_f_:
+        return None
+
+    jj_ = deepcopy(new_state_i["qudits"][m + 1])
+    jj = deepcopy(state_i_["qudits"][m + 1])
+    h = state_i_["qudits"][m][-2]
+    i = state_i_["qudits"][m][-1]
+    i_ = new_state_i["qudits"][m][-1]
+
+    jmo_ = new_state_i["qudits"][0][-1]
+    jmoo = 0
+    jmo = state_i_["qudits"][0][-1]
+    jm = state_i_["roots"][m]
+
+    return (jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
+
+
+def _compute_between_qudits_sigma(state_i_: dict, state_f_: dict, m: int) -> complex:
+    """Compute sigma amplitude for braiding between qudits."""
+    new_state_i = _prepare_new_state(state_i_, state_f_, m)
+
+    if m + 1 > 2:
+        params = _extract_knitting_params_case1(new_state_i, state_i_, state_f_, m)
+    elif m + 1 == 2:
+        params = _extract_knitting_params_case2(new_state_i, state_i_, state_f_, m)
+    else:  # m + 1 == 1
+        params = _extract_knitting_params_case3(new_state_i, state_i_, state_f_, m)
+
+    if params is None:
+        return 0
+
+    return knitting_matrix(*params)
+
+
+def sigma(index_: int, state_f_: dict, state_i_: dict) -> complex:
     """
     Amplitude of getting state_f by applying the braiding operator
     sigma_{index} on state_i.
@@ -241,106 +397,25 @@ def sigma(index_, state_f_, state_i_):
     Returns:
         the component (state_f, state_i) of the sigma_{index} matrix
     """
-    if not (check_state(state_f_) or check_state(state_i_)):
-        raise ValueError("States are not valid!")
+    _validate_sigma_states(state_f_, state_i_)
 
-    # n_qudits = len(state_i_['qudits'])
     qudit_len = len(state_i_["qudits"][0])
 
-    amplitude = 0
-    braket = 1
-
-    # n modulo q > 0
+    # n modulo q > 0: braiding within a qudit
     if index_ % (qudit_len + 1) > 0:
-        # (qudit_len + 1) is number of anyons/qudit
-
         m = index_ // (qudit_len + 1)
-        amplitude = ising.sigma(
-            index=index_ % (qudit_len + 1),
-            state_f=state_f_["qudits"][m],
-            state_i=state_i_["qudits"][m],
+        return _compute_within_qudit_sigma(
+            index_ % (qudit_len + 1), state_f_, state_i_, m
         )
 
-        for ii, qudit in enumerate(state_i_["qudits"]):
-            if ii == m:
-                continue
-            elif qudit != state_f_["qudits"][ii]:
-                return 0
-
-        for ii, root in enumerate(state_i_["roots"]):
-            if root != state_f_["roots"][ii]:
-                return 0
-    # n modulo q = 0
-    else:
-        m = (index_ // (qudit_len + 1)) - 1
-
-        new_state_i = deepcopy(state_i_)
-        new_state_i["qudits"][m][-1] = deepcopy(state_f_["qudits"][m][-1])
-        new_state_i["qudits"][m + 1] = deepcopy(state_f_["qudits"][m + 1])
-        r"""
-            jm: int: j_m
-            jmo: int: j_{m-1}
-            jmoo: int: j_{m-2}
-            jmo_: int: j'_{m-1}
-            h: int: i_{m(q-1)}
-            i_: int: i'_{mq}
-            i: int: i_{mq}
-            jj_: list: [i'_{(m+1)1},....i'_{(m+1)q}]
-            jj: list: [i_{(m+1)1},....i_{(m+1)q}]
-        """
-        if m + 1 > 2:
-            new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["roots"][m - 1]
-            jmoo = state_i_["roots"][m - 2]
-            jmo = state_i_["roots"][m - 1]
-            jm = state_i_["roots"][m]
-
-        elif m + 1 == 2:
-            new_state_i["roots"][m - 1] = state_f_["roots"][m - 1]
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["roots"][m - 1]
-            jmoo = state_i_["qudits"][0][-1]
-            jmo = state_i_["roots"][m - 1]
-            jm = state_i_["roots"][m]
-
-        elif m + 1 == 1:
-            if new_state_i != state_f_:
-                return 0
-
-            jj_ = deepcopy(new_state_i["qudits"][m + 1])
-            jj = deepcopy(state_i_["qudits"][m + 1])
-            h = state_i_["qudits"][m][-2]
-            i = state_i_["qudits"][m][-1]
-            i_ = new_state_i["qudits"][m][-1]
-
-            jmo_ = new_state_i["qudits"][0][-1]
-            jmoo = 0
-            jmo = state_i_["qudits"][0][-1]
-            jm = state_i_["roots"][m]
-
-        amplitude += S(jm, jmo, jmoo, jmo_, h, i_, i, jj_, jj)
-
-    return amplitude
+    # n modulo q = 0: braiding between qudits
+    m = (index_ // (qudit_len + 1)) - 1
+    return _compute_between_qudits_sigma(state_i_, state_f_, m)
 
 
-def braiding_generator(index, n_qudits, qudit_len, show=True):
+def braiding_generator(
+    index: int, n_qudits: int, qudit_len: int, show: bool = True
+) -> tuple[list[list[complex]], list[dict]]:
     r"""
     calculates matrix representation of the braiding generator -in the basis
     of multi-qudit fusion space- which exchanges
@@ -362,7 +437,7 @@ def braiding_generator(index, n_qudits, qudit_len, show=True):
     basis = find_basis(n_qudits, qudit_len)
 
     # compute components of the braiding matrix
-    sig = []
+    sig: list[list[complex]] = []
     for f, state_f in enumerate(basis):
         sig.append([])
         for i, state_i in enumerate(basis):
