@@ -103,7 +103,7 @@ from tqsim import AnyonicCircuit
 from tqsim.models import ISINGMODEL
 
 # Using the Ising model
-circuit_ising = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3, model=IsingModel())
+circuit_ising = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3, model=ISINGMODEL)
 ```
 
 For advanced use cases, you can define **custom anyon models** using the `AnyonModel` class:
@@ -113,7 +113,7 @@ from tqsim.lib import AnyonModel
 
 # Define your custom anyon model
 custom_model = AnyonModel(
-    # Specify fusion rules, R-matrices, F-matrices, etc.
+    # Specify fusion rules, R-matrices, F-matrices
 )
 
 circuit_custom = AnyonicCircuit(nb_qudits=2, nb_anyons_per_qudit=3, model=custom_model)
