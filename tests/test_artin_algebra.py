@@ -24,7 +24,7 @@ class TestFibonacciArtinAlgebra:
     @pytest.mark.parametrize("nb_qudits", [1, 2])
     def test_commutation_relations(self, nb_qudits: int) -> None:
         r"""Test that braid operators commute when |i-j| > 1.
-        
+
         For braid indices i and j where |i-j| > 1, the braid operators
         should satisfy: σ_i σ_j = σ_j σ_i
         """
@@ -32,10 +32,10 @@ class TestFibonacciArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=FIBONACCI_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test commutation for all pairs where |i-j| > 1
         for braid_1 in range(nb_braid_generators):
             for braid_2 in range(braid_1 + 2, nb_braid_generators):
@@ -55,7 +55,7 @@ class TestFibonacciArtinAlgebra:
     @pytest.mark.parametrize("nb_qudits", [1, 2])
     def test_yang_baxter_relation(self, nb_qudits: int) -> None:
         r"""Test the Yang-Baxter (Artin braid) relation.
-        
+
         For adjacent braid indices i and i+1, the operators should satisfy:
         σ_i σ_{i+1} σ_i = σ_{i+1} σ_i σ_{i+1}
         """
@@ -63,10 +63,10 @@ class TestFibonacciArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=FIBONACCI_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test Yang-Baxter relation for all adjacent pairs
         for braid in range(nb_braid_generators - 1):
             left = (
@@ -87,7 +87,7 @@ class TestFibonacciArtinAlgebra:
     @pytest.mark.parametrize("nb_qudits", [1, 2])
     def test_unitarity(self, nb_qudits: int) -> None:
         r"""Test that braid operators are unitary.
-        
+
         Each braid operator σ_i should satisfy:
         σ_i σ_i^† = σ_i^† σ_i = I
         """
@@ -95,28 +95,28 @@ class TestFibonacciArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=FIBONACCI_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test unitarity for all braid operators
         for braid in range(nb_braid_generators):
             operator = circuit.braiding_operators[braid]
             inverse = np.linalg.inv(operator)
             identity = np.eye(operator.shape[0])
-            
+
             # Test σ_i σ_i^{-1} = I
             left = operator @ inverse
             assert np.isclose(
                 np.linalg.norm(left - identity), 0, atol=1e-14
             ), f"Left unitarity failed for braid {braid}"
-            
+
             # Test σ_i^{-1} σ_i = I
             right = inverse @ operator
             assert np.isclose(
                 np.linalg.norm(right - identity), 0, atol=1e-14
             ), f"Right unitarity failed for braid {braid}"
-            
+
             # Test left = right (commutativity of operator with its inverse)
             assert np.isclose(
                 np.linalg.norm(left - right), 0, atol=1e-14
@@ -129,7 +129,7 @@ class TestIsingArtinAlgebra:
     @pytest.mark.parametrize("nb_anyons_per_qudit", [3, 4, 5])
     def test_commutation_relations(self, nb_anyons_per_qudit: int) -> None:
         r"""Test that braid operators commute when |i-j| > 1.
-        
+
         For braid indices i and j where |i-j| > 1, the braid operators
         should satisfy: σ_i σ_j = σ_j σ_i
         """
@@ -137,10 +137,10 @@ class TestIsingArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=ISING_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test commutation for all pairs where |i-j| > 1
         for braid_1 in range(nb_braid_generators):
             for braid_2 in range(braid_1 + 2, nb_braid_generators):
@@ -160,7 +160,7 @@ class TestIsingArtinAlgebra:
     @pytest.mark.parametrize("nb_anyons_per_qudit", [3, 4, 5])
     def test_yang_baxter_relation(self, nb_anyons_per_qudit: int) -> None:
         r"""Test the Yang-Baxter (Artin braid) relation.
-        
+
         For adjacent braid indices i and i+1, the operators should satisfy:
         σ_i σ_{i+1} σ_i = σ_{i+1} σ_i σ_{i+1}
         """
@@ -168,10 +168,10 @@ class TestIsingArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=ISING_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test Yang-Baxter relation for all adjacent pairs
         for braid in range(nb_braid_generators - 1):
             left = (
@@ -192,7 +192,7 @@ class TestIsingArtinAlgebra:
     @pytest.mark.parametrize("nb_anyons_per_qudit", [3, 4, 5])
     def test_unitarity(self, nb_anyons_per_qudit: int) -> None:
         r"""Test that braid operators are unitary.
-        
+
         Each braid operator σ_i should satisfy:
         σ_i σ_i^† = σ_i^† σ_i = I
         """
@@ -200,28 +200,28 @@ class TestIsingArtinAlgebra:
         circuit = AnyonicCircuit(
             nb_qudits, nb_anyons_per_qudit, model=ISING_MODEL, input_charge=1
         )
-        
+
         nb_anyons = nb_qudits * nb_anyons_per_qudit
         nb_braid_generators = nb_anyons - 1
-        
+
         # Test unitarity for all braid operators
         for braid in range(nb_braid_generators):
             operator = circuit.braiding_operators[braid]
             inverse = np.linalg.inv(operator)
             identity = np.eye(operator.shape[0])
-            
+
             # Test σ_i σ_i^{-1} = I
             left = operator @ inverse
             assert np.isclose(
                 np.linalg.norm(left - identity), 0, atol=1e-14
             ), f"Left unitarity failed for braid {braid}"
-            
+
             # Test σ_i^{-1} σ_i = I
             right = inverse @ operator
             assert np.isclose(
                 np.linalg.norm(right - identity), 0, atol=1e-14
             ), f"Right unitarity failed for braid {braid}"
-            
+
             # Test left = right (commutativity of operator with its inverse)
             assert np.isclose(
                 np.linalg.norm(left - right), 0, atol=1e-14
