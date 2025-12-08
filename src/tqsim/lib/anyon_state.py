@@ -195,6 +195,8 @@ class SparseAnyonState(AnyonState):
         np.ndarray
             The outcomes of the SparseAnyonState.
         """
+        if self.nb_qudits == 1:
+            return [self.charges[-1]]
         total_outcomes = self.nb_qudits - 1
         return self.charges[-total_outcomes:]
 
