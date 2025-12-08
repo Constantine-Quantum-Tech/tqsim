@@ -25,7 +25,6 @@ def test_hadamard_gate_sanity() -> None:
     This test verifies:
     1. The Hadamard matrix from quantum circuit matches the one from braiding_generator
     2. The matrix is unitary (U @ U.conj().T = I)
-    3. H^2 is close to identity (up to small error)
     """
     # Hadamard weaving sequence
     hadamard_seq = [
@@ -99,12 +98,11 @@ def test_hadamard_gate_sanity() -> None:
 
 
 def test_cnot_gate_sanity() -> None:
-    """Test Hadamard gate implementation.
+    """Test CNOT gate implementation.
 
     This test verifies:
-    1. The Hadamard matrix from quantum circuit matches the one from braiding_generator
+    1. The CNOT matrix from quantum circuit matches the one from braiding_generator
     2. The matrix is unitary (U @ U.conj().T = I)
-    3. H^2 is close to identity (up to small error)
     """
     # CNOT weaving sequence
     cnot_seq = [
@@ -449,10 +447,11 @@ def test_cnot_gate_sanity() -> None:
                 cnot_generator_unitary[idx_1, idx_2],
                 rtol=1e-10,
             )
-        "Circuit Hadamard matrix does not match braiding_generator result"
+        "Circuit CNOT matrix does not match braiding_generator result"
 
     # Test 2: Check unitarity (U @ U.conj().T = I)
     identity_check = cnot_circuit_unitary @ cnot_circuit_unitary.conj().T
     assert np.allclose(
         identity_check, np.eye(len(basis)), atol=1e-10
-    ), "Hadamard matrix is not unitary"
+    ), "CNOT matrix is not unitary"
+                 
